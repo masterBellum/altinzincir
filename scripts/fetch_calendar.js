@@ -64,8 +64,12 @@ async function run() {
 
     const res = await fetchJson(url);
     if (!res || res.status !== 200 || !res.data) {
-        console.error('❌ Finnhub yanıt vermedi veya hata döndü');
-        process.exit(1);
+        console.warn('⚠️  Finnhub yanıt vermedi veya erişim reddedildi — atlanıyor');
+        process.exit(0);
+    }
+    if (res.data.error) {
+        console.warn(`⚠️  Finnhub hata: ${res.data.error} — atlanıyor`);
+        process.exit(0);
     }
 
     const rawEvents = res.data.economicCalendar || [];
