@@ -2,8 +2,11 @@
  * fetch_calendar.js
  * ─────────────────────────────────────────────────────────────────────────────
  * Her 6 saatte GitHub Actions tarafından çalıştırılır.
- * Finnhub economic_calendar endpoint'inden ekonomik takvim verisi çeker.
- * FINNHUB_KEY secret gerekir (finnhub.io → ücretsiz kayıt → API Key).
+ * ForexFactory gayri resmi JSON feed'inden ekonomik takvim verisi çeker.
+ * Key veya kayıt gerektirmez.
+ *
+ * Kaynak: https://nfs.faireconomy.media/ff_calendar_thisweek.json
+ *         https://nfs.faireconomy.media/ff_calendar_nextweek.json
  *
  * Çıktı: data/calendar.json
  * ─────────────────────────────────────────────────────────────────────────────
@@ -13,18 +16,16 @@ const fs    = require('fs');
 const https = require('https');
 const path  = require('path');
 
-const OUTPUT_FILE  = path.join(__dirname, '..', 'data', 'calendar.json');
-const FINNHUB_KEY  = process.env.FINNHUB_KEY || '';
+const OUTPUT_FILE = path.join(__dirname, '..', 'data', 'calendar.json');
+
+// Önemli ülke/para birimleri
+const IMPORTANT_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CNY', 'CHF', 'All'];
+const HIGH_IMPACT_ONLY = ['High', 'Medium'];
 
 // ── Yardımcı: HTTP GET ────────────────────────────────────────────────────────
 function fetchJson(url) {
     return new Promise(resolve => {
-        const req = https.get(url, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0',
-                'X-Finnhub-Token': FINNHUB_KEY
-            }
-        }, res => {
+        const req = https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, res => {
             let raw = '';
             res.on('data', c => raw += c);
             res.on('end', () => {
@@ -37,69 +38,66 @@ function fetchJson(url) {
     });
 }
 
-// ── Tarih formatı: YYYY-MM-DD ─────────────────────────────────────────────────
-function toDateStr(d) {
-    return d.toISOString().split('T')[0];
-}
+// ── Impact sayıya çevir (sıralama için) ──────────────────────────────────────
+const IMPACT_NUM = { 'High': 3, 'Medium': 2, 'Low': 1, 'Holiday': 0 };
 
-// ── Önemi yüksek ülkeler ──────────────────────────────────────────────────────
-// TR için direkt veri olmayabilir — küresel önemli açıklamalar alınır
-const IMPORTANT_COUNTRIES = ['US', 'EU', 'GB', 'TR', 'DE', 'CN', 'JP'];
-const IMPACT_LABELS = { '1': 'Düşük', '2': 'Orta', '3': 'Yüksek' };
+// ── Impact Türkçe ─────────────────────────────────────────────────────────────
+const IMPACT_TR = { 'High': 'Yüksek', 'Medium': 'Orta', 'Low': 'Düşük', 'Holiday': 'Tatil' };
 
 // ── Ana fonksiyon ─────────────────────────────────────────────────────────────
 async function run() {
-    if (!FINNHUB_KEY) {
-        console.warn('⚠️  FINNHUB_KEY secret bulunamadı. data/calendar.json güncellenmedi.');
+    const urls = [
+        'https://nfs.faireconomy.media/ff_calendar_thisweek.json',
+        'https://nfs.faireconomy.media/ff_calendar_nextweek.json'
+    ];
+
+    console.log('📅 ForexFactory ekonomik takvim çekiliyor...');
+
+    const results = await Promise.all(urls.map(fetchJson));
+    let allEvents = [];
+
+    results.forEach((res, i) => {
+        if (!res || res.status !== 200 || !Array.isArray(res.data)) {
+            console.warn(`⚠️  ${i === 0 ? 'Bu hafta' : 'Gelecek hafta'} verisi alınamadı`);
+            return;
+        }
+        console.log(`  ${i === 0 ? 'Bu hafta' : 'Gelecek hafta'}: ${res.data.length} etkinlik`);
+        allEvents = allEvents.concat(res.data);
+    });
+
+    if (allEvents.length === 0) {
+        console.warn('⚠️  Hiç veri alınamadı — atlanıyor');
         process.exit(0);
     }
 
-    // Bugün + 7 gün aralığı
-    const from = new Date();
-    const to   = new Date();
-    to.setDate(to.getDate() + 7);
-
-    const url = `https://finnhub.io/api/v1/calendar/economic?from=${toDateStr(from)}&to=${toDateStr(to)}&token=${FINNHUB_KEY}`;
-    console.log(`📅 Ekonomik takvim çekiliyor: ${toDateStr(from)} → ${toDateStr(to)}`);
-
-    const res = await fetchJson(url);
-    if (!res || res.status !== 200 || !res.data) {
-        console.warn('⚠️  Finnhub yanıt vermedi veya erişim reddedildi — atlanıyor');
-        process.exit(0);
-    }
-    if (res.data.error) {
-        console.warn(`⚠️  Finnhub hata: ${res.data.error} — atlanıyor`);
-        process.exit(0);
-    }
-
-    const rawEvents = res.data.economicCalendar || [];
-    console.log(`  Ham veri: ${rawEvents.length} etkinlik`);
-
-    // Filtrele: sadece önemli ülkeler + impact 2-3
-    const events = rawEvents
-        .filter(e => IMPORTANT_COUNTRIES.includes(e.country) && parseInt(e.impact || 0) >= 2)
+    // Filtrele: önemli para birimleri + Medium/High impact
+    const events = allEvents
+        .filter(e => IMPORTANT_CURRENCIES.includes(e.country) && HIGH_IMPACT_ONLY.includes(e.impact))
         .map(e => ({
-            id:       `${e.country}-${e.event}-${e.time}`.replace(/\s+/g, '-').toLowerCase().slice(0, 32),
-            country:  e.country || '',
-            event:    e.event   || '',
-            time:     e.time    || '',
-            impact:   IMPACT_LABELS[String(e.impact)] || 'Bilinmiyor',
-            impactNum: parseInt(e.impact || 0),
-            actual:   e.actual   != null ? String(e.actual)   : null,
-            estimate: e.estimate != null ? String(e.estimate) : null,
-            prev:     e.prev     != null ? String(e.prev)     : null,
-            unit:     e.unit     || ''
+            id:        `${e.country}-${e.title}-${e.date}`.replace(/\s+/g, '-').toLowerCase().slice(0, 40),
+            country:   e.country   || '',
+            event:     e.title     || '',
+            time:      e.date      || '',
+            impact:    IMPACT_TR[e.impact] || e.impact,
+            impactNum: IMPACT_NUM[e.impact] || 0,
+            actual:    e.actual    || null,
+            estimate:  e.forecast  || null,
+            prev:      e.previous  || null,
+            unit:      ''
         }))
-        // Tarihe göre sırala (en yakın önce)
         .sort((a, b) => new Date(a.time) - new Date(b.time));
+
+    const now = new Date();
+    const nextWeek = new Date();
+    nextWeek.setDate(now.getDate() + 14);
 
     const output = {
         _meta: {
-            updated_at: new Date().toISOString(),
-            range_from: toDateStr(from),
-            range_to:   toDateStr(to),
-            count: events.length,
-            source: 'Finnhub Economic Calendar'
+            updated_at: now.toISOString(),
+            range_from: now.toISOString().split('T')[0],
+            range_to:   nextWeek.toISOString().split('T')[0],
+            count:      events.length,
+            source:     'ForexFactory (nfs.faireconomy.media)'
         },
         events
     };

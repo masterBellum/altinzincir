@@ -19,8 +19,6 @@ jobs:
           node-version: '20'
 
       - name: Fetch economic calendar
-        env:
-          FINNHUB_KEY: ${{ secrets.FINNHUB_KEY }}
         run: node scripts/fetch_calendar.js
 
       - name: Commit & push
