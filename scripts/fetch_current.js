@@ -17,8 +17,11 @@ const OUTPUT_FILE = path.join(__dirname, '..', 'data', 'current.json');
 
 // ── Kaynak URL'leri ───────────────────────────────────────────────────────────
 const TRUNCGIL_URL    = 'https://finans.truncgil.com/today.json';
-const COINGECKO_URL   = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin,solana,ripple,dogecoin,avalanche-2,litecoin&vs_currencies=usd&include_24hr_change=true';
 const GENPARA_EMTIA   = 'https://api.genelpara.com/json/?list=emtia&sembol=all';
+
+function yahooCryptoUrl(symbol) {
+    return `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2d`;
+}
 
 // ── Yardımcı fonksiyonlar ─────────────────────────────────────────────────────
 function fetchJson(url) {
@@ -82,17 +85,16 @@ const CURRENCY_NAMES = {
     QAR: 'Katar Riyali', ILS: 'İsrail Şekeli',
 };
 
-// İzlenecek kriptolar (CoinGecko id → varlık meta)
-const CRYPTO_MAP = {
-    'bitcoin':     { key: 'btc',  name: 'Bitcoin',   code: 'BTC',  type: 'crypto' },
-    'ethereum':    { key: 'eth',  name: 'Ethereum',  code: 'ETH',  type: 'crypto' },
-    'binancecoin': { key: 'bnb',  name: 'BNB',       code: 'BNB',  type: 'crypto' },
-    'solana':      { key: 'sol',  name: 'Solana',    code: 'SOL',  type: 'crypto' },
-    'ripple':      { key: 'xrp',  name: 'XRP',       code: 'XRP',  type: 'crypto' },
-    'dogecoin':    { key: 'doge', name: 'Dogecoin',  code: 'DOGE', type: 'crypto' },
-    'avalanche-2': { key: 'avax', name: 'Avalanche', code: 'AVAX', type: 'crypto' },
-    'litecoin':    { key: 'ltc',  name: 'Litecoin',  code: 'LTC',  type: 'crypto' },
-};
+// İzlenecek kriptolar (Yahoo Finance sembolü → varlık meta)
+const CRYPTO_MAP = [
+    { yahoo: 'BTC-USD',  key: 'btc',  name: 'Bitcoin',   code: 'BTC',  type: 'crypto' },
+    { yahoo: 'ETH-USD',  key: 'eth',  name: 'Ethereum',  code: 'ETH',  type: 'crypto' },
+    { yahoo: 'BNB-USD',  key: 'bnb',  name: 'BNB',       code: 'BNB',  type: 'crypto' },
+    { yahoo: 'SOL-USD',  key: 'sol',  name: 'Solana',    code: 'SOL',  type: 'crypto' },
+    { yahoo: 'XRP-USD',  key: 'xrp',  name: 'XRP',       code: 'XRP',  type: 'crypto' },
+    { yahoo: 'DOGE-USD', key: 'doge', name: 'Dogecoin',  code: 'DOGE', type: 'crypto' },
+    { yahoo: 'LTC-USD',  key: 'ltc',  name: 'Litecoin',  code: 'LTC',  type: 'crypto' },
+];
 
 // ── Ana fonksiyon ─────────────────────────────────────────────────────────────
 async function run() {
@@ -197,28 +199,32 @@ async function run() {
         console.warn('  ⚠️ GenelPara emtia verisi alınamadı');
     }
 
-    // ── 3. CoinGecko (Kripto) ────────────────────────────────────────────────
-    console.log('⬇️  CoinGecko kripto çekiliyor...');
-    const cgData = await fetchJson(COINGECKO_URL);
-    if (cgData && typeof cgData === 'object' && !Array.isArray(cgData)) {
-        let cryptoCount = 0;
-        Object.entries(cgData).forEach(([id, row]) => {
-            const meta = CRYPTO_MAP[id];
-            if (!meta) return;
-            const priceUSD = row.usd;
-            if (!priceUSD || isNaN(priceUSD) || priceUSD <= 0) return;
+    // ── 3. Yahoo Finance (Kripto) ────────────────────────────────────────────
+    console.log('⬇️  Yahoo Finance kripto çekiliyor...');
+    let cryptoCount = 0;
+    for (const meta of CRYPTO_MAP) {
+        const cData = await fetchJson(yahooCryptoUrl(meta.yahoo));
+        try {
+            const r = cData?.chart?.result?.[0];
+            const closes = r?.indicators?.quote?.[0]?.close || [];
+            const validCloses = closes.filter(x => x != null && !isNaN(x) && x > 0);
+            if (validCloses.length < 1) continue;
+            const priceUSD = validCloses[validCloses.length - 1];
+            const prevUSD  = validCloses.length >= 2 ? validCloses[validCloses.length - 2] : priceUSD;
+            const chg      = parseFloat(((priceUSD - prevUSD) / prevUSD * 100).toFixed(2));
             const priceTRY = parseFloat((priceUSD * usdTry).toFixed(2));
-            const chg      = parseFloat((row.usd_24h_change || 0).toFixed(2));
             current[meta.key] = {
                 name: meta.name, code: meta.code, type: 'crypto',
                 current: priceTRY, selling: priceTRY, buying: priceTRY,
                 change: chg
             };
             cryptoCount++;
-        });
-        console.log(`  ✅ CoinGecko: ${cryptoCount} kripto işlendi`);
+        } catch { /* skip */ }
+    }
+    if (cryptoCount > 0) {
+        console.log(`  ✅ Yahoo Finance kripto: ${cryptoCount} kripto işlendi`);
     } else {
-        console.warn('  ⚠️ CoinGecko verisi alınamadı');
+        console.warn('  ⚠️ Yahoo Finance kripto verisi alınamadı');
     }
 
     // ── Meta bilgisi ekle ve kaydet ───────────────────────────────────────────
