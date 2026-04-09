@@ -17,7 +17,7 @@ const OUTPUT_FILE = path.join(__dirname, '..', 'data', 'current.json');
 
 // ── Kaynak URL'leri ───────────────────────────────────────────────────────────
 const TRUNCGIL_URL    = 'https://finans.truncgil.com/today.json';
-const BINANCE_URL     = 'https://api.binance.com/api/v3/ticker/24hr';
+const COINGECKO_URL   = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin,solana,ripple,dogecoin,avalanche-2,litecoin&vs_currencies=usd&include_24hr_change=true';
 const GENPARA_EMTIA   = 'https://api.genelpara.com/json/?list=emtia&sembol=all';
 
 // ── Yardımcı fonksiyonlar ─────────────────────────────────────────────────────
@@ -82,16 +82,16 @@ const CURRENCY_NAMES = {
     QAR: 'Katar Riyali', ILS: 'İsrail Şekeli',
 };
 
-// İzlenecek kriptolar (Binance sembol → varlık anahtarı)
+// İzlenecek kriptolar (CoinGecko id → varlık meta)
 const CRYPTO_MAP = {
-    BTCUSDT: { key: 'btc', name: 'Bitcoin',  code: 'BTC', type: 'crypto' },
-    ETHUSDT: { key: 'eth', name: 'Ethereum', code: 'ETH', type: 'crypto' },
-    BNBUSDT: { key: 'bnb', name: 'BNB',      code: 'BNB', type: 'crypto' },
-    SOLUSDT: { key: 'sol', name: 'Solana',   code: 'SOL', type: 'crypto' },
-    XRPUSDT: { key: 'xrp', name: 'XRP',      code: 'XRP', type: 'crypto' },
-    DOGEUSDT:{ key: 'doge',name: 'Dogecoin', code: 'DOGE',type: 'crypto' },
-    AVAXUSDT:{ key: 'avax',name: 'Avalanche',code: 'AVAX',type: 'crypto' },
-    LTCUSDT: { key: 'ltc', name: 'Litecoin', code: 'LTC', type: 'crypto' },
+    'bitcoin':     { key: 'btc',  name: 'Bitcoin',   code: 'BTC',  type: 'crypto' },
+    'ethereum':    { key: 'eth',  name: 'Ethereum',  code: 'ETH',  type: 'crypto' },
+    'binancecoin': { key: 'bnb',  name: 'BNB',       code: 'BNB',  type: 'crypto' },
+    'solana':      { key: 'sol',  name: 'Solana',    code: 'SOL',  type: 'crypto' },
+    'ripple':      { key: 'xrp',  name: 'XRP',       code: 'XRP',  type: 'crypto' },
+    'dogecoin':    { key: 'doge', name: 'Dogecoin',  code: 'DOGE', type: 'crypto' },
+    'avalanche-2': { key: 'avax', name: 'Avalanche', code: 'AVAX', type: 'crypto' },
+    'litecoin':    { key: 'ltc',  name: 'Litecoin',  code: 'LTC',  type: 'crypto' },
 };
 
 // ── Ana fonksiyon ─────────────────────────────────────────────────────────────
@@ -197,26 +197,28 @@ async function run() {
         console.warn('  ⚠️ GenelPara emtia verisi alınamadı');
     }
 
-    // ── 3. Binance (Kripto) ───────────────────────────────────────────────────
-    console.log('⬇️  Binance kripto çekiliyor...');
-    const bData = await fetchJson(BINANCE_URL);
-    if (Array.isArray(bData)) {
-        bData.forEach(t => {
-            const meta = CRYPTO_MAP[t.symbol];
+    // ── 3. CoinGecko (Kripto) ────────────────────────────────────────────────
+    console.log('⬇️  CoinGecko kripto çekiliyor...');
+    const cgData = await fetchJson(COINGECKO_URL);
+    if (cgData && typeof cgData === 'object' && !Array.isArray(cgData)) {
+        let cryptoCount = 0;
+        Object.entries(cgData).forEach(([id, row]) => {
+            const meta = CRYPTO_MAP[id];
             if (!meta) return;
-            const priceUSD = parseFloat(t.lastPrice);
+            const priceUSD = row.usd;
+            if (!priceUSD || isNaN(priceUSD) || priceUSD <= 0) return;
             const priceTRY = parseFloat((priceUSD * usdTry).toFixed(2));
-            const chg      = parseFloat(parseFloat(t.priceChangePercent).toFixed(2));
-            if (isNaN(priceTRY) || priceTRY <= 0) return;
+            const chg      = parseFloat((row.usd_24h_change || 0).toFixed(2));
             current[meta.key] = {
                 name: meta.name, code: meta.code, type: 'crypto',
                 current: priceTRY, selling: priceTRY, buying: priceTRY,
                 change: chg
             };
+            cryptoCount++;
         });
-        console.log(`  ✅ Binance: kripto işlendi`);
+        console.log(`  ✅ CoinGecko: ${cryptoCount} kripto işlendi`);
     } else {
-        console.warn('  ⚠️ Binance verisi alınamadı');
+        console.warn('  ⚠️ CoinGecko verisi alınamadı');
     }
 
     // ── Meta bilgisi ekle ve kaydet ───────────────────────────────────────────
