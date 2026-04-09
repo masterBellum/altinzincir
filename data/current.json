@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-04-09T21:08:41.623Z",
+    "updated_at": "2026-04-09T21:02:50.701Z",
     "source": "GitHub Actions / fetch_current.js"
   },
   "gram-altin": {
@@ -709,212 +709,140 @@
     "name": "Kakao",
     "code": "COCOA",
     "type": "commodity",
-    "current": 141960.68,
-    "selling": 141960.68,
-    "buying": 141676.76,
-    "change": 7,
+    "current": 141926.93,
+    "selling": 141926.93,
+    "buying": 141643.08,
+    "change": 0,
     "priceUSD": 3184.01
   },
   "COFFEE": {
     "name": "Kahve",
     "code": "COFFEE",
     "type": "commodity",
-    "current": 12924,
-    "selling": 12924,
-    "buying": 12898.15,
-    "change": -3.45,
+    "current": 12920.93,
+    "selling": 12920.93,
+    "buying": 12895.09,
+    "change": 0,
     "priceUSD": 289.87
   },
   "COIL": {
     "name": "Ham Petrol (WTI)",
     "code": "WTI",
     "type": "commodity",
-    "current": 4427.34,
-    "selling": 4427.34,
-    "buying": 4418.49,
-    "change": 3,
-    "priceUSD": 99.3
+    "current": 4392.86,
+    "selling": 4392.86,
+    "buying": 4384.07,
+    "change": 0.1,
+    "priceUSD": 98.55
   },
   "COPPER": {
     "name": "Bakır",
     "code": "COPPER",
     "type": "commodity",
-    "current": 258.15,
-    "selling": 258.15,
-    "buying": 257.63,
-    "change": 0.01,
-    "priceUSD": 5.79
+    "current": 256.75,
+    "selling": 256.75,
+    "buying": 256.24,
+    "change": 0,
+    "priceUSD": 5.76
   },
   "CORN": {
     "name": "Mısır",
     "code": "CORN",
     "type": "commodity",
-    "current": 19819.15,
-    "selling": 19819.15,
-    "buying": 19779.51,
-    "change": -2.71,
-    "priceUSD": 444.52
+    "current": 19814.88,
+    "selling": 19814.88,
+    "buying": 19775.25,
+    "change": 0,
+    "priceUSD": 444.53
   },
   "COTTON": {
     "name": "Pamuk",
     "code": "COTTON",
     "type": "commodity",
-    "current": 3268.56,
-    "selling": 3268.56,
-    "buying": 3262.02,
-    "change": 1.8,
-    "priceUSD": 73.31
+    "current": 3268.23,
+    "selling": 3268.23,
+    "buying": 3261.69,
+    "change": 0,
+    "priceUSD": 73.32
   },
   "NGAS": {
     "name": "Doğal Gaz",
     "code": "NGAS",
     "type": "commodity",
-    "current": 119.93,
-    "selling": 119.93,
-    "buying": 119.69,
-    "change": -0.05,
-    "priceUSD": 2.69
+    "current": 120.35,
+    "selling": 120.35,
+    "buying": 120.11,
+    "change": 0,
+    "priceUSD": 2.7
   },
   "SOYBEAN": {
     "name": "Soya Fasulyesi",
     "code": "SOYBEAN",
     "type": "commodity",
-    "current": 51909.56,
-    "selling": 51909.56,
-    "buying": 51805.74,
-    "change": 2.56,
+    "current": 51897.22,
+    "selling": 51897.22,
+    "buying": 51793.43,
+    "change": 0,
     "priceUSD": 1164.27
   },
   "SUGAR": {
     "name": "Şeker",
     "code": "SUGAR",
     "type": "commodity",
-    "current": 622.86,
-    "selling": 622.86,
-    "buying": 621.61,
-    "change": -0.3,
-    "priceUSD": 13.97
+    "current": 622.27,
+    "selling": 622.27,
+    "buying": 621.03,
+    "change": 0,
+    "priceUSD": 13.96
   },
   "WHEAT": {
     "name": "Buğday",
     "code": "WHEAT",
     "type": "commodity",
-    "current": 25570.68,
-    "selling": 25570.68,
-    "buying": 25519.54,
-    "change": -6.42,
+    "current": 25564.6,
+    "selling": 25564.6,
+    "buying": 25513.47,
+    "change": 0,
     "priceUSD": 573.52
   },
   "XAGUSD": {
     "name": "Gümüş",
     "code": "XAG",
     "type": "commodity",
-    "current": 3374.68,
-    "selling": 3374.68,
-    "buying": 3367.93,
-    "change": 1.57,
-    "priceUSD": 75.69
+    "current": 3360.95,
+    "selling": 3360.95,
+    "buying": 3354.23,
+    "change": 0,
+    "priceUSD": 75.4
   },
   "XBRUSD": {
     "name": "Brent Ham Petrol",
     "code": "BRENT",
     "type": "commodity",
-    "current": 4463.01,
-    "selling": 4463.01,
-    "buying": 4454.08,
-    "change": 0.82,
-    "priceUSD": 100.1
+    "current": 4421.83,
+    "selling": 4421.83,
+    "buying": 4412.99,
+    "change": 0,
+    "priceUSD": 99.2
   },
   "XPDUSD": {
     "name": "Paladyum",
     "code": "XPD",
     "type": "commodity",
-    "current": 69697.84,
-    "selling": 69697.84,
-    "buying": 69558.44,
-    "change": -4.85,
-    "priceUSD": 1563.24
+    "current": 69480.23,
+    "selling": 69480.23,
+    "buying": 69341.27,
+    "change": 0,
+    "priceUSD": 1558.73
   },
   "XPTUSD": {
     "name": "Platin",
     "code": "XPT",
     "type": "commodity",
-    "current": 94151.65,
-    "selling": 94151.65,
-    "buying": 93963.35,
-    "change": 76.44,
-    "priceUSD": 2111.71
-  },
-  "avax": {
-    "name": "Avalanche",
-    "code": "AVAX",
-    "type": "crypto",
-    "current": 416.33,
-    "selling": 416.33,
-    "buying": 416.33,
-    "change": 2.22
-  },
-  "bnb": {
-    "name": "BNB",
-    "code": "BNB",
-    "type": "crypto",
-    "current": 27175.98,
-    "selling": 27175.98,
-    "buying": 27175.98,
-    "change": 0.72
-  },
-  "btc": {
-    "name": "Bitcoin",
-    "code": "BTC",
-    "type": "crypto",
-    "current": 3237073.81,
-    "selling": 3237073.81,
-    "buying": 3237073.81,
-    "change": 1.67
-  },
-  "doge": {
-    "name": "Dogecoin",
-    "code": "DOGE",
-    "type": "crypto",
-    "current": 4.19,
-    "selling": 4.19,
-    "buying": 4.19,
-    "change": 1.02
-  },
-  "eth": {
-    "name": "Ethereum",
-    "code": "ETH",
-    "type": "crypto",
-    "current": 99029.38,
-    "selling": 99029.38,
-    "buying": 99029.38,
-    "change": 0.51
-  },
-  "ltc": {
-    "name": "Litecoin",
-    "code": "LTC",
-    "type": "crypto",
-    "current": 2448.5,
-    "selling": 2448.5,
-    "buying": 2448.5,
-    "change": 1.15
-  },
-  "xrp": {
-    "name": "XRP",
-    "code": "XRP",
-    "type": "crypto",
-    "current": 60.62,
-    "selling": 60.62,
-    "buying": 60.62,
-    "change": 0.7
-  },
-  "sol": {
-    "name": "Solana",
-    "code": "SOL",
-    "type": "crypto",
-    "current": 3767.47,
-    "selling": 3767.47,
-    "buying": 3767.47,
-    "change": 1.45
+    "current": 94008.02,
+    "selling": 94008.02,
+    "buying": 93820,
+    "change": 0,
+    "priceUSD": 2108.99
   }
 }
