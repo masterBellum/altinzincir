@@ -16,9 +16,9 @@ const path  = require('path');
 const OUTPUT_FILE = path.join(__dirname, '..', 'data', 'current.json');
 
 // ── Kaynak URL'leri ───────────────────────────────────────────────────────────
-const TRUNCGIL_URL   = 'https://finans.truncgil.com/today.json';
-const BINANCE_URL    = 'https://api.binance.com/api/v3/ticker/24hr';
-const GENPARA_DOVIZ  = 'https://api.genelpara.com/json/?list=doviz&sembol=all';
+const TRUNCGIL_URL    = 'https://finans.truncgil.com/today.json';
+const BINANCE_URL     = 'https://api.binance.com/api/v3/ticker/24hr';
+const GENPARA_EMTIA   = 'https://api.genelpara.com/json/?list=emtia&sembol=all';
 
 // ── Yardımcı fonksiyonlar ─────────────────────────────────────────────────────
 function fetchJson(url) {
@@ -157,28 +157,47 @@ async function run() {
         console.warn('  ⚠️ Truncgil verisi alınamadı, mevcut fiyatlar korunuyor');
     }
 
-    // Truncgil dövizi yetersizse GenelPara fallback
-    const hasDoviz = Object.values(current).filter(v => v.type === 'currency').length;
-    if (hasDoviz < 5) {
-        console.log('⬇️  GenelPara döviz fallback...');
-        const gpData = await fetchJson(GENPARA_DOVIZ);
-        if (gpData) {
-            Object.entries(gpData).forEach(([sym, row]) => {
-                if (current[sym]?.current > 0) return;
-                const satis = parseTR(row.satis);
-                if (isNaN(satis) || satis <= 0) return;
-                current[sym] = {
-                    name: CURRENCY_NAMES[sym] || sym, code: sym, type: 'currency',
-                    current: satis, selling: satis,
-                    buying:  parseFloat((satis * 0.995).toFixed(2)),
-                    change:  parseTR(String(row.oran || 0).replace('%', '')) || 0
-                };
-                if (sym === 'USD') usdTry = satis;
-            });
-        }
+    // ── 2. GenelPara (Emtia) ─────────────────────────────────────────────────
+    console.log('⬇️  GenelPara emtia çekiliyor...');
+    const gpData = await fetchJson(GENPARA_EMTIA);
+    if (gpData?.data) {
+        const EMTIA_MAP = {
+            XAGUSD: { name: 'Gümüş',        code: 'XAG' },
+            XPTUSD: { name: 'Platin',        code: 'XPT' },
+            XPDUSD: { name: 'Paladyum',      code: 'XPD' },
+            XBRUSD: { name: 'Brent Ham Petrol', code: 'BRENT' },
+            COIL:   { name: 'Ham Petrol (WTI)', code: 'WTI'  },
+            COPPER: { name: 'Bakır',         code: 'COPPER' },
+            NGAS:   { name: 'Doğal Gaz',     code: 'NGAS'  },
+            WHEAT:  { name: 'Buğday',        code: 'WHEAT' },
+            CORN:   { name: 'Mısır',         code: 'CORN'  },
+            COFFEE: { name: 'Kahve',         code: 'COFFEE'},
+            SUGAR:  { name: 'Şeker',         code: 'SUGAR' },
+            COCOA:  { name: 'Kakao',         code: 'COCOA' },
+            SOYBEAN:{ name: 'Soya Fasulyesi',code: 'SOYBEAN'},
+            COTTON: { name: 'Pamuk',         code: 'COTTON'},
+        };
+        Object.entries(gpData.data).forEach(([sym, row]) => {
+            const meta = EMTIA_MAP[sym];
+            if (!meta) return;
+            const satis = parseTR(row.satis);
+            if (isNaN(satis) || satis <= 0) return;
+            const satisTRY = parseFloat((satis * usdTry).toFixed(2));
+            const oran = parseTR(String(row.oran || 0).replace('%', '').replace('+', ''));
+            current[sym] = {
+                name: meta.name, code: meta.code, type: 'commodity',
+                current: satisTRY, selling: satisTRY,
+                buying:  parseFloat((satisTRY * 0.998).toFixed(2)),
+                change:  !isNaN(oran) ? oran : 0,
+                priceUSD: satis
+            };
+        });
+        console.log(`  ✅ GenelPara: ${Object.keys(gpData.data).length} emtia işlendi`);
+    } else {
+        console.warn('  ⚠️ GenelPara emtia verisi alınamadı');
     }
 
-    // ── 2. Binance (Kripto) ───────────────────────────────────────────────────
+    // ── 3. Binance (Kripto) ───────────────────────────────────────────────────
     console.log('⬇️  Binance kripto çekiliyor...');
     const bData = await fetchJson(BINANCE_URL);
     if (Array.isArray(bData)) {
