@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-04-11T11:47:45.471Z",
+    "updated_at": "2026-04-11T12:03:16.869Z",
     "source": "GitHub Actions / fetch_current.js"
   },
   "gram-altin": {
@@ -849,46 +849,46 @@
     "name": "Bitcoin",
     "code": "BTC",
     "type": "crypto",
-    "current": 3252609.86,
-    "selling": 3252609.86,
-    "buying": 3252609.86,
-    "change": -0.14
+    "current": 3254612.99,
+    "selling": 3254612.99,
+    "buying": 3254612.99,
+    "change": -0.08
   },
   "eth": {
     "name": "Ethereum",
     "code": "ETH",
     "type": "crypto",
-    "current": 100135.94,
-    "selling": 100135.94,
-    "buying": 100135.94,
-    "change": -0.07
+    "current": 100270.58,
+    "selling": 100270.58,
+    "buying": 100270.58,
+    "change": 0.07
   },
   "bnb": {
     "name": "BNB",
     "code": "BNB",
     "type": "crypto",
-    "current": 26998.26,
-    "selling": 26998.26,
-    "buying": 26998.26,
-    "change": -0.18
+    "current": 27019.53,
+    "selling": 27019.53,
+    "buying": 27019.53,
+    "change": -0.1
   },
   "sol": {
     "name": "Solana",
     "code": "SOL",
     "type": "crypto",
-    "current": 3755.4,
-    "selling": 3755.4,
-    "buying": 3755.4,
-    "change": -0.81
+    "current": 3761.07,
+    "selling": 3761.07,
+    "buying": 3761.07,
+    "change": -0.66
   },
   "xrp": {
     "name": "XRP",
     "code": "XRP",
     "type": "crypto",
-    "current": 60.07,
-    "selling": 60.07,
-    "buying": 60.07,
-    "change": -0.78
+    "current": 60.09,
+    "selling": 60.09,
+    "buying": 60.09,
+    "change": -0.75
   },
   "doge": {
     "name": "Dogecoin",
@@ -897,15 +897,15 @@
     "current": 4.15,
     "selling": 4.15,
     "buying": 4.15,
-    "change": -0.89
+    "change": -0.8
   },
   "ltc": {
     "name": "Litecoin",
     "code": "LTC",
     "type": "crypto",
-    "current": 2434.85,
-    "selling": 2434.85,
-    "buying": 2434.85,
-    "change": -0.75
+    "current": 2435.35,
+    "selling": 2435.35,
+    "buying": 2435.35,
+    "change": -0.73
   }
 }
