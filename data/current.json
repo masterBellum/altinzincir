@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-04-11T05:21:39.573Z",
+    "updated_at": "2026-04-11T06:16:49.792Z",
     "source": "GitHub Actions / fetch_current.js"
   },
   "gram-altin": {
@@ -849,63 +849,63 @@
     "name": "Bitcoin",
     "code": "BTC",
     "type": "crypto",
-    "current": 3247427.85,
-    "selling": 3247427.85,
-    "buying": 3247427.85,
+    "current": 3245122.41,
+    "selling": 3245122.41,
+    "buying": 3245122.41,
     "change": 0
   },
   "eth": {
     "name": "Ethereum",
     "code": "ETH",
     "type": "crypto",
-    "current": 99749.72,
-    "selling": 99749.72,
-    "buying": 99749.72,
+    "current": 99684.24,
+    "selling": 99684.24,
+    "buying": 99684.24,
     "change": 0
   },
   "bnb": {
     "name": "BNB",
     "code": "BNB",
     "type": "crypto",
-    "current": 27023.01,
-    "selling": 27023.01,
-    "buying": 27023.01,
+    "current": 27009.11,
+    "selling": 27009.11,
+    "buying": 27009.11,
     "change": 0
   },
   "sol": {
     "name": "Solana",
     "code": "SOL",
     "type": "crypto",
-    "current": 3758.79,
-    "selling": 3758.79,
-    "buying": 3758.79,
+    "current": 3752.01,
+    "selling": 3752.01,
+    "buying": 3752.01,
     "change": 0
   },
   "xrp": {
     "name": "XRP",
     "code": "XRP",
     "type": "crypto",
-    "current": 60.17,
-    "selling": 60.17,
-    "buying": 60.17,
+    "current": 60.07,
+    "selling": 60.07,
+    "buying": 60.07,
     "change": 0
   },
   "doge": {
     "name": "Dogecoin",
     "code": "DOGE",
     "type": "crypto",
-    "current": 4.16,
-    "selling": 4.16,
-    "buying": 4.16,
+    "current": 4.14,
+    "selling": 4.14,
+    "buying": 4.14,
     "change": 0
   },
   "ltc": {
     "name": "Litecoin",
     "code": "LTC",
     "type": "crypto",
-    "current": 2436.68,
-    "selling": 2436.68,
-    "buying": 2436.68,
+    "current": 2432.05,
+    "selling": 2432.05,
+    "buying": 2432.05,
     "change": 0
   }
 }
