@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-04-12T17:36:06.983Z",
+    "updated_at": "2026-04-12T18:05:04.754Z",
     "source": "GitHub Actions / fetch_current.js"
   },
   "gram-altin": {
@@ -849,63 +849,63 @@
     "name": "Bitcoin",
     "code": "BTC",
     "type": "crypto",
-    "current": 3169855.33,
-    "selling": 3169855.33,
-    "buying": 3169855.33,
-    "change": -2.78
+    "current": 3173738.53,
+    "selling": 3173738.53,
+    "buying": 3173738.53,
+    "change": -2.66
   },
   "eth": {
     "name": "Ethereum",
     "code": "ETH",
     "type": "crypto",
-    "current": 98045.27,
-    "selling": 98045.27,
-    "buying": 98045.27,
-    "change": -3.88
+    "current": 98346.57,
+    "selling": 98346.57,
+    "buying": 98346.57,
+    "change": -3.58
   },
   "bnb": {
     "name": "BNB",
     "code": "BNB",
     "type": "crypto",
-    "current": 26425.31,
-    "selling": 26425.31,
-    "buying": 26425.31,
-    "change": -2.52
+    "current": 26462.29,
+    "selling": 26462.29,
+    "buying": 26462.29,
+    "change": -2.38
   },
   "sol": {
     "name": "Solana",
     "code": "SOL",
     "type": "crypto",
-    "current": 3658.86,
-    "selling": 3658.86,
-    "buying": 3658.86,
-    "change": -3.49
+    "current": 3668.03,
+    "selling": 3668.03,
+    "buying": 3668.03,
+    "change": -3.25
   },
   "xrp": {
     "name": "XRP",
     "code": "XRP",
     "type": "crypto",
-    "current": 59.35,
-    "selling": 59.35,
-    "buying": 59.35,
-    "change": -1.89
+    "current": 59.5,
+    "selling": 59.5,
+    "buying": 59.5,
+    "change": -1.64
   },
   "doge": {
     "name": "Dogecoin",
     "code": "DOGE",
     "type": "crypto",
-    "current": 4.05,
-    "selling": 4.05,
-    "buying": 4.05,
-    "change": -2.46
+    "current": 4.07,
+    "selling": 4.07,
+    "buying": 4.07,
+    "change": -2.11
   },
   "ltc": {
     "name": "Litecoin",
     "code": "LTC",
     "type": "crypto",
-    "current": 2398.58,
-    "selling": 2398.58,
-    "buying": 2398.58,
-    "change": -2.41
+    "current": 2403.58,
+    "selling": 2403.58,
+    "buying": 2403.58,
+    "change": -2.21
   }
 }
