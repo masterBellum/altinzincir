@@ -19,6 +19,8 @@ jobs:
           node-version: '20'
 
       - name: Fetch economic calendar
+        env:
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
         run: node scripts/fetch_calendar.js
 
       - name: Commit & push
