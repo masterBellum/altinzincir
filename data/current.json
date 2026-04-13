@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-04-13T08:29:53.798Z",
+    "updated_at": "2026-04-13T10:15:36.613Z",
     "source": "GitHub Actions / fetch_current.js"
   },
   "gram-altin": {
@@ -849,63 +849,63 @@
     "name": "Bitcoin",
     "code": "BTC",
     "type": "crypto",
-    "current": 3166344.86,
-    "selling": 3166344.86,
-    "buying": 3166344.86,
-    "change": 0.06
+    "current": 3167918.31,
+    "selling": 3167918.31,
+    "buying": 3167918.31,
+    "change": 0.11
   },
   "eth": {
     "name": "Ethereum",
     "code": "ETH",
     "type": "crypto",
-    "current": 97776.94,
-    "selling": 97776.94,
-    "buying": 97776.94,
-    "change": -0.28
+    "current": 97806.66,
+    "selling": 97806.66,
+    "buying": 97806.66,
+    "change": -0.25
   },
   "bnb": {
     "name": "BNB",
     "code": "BNB",
     "type": "crypto",
-    "current": 26662.81,
-    "selling": 26662.81,
-    "buying": 26662.81,
-    "change": 0.66
+    "current": 26726.63,
+    "selling": 26726.63,
+    "buying": 26726.63,
+    "change": 0.9
   },
   "sol": {
     "name": "Solana",
     "code": "SOL",
     "type": "crypto",
-    "current": 3666.2,
-    "selling": 3666.2,
-    "buying": 3666.2,
-    "change": 0.53
+    "current": 3663.51,
+    "selling": 3663.51,
+    "buying": 3663.51,
+    "change": 0.46
   },
   "xrp": {
     "name": "XRP",
     "code": "XRP",
     "type": "crypto",
-    "current": 59.34,
-    "selling": 59.34,
-    "buying": 59.34,
-    "change": 0.13
+    "current": 59.32,
+    "selling": 59.32,
+    "buying": 59.32,
+    "change": 0.1
   },
   "doge": {
     "name": "Dogecoin",
     "code": "DOGE",
     "type": "crypto",
-    "current": 4.06,
-    "selling": 4.06,
-    "buying": 4.06,
-    "change": 0
+    "current": 4.07,
+    "selling": 4.07,
+    "buying": 4.07,
+    "change": 0.14
   },
   "ltc": {
     "name": "Litecoin",
     "code": "LTC",
     "type": "crypto",
-    "current": 2375.03,
-    "selling": 2375.03,
-    "buying": 2375.03,
-    "change": -0.73
+    "current": 2364.54,
+    "selling": 2364.54,
+    "buying": 2364.54,
+    "change": -1.16
   }
 }
