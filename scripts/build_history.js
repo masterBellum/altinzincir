@@ -40,12 +40,12 @@ function isLastDayOfYear(d) {
     return d.getUTCMonth() === 11 && d.getUTCDate() === 31;
 }
 
-/** Gece yarısı mı? (00:00 UTC) */
-const isMidnight    = utcHour === 0;
+/** Günlük kayıt saati: 06:00 UTC (Türkiye 09:00 — piyasalar açılmadan önceki kapanış) */
+const isMidnight    = utcHour === 6;
 const isMonthEnd    = isMidnight && isLastDayOfMonth(now);
 const isYearEnd     = isMidnight && isLastDayOfYear(now);
 
-console.log(`⏰ ${now.toISOString()} | midnight=${isMidnight} | monthEnd=${isMonthEnd} | yearEnd=${isYearEnd}`);
+console.log(`⏰ ${now.toISOString()} | dailyRollup=${isMidnight} | monthEnd=${isMonthEnd} | yearEnd=${isYearEnd}`);
 
 // ── Dosyaları yükle ───────────────────────────────────────────────────────────
 let current = {};
@@ -118,7 +118,7 @@ Object.entries(current).forEach(([key, asset]) => {
 
         // Hourly'i temizle (yeni güne sıfırla)
         h.hourly = [];
-        console.log(`  🌙 [GECE] ${key}: ${dailyClose} → daily (${h.daily.length}/365)`);
+        console.log(`  🌅 [06:00] ${key}: ${dailyClose} → daily (${h.daily.length}/365)`);
     }
 
     updatedCount++;

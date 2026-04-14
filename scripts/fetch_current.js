@@ -2,8 +2,8 @@
  * fetch_current.js
  * ─────────────────────────────────────────────────────────────────────────────
  * Her 5 dakikada GitHub Actions tarafından çalıştırılır.
- * Truncgil (altın + döviz) ve Binance (kripto) kaynaklarından anlık fiyatları çeker,
- * data/current.json dosyasına yazar.
+ * Truncgil (altın + döviz), GenelPara (emtia) ve Binance (kripto) kaynaklarından
+ * anlık fiyatları çeker, data/current.json dosyasına yazar.
  *
  * App artık doğrudan API'lere istek atmaz — sadece bu dosyayı okur.
  * ─────────────────────────────────────────────────────────────────────────────
@@ -16,11 +16,11 @@ const path  = require('path');
 const OUTPUT_FILE = path.join(__dirname, '..', 'data', 'current.json');
 
 // ── Kaynak URL'leri ───────────────────────────────────────────────────────────
-const TRUNCGIL_URL    = 'https://finans.truncgil.com/today.json';
-const GENPARA_EMTIA   = 'https://api.genelpara.com/json/?list=emtia&sembol=all';
+const TRUNCGIL_URL  = 'https://finans.truncgil.com/today.json';
+const GENPARA_EMTIA = 'https://api.genelpara.com/json/?list=emtia&sembol=all';
 
-function yahooCryptoUrl(symbol) {
-    return `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2d`;
+function coinGeckoUrl(ids) {
+    return `https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=usd&include_24hr_change=true&precision=8`;
 }
 
 // ── Yardımcı fonksiyonlar ─────────────────────────────────────────────────────
@@ -60,58 +60,63 @@ function parseTR(val) {
 
 // ── Altın key → meta tablosu ──────────────────────────────────────────────────
 const GOLD_MAP = {
-    'gram-altin':      { name: 'Gram Altın',         code: 'GRAM',    type: 'gold' },
-    'ons':             { name: 'Ons Altın',           code: 'ONS',     type: 'gold', isUSD: true },
-    'ceyrek-altin':    { name: 'Çeyrek Altın',        code: 'CEYREK',  type: 'gold' },
-    'yarim-altin':     { name: 'Yarım Altın',         code: 'YARIM',   type: 'gold' },
-    'tam-altin':       { name: 'Tam Altın',           code: 'TAM',     type: 'gold' },
-    'cumhuriyet-altini':{ name:'Cumhuriyet Altını',   code: 'CUMHUR',  type: 'gold' },
-    'ata-altin':       { name: 'Ata Altın',           code: 'ATAALT',  type: 'gold' },
-    'resat-altin':     { name: 'Reşat Altın',         code: 'RESAT',   type: 'gold' },
-    'hamit-altin':     { name: 'Hamit Altın',         code: 'HAMIT',   type: 'gold' },
-    'gram-has-altin':  { name: 'Gram Has Altın',      code: 'HAS',     type: 'gold' },
-    '14-ayar-altin':   { name: '14 Ayar Altın',       code: '14AYAR',  type: 'gold' },
-    '18-ayar-altin':   { name: '18 Ayar Altın',       code: '18AYAR',  type: 'gold' },
-    '22-ayar-bilezik': { name: '22 Ayar Bilezik',     code: '22AYAR',  type: 'gold' },
-    'gumus':           { name: 'Gümüş',               code: 'GUMUS',   type: 'commodity' },
-    'gram-platin':     { name: 'Gram Platin',          code: 'PLATIN',  type: 'commodity' },
+    'gram-altin':       { name: 'Gram Altın',          code: 'GRAM',    type: 'gold' },
+    'ons':              { name: 'Ons Altın',            code: 'ONS',     type: 'gold', isUSD: true },
+    'ceyrek-altin':     { name: 'Çeyrek Altın',         code: 'CEYREK',  type: 'gold' },
+    'yarim-altin':      { name: 'Yarım Altın',          code: 'YARIM',   type: 'gold' },
+    'tam-altin':        { name: 'Tam Altın',            code: 'TAM',     type: 'gold' },
+    'cumhuriyet-altini':{ name: 'Cumhuriyet Altını',    code: 'CUMHUR',  type: 'gold' },
+    'ata-altin':        { name: 'Ata Altın',            code: 'ATAALT',  type: 'gold' },
+    'resat-altin':      { name: 'Reşat Altın',          code: 'RESAT',   type: 'gold' },
+    'hamit-altin':      { name: 'Hamit Altın',          code: 'HAMIT',   type: 'gold' },
+    'gram-has-altin':   { name: 'Gram Has Altın',       code: 'HAS',     type: 'gold' },
+    '14-ayar-altin':    { name: '14 Ayar Altın',        code: '14AYAR',  type: 'gold' },
+    '18-ayar-altin':    { name: '18 Ayar Altın',        code: '18AYAR',  type: 'gold' },
+    '22-ayar-bilezik':  { name: '22 Ayar Bilezik',      code: '22AYAR',  type: 'gold' },
+    'gumus':            { name: 'Gümüş',                code: 'GUMUS',   type: 'commodity' },
+    'gram-platin':      { name: 'Gram Platin',           code: 'PLATIN',  type: 'commodity' },
 };
 
 const CURRENCY_NAMES = {
-    USD: 'ABD Doları', EUR: 'Euro', GBP: 'İngiliz Sterlini',
-    JPY: 'Japon Yeni', CHF: 'İsviçre Frangı', CAD: 'Kanada Doları',
-    AUD: 'Avustralya Doları', SAR: 'Suudi Riyali', RUB: 'Rus Rublesi',
-    KWD: 'Kuveyt Dinarı', AZN: 'Azerbaycan Manatı', AED: 'BAE Dirhemi',
-    QAR: 'Katar Riyali', ILS: 'İsrail Şekeli',
+    USD: 'ABD Doları',      EUR: 'Euro',               GBP: 'İngiliz Sterlini',
+    JPY: 'Japon Yeni',      CHF: 'İsviçre Frangı',     CAD: 'Kanada Doları',
+    AUD: 'Avustralya Doları', NZD: 'Yeni Zelanda Doları', SEK: 'İsveç Kronası',
+    NOK: 'Norveç Kronası',  DKK: 'Danimarka Kronası',  SAR: 'Suudi Riyali',
+    RUB: 'Rus Rublesi',     CNY: 'Çin Yuanı',          HKD: 'Hong Kong Doları',
+    SGD: 'Singapur Doları', INR: 'Hindistan Rupisi',   KWD: 'Kuveyt Dinarı',
+    AED: 'BAE Dirhemi',     ZAR: 'Güney Afrika Randı', BRL: 'Brezilya Reali',
+    MXN: 'Meksika Pesosu',  ILS: 'İsrail Şekeli',      PLN: 'Polonya Zlotısı',
+    CZK: 'Çek Korunası',    HUF: 'Macar Forinti',      RON: 'Rumen Leyi',
+    AZN: 'Azerbaycan Manatı', QAR: 'Katar Riyali',
 };
 
-// İzlenecek kriptolar (Yahoo Finance sembolü → varlık meta)
-const CRYPTO_MAP = [
-    { yahoo: 'BTC-USD',      key: 'btc',   name: 'Bitcoin',        code: 'BTC',   type: 'crypto' },
-    { yahoo: 'ETH-USD',      key: 'eth',   name: 'Ethereum',       code: 'ETH',   type: 'crypto' },
-    { yahoo: 'BNB-USD',      key: 'bnb',   name: 'BNB',            code: 'BNB',   type: 'crypto' },
-    { yahoo: 'SOL-USD',      key: 'sol',   name: 'Solana',         code: 'SOL',   type: 'crypto' },
-    { yahoo: 'XRP-USD',      key: 'xrp',   name: 'XRP',            code: 'XRP',   type: 'crypto' },
-    { yahoo: 'DOGE-USD',     key: 'doge',  name: 'Dogecoin',       code: 'DOGE',  type: 'crypto' },
-    { yahoo: 'LTC-USD',      key: 'ltc',   name: 'Litecoin',       code: 'LTC',   type: 'crypto' },
-    { yahoo: 'ADA-USD',      key: 'ada',   name: 'Cardano',        code: 'ADA',   type: 'crypto' },
-    { yahoo: 'AVAX-USD',     key: 'avax',  name: 'Avalanche',      code: 'AVAX',  type: 'crypto' },
-    { yahoo: 'DOT-USD',      key: 'dot',   name: 'Polkadot',       code: 'DOT',   type: 'crypto' },
-    { yahoo: 'LINK-USD',     key: 'link',  name: 'Chainlink',      code: 'LINK',  type: 'crypto' },
-    { yahoo: 'ATOM-USD',     key: 'atom',  name: 'Cosmos',         code: 'ATOM',  type: 'crypto' },
-    { yahoo: 'TRX-USD',      key: 'trx',   name: 'TRON',           code: 'TRX',   type: 'crypto' },
-    { yahoo: 'MATIC-USD',    key: 'matic', name: 'Polygon',        code: 'MATIC', type: 'crypto' },
-    { yahoo: 'SHIB-USD',     key: 'shib',  name: 'Shiba Inu',      code: 'SHIB',  type: 'crypto' },
-    { yahoo: 'NEAR-USD',     key: 'near',  name: 'NEAR Protocol',  code: 'NEAR',  type: 'crypto' },
-    { yahoo: 'UNI7083-USD',  key: 'uni',   name: 'Uniswap',        code: 'UNI',   type: 'crypto' },
-    { yahoo: 'ARB11841-USD', key: 'arb',   name: 'Arbitrum',       code: 'ARB',   type: 'crypto' },
-    { yahoo: 'TON11419-USD', key: 'ton',   name: 'Toncoin',        code: 'TON',   type: 'crypto' },
-    { yahoo: 'SUI20947-USD', key: 'sui',   name: 'Sui',            code: 'SUI',   type: 'crypto' },
+// ── CoinGecko kripto tablosu ──────────────────────────────────────────────────
+// CoinGecko: API key gerektirmez, 30 istek/dk, GH Actions'dan kesinlikle çalışır
+const COINGECKO_CRYPTO = [
+    { gecko: 'bitcoin',          key: 'btc',   name: 'Bitcoin',        code: 'BTC'   },
+    { gecko: 'ethereum',         key: 'eth',   name: 'Ethereum',       code: 'ETH'   },
+    { gecko: 'binancecoin',      key: 'bnb',   name: 'BNB',            code: 'BNB'   },
+    { gecko: 'solana',           key: 'sol',   name: 'Solana',         code: 'SOL'   },
+    { gecko: 'ripple',           key: 'xrp',   name: 'XRP',            code: 'XRP'   },
+    { gecko: 'dogecoin',         key: 'doge',  name: 'Dogecoin',       code: 'DOGE'  },
+    { gecko: 'litecoin',         key: 'ltc',   name: 'Litecoin',       code: 'LTC'   },
+    { gecko: 'cardano',          key: 'ada',   name: 'Cardano',        code: 'ADA'   },
+    { gecko: 'avalanche-2',      key: 'avax',  name: 'Avalanche',      code: 'AVAX'  },
+    { gecko: 'polkadot',         key: 'dot',   name: 'Polkadot',       code: 'DOT'   },
+    { gecko: 'chainlink',        key: 'link',  name: 'Chainlink',      code: 'LINK'  },
+    { gecko: 'cosmos',           key: 'atom',  name: 'Cosmos',         code: 'ATOM'  },
+    { gecko: 'tron',             key: 'trx',   name: 'TRON',           code: 'TRX'   },
+    { gecko: 'matic-network',    key: 'matic', name: 'Polygon',        code: 'MATIC' },
+    { gecko: 'shiba-inu',        key: 'shib',  name: 'Shiba Inu',      code: 'SHIB'  },
+    { gecko: 'near',             key: 'near',  name: 'NEAR Protocol',  code: 'NEAR'  },
+    { gecko: 'uniswap',          key: 'uni',   name: 'Uniswap',        code: 'UNI'   },
+    { gecko: 'arbitrum',         key: 'arb',   name: 'Arbitrum',       code: 'ARB'   },
+    { gecko: 'the-open-network', key: 'ton',   name: 'Toncoin',        code: 'TON'   },
+    { gecko: 'sui',              key: 'sui',   name: 'Sui',            code: 'SUI'   },
 ];
 
 // ── Ana fonksiyon ─────────────────────────────────────────────────────────────
 async function run() {
-    // Mevcut dosyayı oku (yoksa boş başla)
     let current = {};
     try { current = JSON.parse(fs.readFileSync(OUTPUT_FILE, 'utf8')); } catch {}
 
@@ -121,7 +126,6 @@ async function run() {
     let usdTry = current['USD']?.current || 38;
 
     if (tData) {
-        // USD/TRY'yi ilk önce al (ons dönüşümü için lazım)
         if (tData['USD']) {
             const u = parseTR(tData['USD']['Satış'] || tData['USD']['Satis']);
             if (!isNaN(u) && u > 0) usdTry = u;
@@ -134,19 +138,17 @@ async function run() {
             const satisKey = Object.keys(row).find(k => /sat/i.test(k));
             const alisKey  = Object.keys(row).find(k => /al/i.test(k) && !/sat/i.test(k));
             const degKey   = Object.keys(row).find(k => /değ|deg/i.test(k));
-            let satis  = parseTR(satisKey ? row[satisKey] : null);
-            let alis   = parseTR(alisKey  ? row[alisKey]  : null);
-            const chg  = parseTR(String(degKey ? row[degKey] : 0).replace('%', ''));
+            let satis = parseTR(satisKey ? row[satisKey] : null);
+            let alis  = parseTR(alisKey  ? row[alisKey]  : null);
+            const chg = parseTR(String(degKey ? row[degKey] : 0).replace('%', ''));
             if (isNaN(satis) || satis <= 0) return;
             if (meta.isUSD) {
                 satis = parseFloat((satis * usdTry).toFixed(2));
                 if (!isNaN(alis) && alis > 0) alis = parseFloat((alis * usdTry).toFixed(2));
             }
-
             current[tKey] = {
                 name: meta.name, code: meta.code, type: meta.type,
-                current: satis,
-                selling: satis,
+                current: satis, selling: satis,
                 buying:  !isNaN(alis) && alis > 0 ? alis : parseFloat((satis * 0.995).toFixed(2)),
                 change:  !isNaN(chg) ? chg : 0
             };
@@ -177,20 +179,20 @@ async function run() {
     const gpData = await fetchJson(GENPARA_EMTIA);
     if (gpData?.data) {
         const EMTIA_MAP = {
-            XAGUSD: { name: 'Gümüş',        code: 'XAG' },
-            XPTUSD: { name: 'Platin',        code: 'XPT' },
-            XPDUSD: { name: 'Paladyum',      code: 'XPD' },
-            XBRUSD: { name: 'Brent Ham Petrol', code: 'BRENT' },
-            COIL:   { name: 'Ham Petrol (WTI)', code: 'WTI'  },
-            COPPER: { name: 'Bakır',         code: 'COPPER' },
-            NGAS:   { name: 'Doğal Gaz',     code: 'NGAS'  },
-            WHEAT:  { name: 'Buğday',        code: 'WHEAT' },
-            CORN:   { name: 'Mısır',         code: 'CORN'  },
-            COFFEE: { name: 'Kahve',         code: 'COFFEE'},
-            SUGAR:  { name: 'Şeker',         code: 'SUGAR' },
-            COCOA:  { name: 'Kakao',         code: 'COCOA' },
-            SOYBEAN:{ name: 'Soya Fasulyesi',code: 'SOYBEAN'},
-            COTTON: { name: 'Pamuk',         code: 'COTTON'},
+            XAGUSD: { name: 'Gümüş',              code: 'XAG'    },
+            XPTUSD: { name: 'Platin',              code: 'XPT'    },
+            XPDUSD: { name: 'Paladyum',            code: 'XPD'    },
+            XBRUSD: { name: 'Brent Ham Petrol',    code: 'BRENT'  },
+            COIL:   { name: 'Ham Petrol (WTI)',    code: 'WTI'    },
+            COPPER: { name: 'Bakır',               code: 'COPPER' },
+            NGAS:   { name: 'Doğal Gaz',           code: 'NGAS'   },
+            WHEAT:  { name: 'Buğday',              code: 'WHEAT'  },
+            CORN:   { name: 'Mısır',               code: 'CORN'   },
+            COFFEE: { name: 'Kahve',               code: 'COFFEE' },
+            SUGAR:  { name: 'Şeker',               code: 'SUGAR'  },
+            COCOA:  { name: 'Kakao',               code: 'COCOA'  },
+            SOYBEAN:{ name: 'Soya Fasulyesi',      code: 'SOYBEAN'},
+            COTTON: { name: 'Pamuk',               code: 'COTTON' },
         };
         Object.entries(gpData.data).forEach(([sym, row]) => {
             const meta = EMTIA_MAP[sym];
@@ -212,38 +214,37 @@ async function run() {
         console.warn('  ⚠️ GenelPara emtia verisi alınamadı');
     }
 
-    // ── 3. Yahoo Finance (Kripto) ────────────────────────────────────────────
-    console.log('⬇️  Yahoo Finance kripto çekiliyor...');
+    // ── 3. CoinGecko (Kripto) ────────────────────────────────────────────────
+    console.log('⬇️  CoinGecko kripto çekiliyor...');
+    const geckoIds = COINGECKO_CRYPTO.map(m => m.gecko);
+    const cgData   = await fetchJson(coinGeckoUrl(geckoIds));
     let cryptoCount = 0;
-    for (const meta of CRYPTO_MAP) {
-        const cData = await fetchJson(yahooCryptoUrl(meta.yahoo));
-        try {
-            const r = cData?.chart?.result?.[0];
-            const closes = r?.indicators?.quote?.[0]?.close || [];
-            const validCloses = closes.filter(x => x != null && !isNaN(x) && x > 0);
-            if (validCloses.length < 1) continue;
-            const priceUSD = validCloses[validCloses.length - 1];
-            const prevUSD  = validCloses.length >= 2 ? validCloses[validCloses.length - 2] : priceUSD;
-            const chg      = parseFloat(((priceUSD - prevUSD) / prevUSD * 100).toFixed(2));
+
+    if (cgData && typeof cgData === 'object' && !cgData.status) {
+        for (const meta of COINGECKO_CRYPTO) {
+            const row = cgData[meta.gecko];
+            if (!row) continue;
+            const priceUSD = row['usd'];
+            if (!priceUSD || priceUSD <= 0) continue;
+            const chg      = parseFloat((row['usd_24h_change'] || 0).toFixed(2));
             const priceTRY = parseFloat((priceUSD * usdTry).toFixed(2));
             current[meta.key] = {
                 name: meta.name, code: meta.code, type: 'crypto',
                 current: priceTRY, selling: priceTRY, buying: priceTRY,
-                change: chg
+                change: chg, priceUSD
             };
             cryptoCount++;
-        } catch { /* skip */ }
-    }
-    if (cryptoCount > 0) {
-        console.log(`  ✅ Yahoo Finance kripto: ${cryptoCount} kripto işlendi`);
+        }
+        console.log(`  ✅ CoinGecko: ${cryptoCount} kripto işlendi`);
     } else {
-        console.warn('  ⚠️ Yahoo Finance kripto verisi alınamadı');
+        console.warn('  ⚠️ CoinGecko verisi alınamadı, bir önceki değerler korunuyor');
+        if (cgData?.status) console.warn('  CoinGecko hata:', cgData.status.error_message);
     }
 
     // ── Meta bilgisi ekle ve kaydet ───────────────────────────────────────────
     current['_meta'] = {
         updated_at: new Date().toISOString(),
-        source: 'GitHub Actions / fetch_current.js'
+        source: 'Truncgil (altın+döviz) | GenelPara (emtia) | CoinGecko (kripto)'
     };
 
     fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
