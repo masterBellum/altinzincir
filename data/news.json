@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-04-14T22:12:03.336Z",
+    "updated_at": "2026-04-14T23:23:51.414Z",
     "count": 50,
     "source": "Google News RSS / NewsAPI fallback"
   },
@@ -19,14 +19,6 @@
       "source": "Bitcoin.com News",
       "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxOVlBCTHFzQTV6b0xwY3BiY3NTRER5cU1KVmVSbEtkQklqQnVhR2F6OUo0WWlGU2lSTEVnMmV0ZzF2Q3g4OHAxY3pFcHJxdjlTTXNESFE0NVN0TVVFS0ItdmZfQWY5bnNDZmpmd3hzN1Z4ZlNkU3VBWDJndUszeGRabFQ3aHhlTVQ0OHZuRG9oNlZ2TGdUWFBoQXAtSWF2cFM1M2lVdEJNYjliZTNXb1U0VjBwRFpCbW1VX0R1RjRjUW1qUWFGM25BcFlXOUZfUQ?oc=5",
       "publishedAt": "2026-04-14T21:44:20.000Z",
-      "category": "general"
-    },
-    {
-      "id": "aHR0cHM6Ly9uZXdz",
-      "title": "Kraken'in Eş CEO'su Arjun Sethi, Semafor Dünya Ekonomi Zirvesi'nde gizli halka arz başvurusu yaptığını doğruladı - Bitcoin.com News",
-      "source": "Bitcoin.com News",
-      "url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxOMDUzc3VFbWtkcmczajBVNGFhLU1KQzdfRUxWN2dOUlJwMnZ0Ml80S2pmanV0cXF2UU1qOGRCMWI4d2NnT0pWOWNwRTFrQ1RobFVsZ25JLXR3Z1kwbVVEVXBnZ1RoM2pDX2RzeG1reURIakRzOHBLbG5sNHJFSTBwTHQzMFZ6N1ZaTkhhdEFfQ0NwZzl4TkJOTjQ5dVRvX2psbXNWdzFtZXJGYmNYQ1FvZHFGbVZmdFhIOU15bUZfQVZ2ZWx6OEg5MjgzSU1wSHVRRW5SSnRadw?oc=5",
-      "publishedAt": "2026-04-14T21:42:17.000Z",
       "category": "general"
     },
     {
@@ -139,6 +131,14 @@
       "source": "CoinDesk",
       "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPNUlHTE9valNZeFVlRHpxX3BjdW9pQXg1aWE0WkVKZnYxWUtlREJ2cnNXRzU0dWZ4aW90cjYtcko4dEhrRHlMTTB0a1V3ank2azg5clA4Tm1LVGZzSWszelQ3d3F0eXhnWHJ0TE1TYjNPb1hJZlpOTzJaUnlDNktJQjY5QWxMMzdERUtvVXJreDNKbVZJd3JseldiUVBHcktnbFA5eks2eTNZeU9pcFphVE5GTndNMnY3OHBsTkFuNlZJZw?oc=5",
       "publishedAt": "2026-04-14T15:54:13.000Z",
+      "category": "general"
+    },
+    {
+      "id": "aHR0cHM6Ly9uZXdz",
+      "title": "Fed Başkan Adayı Servetini Açıkladı: İşte Yatırım Yaptığı 30 Kripto Projesi - CryptoPotato",
+      "source": "CryptoPotato",
+      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQR0N3bU9jVkJDZUJQRkNoLWVLNG1Ma1pVcDZnTmhnMUZ1UEt6dXM3WFh0azBqZjZoQkxnSmd2X05TemtFMVdpMWdreW9XWkJ0Z0IyNE5hMS1kMUdKSGZ0ZFc5Z1Y1bFJQUXRZT1E5WlVYUzdRdWdkOUJHQjFPWThLakNmczhBNTFjMmhpUW1RMkNKTmpLVDRtWTJoUThGblh0ek9lWG9R?oc=5",
+      "publishedAt": "2026-04-14T15:37:24.000Z",
       "category": "general"
     },
     {
@@ -271,10 +271,26 @@
     },
     {
       "id": "aHR0cHM6Ly9uZXdz",
+      "title": "TCMB?NİN 1 HAFTA VADELİ TL KARŞILIĞI ALTIN SWAP İHALESİNDE EN DÜŞÜK FİYAT 6833760,00 TL/KG, ORTALAMA FİYAT 6833768,14 TL/KG, EN YÜKSEK FİYAT 6833768,95 TL/KG [FNC-NEWS] - Uzmanpara",
+      "source": "Uzmanpara",
+      "url": "https://news.google.com/rss/articles/CBMiygJBVV95cUxPOXJSVzhGZjlzSjRoS0x2eEs5UHBhTU1SbEdLVDgxdWhpOXR1YVNGdzYzQm1ZZXhCV0NnZ1R0d3E5aDRfZTh2MVoybFQ5cng4eVU0OUUtVVp3VUFRVVg5aDJJWmhPSkIyc1RueVowWHUzZFBJNE1uU2NpUmM1RUdSd1l2a0dGbHIxQV9HUzlidjMzRExmOENLTG5FR3N1RllSSF8tQ0tiVWNKZVJqaUh4Z2piaGdFYmlFZFZUYWhWMUYxRjdJMmg3aUZKTS0tSmlEMG5sTGRQcmJXRGowc1Q4ZTZfOWJxRDNXdDVBc3RhUHBXdGFfMXlHMzB4YXBfMmFqVjFwc3gzZV9sSVhOOWhsdk13dm84RFdoVWJ4bXBQTURONjBhMjZRcGxwTl9vMjY5QkZFX0RLY0N5Mmc4ZmxPcTBWSDcxWEYyVEE?oc=5",
+      "publishedAt": "2026-04-14T13:30:04.000Z",
+      "category": "general"
+    },
+    {
+      "id": "aHR0cHM6Ly9uZXdz",
       "title": "Bitcoin ne kadar oldu? - odakgazetesi.com",
       "source": "odakgazetesi.com",
       "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFA5a3c0aDF4S3FLWmNVVGhGM1FTa0swUEMwZE8xUndPUlN2a3JKc0V1TzFLZVdLYXhWR2I0RW5fZnczNDNJaVhBR2NDWTF1M2o0dGlKR0F6T0FpcUc4ZEJ3?oc=5",
       "publishedAt": "2026-04-14T13:08:00.000Z",
+      "category": "general"
+    },
+    {
+      "id": "aHR0cHM6Ly9uZXdz",
+      "title": "Bitcoin (BTC) Fiyatını Belirleyen 4 Önemli Gösterge - CryptoPotato",
+      "source": "CryptoPotato",
+      "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPNG45SXpGTTBZdUtqTFlmWEFSVkxZbmVmeV9EMmV2ZjloT3N0SEFHM3ZES2RzbHJBdWZhYWR5c3c0ZnlHQjNKbTVMQlh4V3U1NUdvYUdBRGt4eHF3c1EzcnRZanp4TDVnXzNMZ3JTRjVVc3daM19VVkE3dHFlT3hPZFB2WGE?oc=5",
+      "publishedAt": "2026-04-14T13:06:04.000Z",
       "category": "general"
     },
     {
@@ -295,18 +311,10 @@
     },
     {
       "id": "aHR0cHM6Ly9uZXdz",
-      "title": "Bitcoin'de 'Trump' etkisi: Aylardır beklenen seviye sonunda aşıldı! - Sözcü Gazetesi",
-      "source": "Sözcü Gazetesi",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQYlRiRUNXMElvWVRXTlNYek41SUVmblh1dzY4NUZrQ1JOTEZuQTdibXk4czBVWjFKNEFTVmp0U0g3d0pmOUFWbXVZWjJkdWE1dC1hWFdITUt3Z2I5TzJnNU4xSGpsc0Z2dk1qSGpmMFFpalVONlFwUWFYMU5feWtuY2tqWkRENXJGUFcxMi1WeGs0TExJLVYyNDVnT2s4ZExCWXc?oc=5",
-      "publishedAt": "2026-04-14T12:28:00.000Z",
-      "category": "general"
-    },
-    {
-      "id": "aHR0cHM6Ly9uZXdz",
-      "title": "Bitcoin'de sert yükseliş! 'Müzakere' iddiaları piyasayı hareketlendirdi - Uzmanpara",
-      "source": "Uzmanpara",
-      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQeHVoampyaW13MXZIVnBMOFNzaWNZYTBGYldCcWxHY0dUTWljU2ppVlQ3eTNVYkJYNzJMeklnT0ZqbmpCSEdycTJPMlVCTWoydkRoZ1BvSkw0VFU3dV90eUV0bTVwMW5Od2xnTEh5Z2NJWEt6SWxHVkZ5VUZsekhOUTU2M1Vqa0VHZ0xROFNjT19NaWFSamhqVWh0ZW9mMGFuOTg5SjhNRzROZUFjZ251UUNCTGZVQ3JURVBv?oc=5",
-      "publishedAt": "2026-04-14T12:19:00.000Z",
+      "title": "Küresel risk iştahı kriptoyu uçurdu: Bitcoin 74 bin doları aştı - Dünya Gazetesi",
+      "source": "Dünya Gazetesi",
+      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPVEpVdERQaUNWZTZ4VTJoY3Z5eHkzSXBXbmJKWEFNVUI2UTZpLVFmSFlPN1lwRkpBdGxEcFZPRkpoMXVQbFg4QWFsZ2dwSnJBRGFtSHVDR2Q5em5GQ0RfX3haODREVWhxVnZlN3dPZlNVVE5ablA2ZU5idmRJQ1AzNDZQZ0xZaEFRbjhFcm82ckdKWW1yZXZ6T0s0YmFiLVNtMUxKY3NGY0tscnVqT1p3N2lMc3lIQkg2?oc=5",
+      "publishedAt": "2026-04-14T12:35:00.000Z",
       "category": "general"
     },
     {
@@ -339,14 +347,6 @@
       "source": "Borsanın Gündemi",
       "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxObFdqLUNLYnhwMi03TXB3Z1huQkpNTWswVVJWVGI0ai03TWlyZHcyMFhaR1pZU09VRzlsamxheER2UDJkRlpuVFVPMlF5cE5LMFUxUUJySS1sWjFQLUxFc0ZmcnFWSGRudnJKMk12ZVVvUkdaSTlWQjVjTURITUliTG1rc3I3RWFWRFJMSktCaGp3dVBFalNuT1Vn?oc=5",
       "publishedAt": "2026-04-14T11:30:06.000Z",
-      "category": "general"
-    },
-    {
-      "id": "aHR0cHM6Ly9uZXdz",
-      "title": "Altın almak için fırsat zamanı mı? İslam Memiş anlattı - Haber Global",
-      "source": "Haber Global",
-      "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPejQ5YWxoT3BiWWl6b1pDcDM1WXRpektxYnJvcXpmLVRiczVhNFJ5RmVDeWhMeTBpZ3pjTEI0Ni0wLUZjdTdrdlhJRmIxLXRQd25VUEthNS1WeXgyRmctd1U2VmdnbTNlQnJrUGpVc3VaNC1pQ0liTE95bGtIVXZNSkplbldISy1QRkxrbVBfaUF2ZlFKNHfSAZsBQVVfeXFMTUZ3cEdzUGo4MldvS2tWLWZnamd0SXdSS0sya2tSemE3TWhiYzVrZkM5blFYTk5QUVdLX0JQS0lfZHJKQjZ3NFBTR2hQSXQtT1Q3SjlfZmZncW02aVhHeDdfTE9RME00UDBXb2FiZVVUMEQyVWI1MlQxQjdrbDZKNzU0ZWZYdy05ejhQbWdKSzlPN2ZlSkhjQkVFQnc?oc=5",
-      "publishedAt": "2026-04-14T11:30:00.000Z",
       "category": "general"
     },
     {
