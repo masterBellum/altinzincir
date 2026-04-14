@@ -87,13 +87,26 @@ const CURRENCY_NAMES = {
 
 // İzlenecek kriptolar (Yahoo Finance sembolü → varlık meta)
 const CRYPTO_MAP = [
-    { yahoo: 'BTC-USD',  key: 'btc',  name: 'Bitcoin',   code: 'BTC',  type: 'crypto' },
-    { yahoo: 'ETH-USD',  key: 'eth',  name: 'Ethereum',  code: 'ETH',  type: 'crypto' },
-    { yahoo: 'BNB-USD',  key: 'bnb',  name: 'BNB',       code: 'BNB',  type: 'crypto' },
-    { yahoo: 'SOL-USD',  key: 'sol',  name: 'Solana',    code: 'SOL',  type: 'crypto' },
-    { yahoo: 'XRP-USD',  key: 'xrp',  name: 'XRP',       code: 'XRP',  type: 'crypto' },
-    { yahoo: 'DOGE-USD', key: 'doge', name: 'Dogecoin',  code: 'DOGE', type: 'crypto' },
-    { yahoo: 'LTC-USD',  key: 'ltc',  name: 'Litecoin',  code: 'LTC',  type: 'crypto' },
+    { yahoo: 'BTC-USD',      key: 'btc',   name: 'Bitcoin',        code: 'BTC',   type: 'crypto' },
+    { yahoo: 'ETH-USD',      key: 'eth',   name: 'Ethereum',       code: 'ETH',   type: 'crypto' },
+    { yahoo: 'BNB-USD',      key: 'bnb',   name: 'BNB',            code: 'BNB',   type: 'crypto' },
+    { yahoo: 'SOL-USD',      key: 'sol',   name: 'Solana',         code: 'SOL',   type: 'crypto' },
+    { yahoo: 'XRP-USD',      key: 'xrp',   name: 'XRP',            code: 'XRP',   type: 'crypto' },
+    { yahoo: 'DOGE-USD',     key: 'doge',  name: 'Dogecoin',       code: 'DOGE',  type: 'crypto' },
+    { yahoo: 'LTC-USD',      key: 'ltc',   name: 'Litecoin',       code: 'LTC',   type: 'crypto' },
+    { yahoo: 'ADA-USD',      key: 'ada',   name: 'Cardano',        code: 'ADA',   type: 'crypto' },
+    { yahoo: 'AVAX-USD',     key: 'avax',  name: 'Avalanche',      code: 'AVAX',  type: 'crypto' },
+    { yahoo: 'DOT-USD',      key: 'dot',   name: 'Polkadot',       code: 'DOT',   type: 'crypto' },
+    { yahoo: 'LINK-USD',     key: 'link',  name: 'Chainlink',      code: 'LINK',  type: 'crypto' },
+    { yahoo: 'ATOM-USD',     key: 'atom',  name: 'Cosmos',         code: 'ATOM',  type: 'crypto' },
+    { yahoo: 'TRX-USD',      key: 'trx',   name: 'TRON',           code: 'TRX',   type: 'crypto' },
+    { yahoo: 'MATIC-USD',    key: 'matic', name: 'Polygon',        code: 'MATIC', type: 'crypto' },
+    { yahoo: 'SHIB-USD',     key: 'shib',  name: 'Shiba Inu',      code: 'SHIB',  type: 'crypto' },
+    { yahoo: 'NEAR-USD',     key: 'near',  name: 'NEAR Protocol',  code: 'NEAR',  type: 'crypto' },
+    { yahoo: 'UNI7083-USD',  key: 'uni',   name: 'Uniswap',        code: 'UNI',   type: 'crypto' },
+    { yahoo: 'ARB11841-USD', key: 'arb',   name: 'Arbitrum',       code: 'ARB',   type: 'crypto' },
+    { yahoo: 'TON11419-USD', key: 'ton',   name: 'Toncoin',        code: 'TON',   type: 'crypto' },
+    { yahoo: 'SUI20947-USD', key: 'sui',   name: 'Sui',            code: 'SUI',   type: 'crypto' },
 ];
 
 // ── Ana fonksiyon ─────────────────────────────────────────────────────────────
