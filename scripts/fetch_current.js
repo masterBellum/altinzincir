@@ -106,7 +106,7 @@ const COINGECKO_CRYPTO = [
     { gecko: 'chainlink',        key: 'link',  name: 'Chainlink',      code: 'LINK'  },
     { gecko: 'cosmos',           key: 'atom',  name: 'Cosmos',         code: 'ATOM'  },
     { gecko: 'tron',             key: 'trx',   name: 'TRON',           code: 'TRX'   },
-    { gecko: 'matic-network',    key: 'matic', name: 'Polygon',        code: 'MATIC' },
+    { gecko: 'polygon-ecosystem-token', key: 'matic', name: 'Polygon (POL)', code: 'MATIC' },
     { gecko: 'shiba-inu',        key: 'shib',  name: 'Shiba Inu',      code: 'SHIB'  },
     { gecko: 'near',             key: 'near',  name: 'NEAR Protocol',  code: 'NEAR'  },
     { gecko: 'uniswap',          key: 'uni',   name: 'Uniswap',        code: 'UNI'   },
@@ -227,7 +227,10 @@ async function run() {
             const priceUSD = row['usd'];
             if (!priceUSD || priceUSD <= 0) continue;
             const chg      = parseFloat((row['usd_24h_change'] || 0).toFixed(2));
-            const priceTRY = parseFloat((priceUSD * usdTry).toFixed(2));
+            const raw      = priceUSD * usdTry;
+            // Çok küçük fiyatlar (SHIB gibi) için anlamlı basamak sayısı koru
+            const decimals = raw >= 1 ? 2 : raw >= 0.01 ? 4 : raw >= 0.0001 ? 6 : 8;
+            const priceTRY = parseFloat(raw.toFixed(decimals));
             current[meta.key] = {
                 name: meta.name, code: meta.code, type: 'crypto',
                 current: priceTRY, selling: priceTRY, buying: priceTRY,
