@@ -340,44 +340,55 @@ async function run() {
     }
 
     // ────────────────────────────────────────────────────────────────────────
-    // BÖLÜM 4 — KRİPTO (Binance klines, 20 coin)
+    // BÖLÜM 4 — KRİPTO (CoinGecko market_chart — API key gerektirmez)
+    // /coins/{id}/market_chart?vs_currency=usd&days=1825&interval=daily
     // ────────────────────────────────────────────────────────────────────────
-    console.log('\n═══ 4/5  Kripto (Binance, 20 coin) ═══');
-    const BINANCE_CRYPTO = [
-        { binance: 'BTCUSDT',   key: 'btc'   },
-        { binance: 'ETHUSDT',   key: 'eth'   },
-        { binance: 'BNBUSDT',   key: 'bnb'   },
-        { binance: 'SOLUSDT',   key: 'sol'   },
-        { binance: 'XRPUSDT',   key: 'xrp'   },
-        { binance: 'DOGEUSDT',  key: 'doge'  },
-        { binance: 'LTCUSDT',   key: 'ltc'   },
-        { binance: 'ADAUSDT',   key: 'ada'   },
-        { binance: 'AVAXUSDT',  key: 'avax'  },
-        { binance: 'DOTUSDT',   key: 'dot'   },
-        { binance: 'LINKUSDT',  key: 'link'  },
-        { binance: 'ATOMUSDT',  key: 'atom'  },
-        { binance: 'TRXUSDT',   key: 'trx'   },
-        { binance: 'POLUSDT',   key: 'matic' },
-        { binance: 'SHIBUSDT',  key: 'shib'  },
-        { binance: 'NEARUSDT',  key: 'near'  },
-        { binance: 'UNIUSDT',   key: 'uni'   },
-        { binance: 'ARBUSDT',   key: 'arb'   },
-        { binance: 'TONUSDT',   key: 'ton'   },
-        { binance: 'SUIUSDT',   key: 'sui'   },
+    console.log('\n═══ 4/5  Kripto (CoinGecko market_chart, 20 coin) ═══');
+
+    const COINGECKO_CRYPTO = [
+        { gecko: 'bitcoin',              key: 'btc'   },
+        { gecko: 'ethereum',             key: 'eth'   },
+        { gecko: 'binancecoin',          key: 'bnb'   },
+        { gecko: 'solana',               key: 'sol'   },
+        { gecko: 'ripple',               key: 'xrp'   },
+        { gecko: 'dogecoin',             key: 'doge'  },
+        { gecko: 'litecoin',             key: 'ltc'   },
+        { gecko: 'cardano',              key: 'ada'   },
+        { gecko: 'avalanche-2',          key: 'avax'  },
+        { gecko: 'polkadot',             key: 'dot'   },
+        { gecko: 'chainlink',            key: 'link'  },
+        { gecko: 'cosmos',               key: 'atom'  },
+        { gecko: 'tron',                 key: 'trx'   },
+        { gecko: 'matic-network',        key: 'matic' },
+        { gecko: 'shiba-inu',            key: 'shib'  },
+        { gecko: 'near',                 key: 'near'  },
+        { gecko: 'uniswap',              key: 'uni'   },
+        { gecko: 'arbitrum',             key: 'arb'   },
+        { gecko: 'the-open-network',     key: 'ton'   },
+        { gecko: 'sui',                  key: 'sui'   },
     ];
 
-    for (const coin of BINANCE_CRYPTO) {
-        console.log(`  Fetching: ${coin.binance}...`);
-        const klines = await fetchBinanceKlines(coin.binance, 1825);
-        // USD → TRY
-        const trySeries = klines.map(({ ts, close: priceUSD }) => {
+    for (const coin of COINGECKO_CRYPTO) {
+        // Zaten yeterli verisi varsa atla
+        if (history[coin.key] && (history[coin.key].daily || []).length > 100) {
+            console.log(`  ✅ ${coin.key}: zaten dolu, atlandı`);
+            continue;
+        }
+        console.log(`  Fetching CoinGecko: ${coin.gecko}...`);
+        const url  = `https://api.coingecko.com/api/v3/coins/${coin.gecko}/market_chart?vs_currency=usd&days=1825&interval=daily`;
+        const data = await fetchJson(url);
+        if (!data || !data.prices) { console.log(`  ⚠️  ${coin.key}: CoinGecko veri yok`); await sleep(2000); continue; }
+
+        // CoinGecko prices: [[timestamp_ms, price_usd], ...]
+        const trySeries = data.prices.map(([ts, priceUSD]) => {
             const dateKey = new Date(ts).toISOString().slice(0, 10);
             const rate    = usdMap[dateKey];
             if (!rate) return null;
             return { ts, close: priceUSD * rate };
         }).filter(Boolean);
+
         merge(coin.key, trySeries);
-        await sleep(600);  // Binance rate limit için arttırıldı
+        await sleep(2000);  // CoinGecko public API: 30 req/dk → 2sn aralık güvenli
     }
 
     // ────────────────────────────────────────────────────────────────────────
