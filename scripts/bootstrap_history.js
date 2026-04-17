@@ -73,14 +73,15 @@ function fetchTcmbXml(url) {
 /** TCMB XML string'inden belirli bir döviz kodunun alış kurunu çıkarır */
 function parseTcmbRate(xml, code) {
     if (!xml) return null;
-    const re = new RegExp(`CurrencyCode="${code}"[\\s\\S]*?<ForexBuying>([\\d.]+)<\\/ForexBuying>`);
+    // Kod="AZN" veya CurrencyCode="AZN" → ardından gelen ForexBuying değeri
+    const re = new RegExp(`(?:Kod|CurrencyCode)="${code}"[\\s\\S]*?<ForexBuying>([\\d.]+)<\\/ForexBuying>`);
     const m = xml.match(re);
     return m ? parseFloat(m[1]) : null;
 }
 
 /**
  * TCMB tarihsel XML'lerden belirli bir dövizin 5 yıllık TRY serisini çeker.
- * URL formatı: https://www.tcmb.gov.tr/kurlar/YYMM/DDMMYYYY.xml
+ * URL formatı: https://www.tcmb.gov.tr/kurlar/YYYYMM/DDMMYYYY.xml
  */
 async function fetchTcmbHistory(code, years = 5) {
     const series = [];
@@ -104,8 +105,8 @@ async function fetchTcmbHistory(code, years = 5) {
         const dd   = String(day.getUTCDate()).padStart(2, '0');
         const mm   = String(day.getUTCMonth() + 1).padStart(2, '0');
         const yyyy = day.getUTCFullYear();
-        const yymm = `${String(yyyy).slice(2)}${mm}`;
-        const url  = `https://www.tcmb.gov.tr/kurlar/${yymm}/${dd}${mm}${yyyy}.xml`;
+        const yyyymm = `${yyyy}${mm}`;
+        const url  = `https://www.tcmb.gov.tr/kurlar/${yyyymm}/${dd}${mm}${yyyy}.xml`;
 
         const xml  = await fetchTcmbXml(url);
         const rate = parseTcmbRate(xml, code);
