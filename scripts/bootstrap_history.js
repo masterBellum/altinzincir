@@ -26,7 +26,8 @@ const path  = require('path');
 const HISTORY_FILE = path.join(__dirname, '..', 'data', 'history.json');
 
 // Yahoo Finance / diğer kaynaklarda veri olmayan, desteklenmeyen para birimleri
-const BLACKLIST = new Set(['AZN', 'BAM', 'GEL', 'SYP']);
+// AZN: TCMB'den çekiliyor (aşağıda ayrı bölüm)
+const BLACKLIST = new Set(['BAM', 'GEL', 'SYP']);
 
 // ── HTTP yardımcısı ───────────────────────────────────────────────────────────
 function fetchJson(url, extraHeaders = {}) {
@@ -55,6 +56,71 @@ function fetchJson(url, extraHeaders = {}) {
 
 /** ms bekleme (rate limit önlemi) */
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/** TCMB günlük XML'den belirtilen CurrencyCode'un ForexBuying değerini döndürür */
+function fetchTcmbXml(url) {
+    return new Promise(resolve => {
+        const req = https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, res => {
+            let raw = '';
+            res.on('data', c => raw += c);
+            res.on('end', () => resolve(raw));
+        });
+        req.on('error', () => resolve(null));
+        req.setTimeout(15000, () => { req.destroy(); resolve(null); });
+    });
+}
+
+/** TCMB XML string'inden belirli bir döviz kodunun alış kurunu çıkarır */
+function parseTcmbRate(xml, code) {
+    if (!xml) return null;
+    const re = new RegExp(`CurrencyCode="${code}"[\\s\\S]*?<ForexBuying>([\\d.]+)<\\/ForexBuying>`);
+    const m = xml.match(re);
+    return m ? parseFloat(m[1]) : null;
+}
+
+/**
+ * TCMB tarihsel XML'lerden belirli bir dövizin 5 yıllık TRY serisini çeker.
+ * URL formatı: https://www.tcmb.gov.tr/kurlar/YYMM/DDMMYYYY.xml
+ */
+async function fetchTcmbHistory(code, years = 5) {
+    const series = [];
+    const today  = new Date();
+    const start  = new Date(today);
+    start.setFullYear(start.getFullYear() - years);
+
+    // Hafta içi günleri üret
+    const days = [];
+    for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+        const dow = d.getDay();
+        if (dow === 0 || dow === 6) continue; // pazar/cumartesi atla
+        days.push(new Date(d));
+    }
+
+    console.log(`  TCMB ${code}: ${days.length} iş günü çekilecek (batch ile)...`);
+
+    // Yılları grupla — her yıl için tüm günleri çek ama rate limit için yavaşla
+    let fetched = 0, skipped = 0;
+    for (const day of days) {
+        const dd   = String(day.getUTCDate()).padStart(2, '0');
+        const mm   = String(day.getUTCMonth() + 1).padStart(2, '0');
+        const yyyy = day.getUTCFullYear();
+        const yymm = `${String(yyyy).slice(2)}${mm}`;
+        const url  = `https://www.tcmb.gov.tr/kurlar/${yymm}/${dd}${mm}${yyyy}.xml`;
+
+        const xml  = await fetchTcmbXml(url);
+        const rate = parseTcmbRate(xml, code);
+        if (rate && rate > 0) {
+            series.push({ ts: day.getTime(), close: rate });
+            fetched++;
+        } else {
+            skipped++;
+        }
+        // Her 10 istekte bir kısa bekleme
+        if (fetched % 10 === 0) await sleep(100);
+    }
+    console.log(`  TCMB ${code}: ${fetched} gün alındı, ${skipped} gün atlandı`);
+    return series;
+}
 
 // ── Yahoo Finance yardımcıları ────────────────────────────────────────────────
 function yahooUrl(symbol, range = '5y', interval = '1d') {
@@ -219,6 +285,15 @@ async function run() {
     await sleep(500);
 
     // ────────────────────────────────────────────────────────────────────────
+    // BÖLÜM 2b — TCMB'den desteklenen dövizler (AZN)
+    // Yahoo Finance'te 5 yıllık veri olmayan ama TCMB'de olan kurlar
+    // ────────────────────────────────────────────────────────────────────────
+    console.log('\n═══ 2b/5  TCMB dövizler (AZN) ═══');
+    const aznSeries = await fetchTcmbHistory('AZN', 5);
+    merge('AZN', aznSeries);
+    await sleep(500);
+
+    // ────────────────────────────────────────────────────────────────────────
     // BÖLÜM 3 — DÖVİZ (current.json'daki tüm dövizler)
     // ────────────────────────────────────────────────────────────────────────
     // Strateji: XXXUSD=X çek → usdMap ile × USDTRY → TRY fiyatı
@@ -270,9 +345,7 @@ async function run() {
         { yahoo: 'MDLUSD=X',  key: 'MDL'  },
         { yahoo: 'MKDUSD=X',  key: 'MKD'  },
         { yahoo: 'ALLUSD=X',  key: 'ALL'  },
-        { yahoo: 'BAMUSD=X',  key: 'BAM'  },
-        { yahoo: 'AZNUSD=X',  key: 'AZN'  },
-        { yahoo: 'GELUSD=X',  key: 'GEL'  },
+        // AZN → TCMB'den çekiliyor (bölüm 2b), BAM/GEL/SYP → blacklist
         { yahoo: 'UAHUSD=X',  key: 'UAH'  },
         { yahoo: 'KZTUSD=X',  key: 'KZT'  },
         { yahoo: 'OMRUSD=X',  key: 'OMR'  },
@@ -291,7 +364,7 @@ async function run() {
         { yahoo: 'IQDUSD=X',  key: 'IQD'  },
         { yahoo: 'CRCUSD=X',  key: 'CRC'  },
         { yahoo: 'LBPUSD=X',  key: 'LBP'  },
-        { yahoo: 'SYPUSD=X',  key: 'SYP'  },
+        // SYP → blacklist (Yahoo/TCMB'de veri yok)
     ];
 
     for (const pair of FOREX_PAIRS) {

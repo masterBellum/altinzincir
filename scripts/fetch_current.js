@@ -90,6 +90,37 @@ const CURRENCY_NAMES = {
     AZN: 'Azerbaycan Manatı', QAR: 'Katar Riyali',
 };
 
+// Truncgil'den gelen ama desteklenmeyen dövizler (history kaynağı yok)
+const CURRENCY_BLACKLIST = new Set(['BAM', 'GEL', 'SYP']);
+
+// ── BIST hisse tablosu (Yahoo Finance .IS) ────────────────────────────────────
+const BIST_STOCKS = [
+    { yahoo: 'GARAN.IS',  key: 'garan',  name: 'Garanti BBVA',        code: 'GARAN'  },
+    { yahoo: 'AKBNK.IS',  key: 'akbnk',  name: 'Akbank',              code: 'AKBNK'  },
+    { yahoo: 'YKBNK.IS',  key: 'ykbnk',  name: 'Yapı Kredi',          code: 'YKBNK'  },
+    { yahoo: 'ISCTR.IS',  key: 'isctr',  name: 'İş Bankası (C)',      code: 'ISCTR'  },
+    { yahoo: 'HALKB.IS',  key: 'halkb',  name: 'Halkbank',            code: 'HALKB'  },
+    { yahoo: 'VAKBN.IS',  key: 'vakbn',  name: 'Vakıfbank',           code: 'VAKBN'  },
+    { yahoo: 'THYAO.IS',  key: 'thyao',  name: 'Türk Hava Yolları',   code: 'THYAO'  },
+    { yahoo: 'ASELS.IS',  key: 'asels',  name: 'Aselsan',             code: 'ASELS'  },
+    { yahoo: 'EREGL.IS',  key: 'eregl',  name: 'Ereğli Demir Çelik', code: 'EREGL'  },
+    { yahoo: 'SISE.IS',   key: 'sise',   name: 'Şişecam',             code: 'SISE'   },
+    { yahoo: 'KCHOL.IS',  key: 'kchol',  name: 'Koç Holding',         code: 'KCHOL'  },
+    { yahoo: 'SAHOL.IS',  key: 'sahol',  name: 'Sabancı Holding',     code: 'SAHOL'  },
+    { yahoo: 'TUPRS.IS',  key: 'tuprs',  name: 'Tüpraş',              code: 'TUPRS'  },
+    { yahoo: 'TOASO.IS',  key: 'toaso',  name: 'Tofaş',               code: 'TOASO'  },
+    { yahoo: 'FROTO.IS',  key: 'froto',  name: 'Ford Otosan',         code: 'FROTO'  },
+    { yahoo: 'OTKAR.IS',  key: 'otkar',  name: 'Otokar',              code: 'OTKAR'  },
+    { yahoo: 'TCELL.IS',  key: 'tcell',  name: 'Turkcell',            code: 'TCELL'  },
+    { yahoo: 'TTKOM.IS',  key: 'ttkom',  name: 'Türk Telekom',        code: 'TTKOM'  },
+    { yahoo: 'LOGO.IS',   key: 'logo',   name: 'Logo Yazılım',        code: 'LOGO'   },
+    { yahoo: 'ENKAI.IS',  key: 'enkai',  name: 'Enka İnşaat',         code: 'ENKAI'  },
+    { yahoo: 'BIMAS.IS',  key: 'bimas',  name: 'BİM Mağazalar',       code: 'BIMAS'  },
+    { yahoo: 'MGROS.IS',  key: 'mgros',  name: 'Migros',              code: 'MGROS'  },
+    { yahoo: 'PGSUS.IS',  key: 'pgsus',  name: 'Pegasus',             code: 'PGSUS'  },
+    { yahoo: 'ULKER.IS',  key: 'ulker',  name: 'Ülker',               code: 'ULKER'  },
+];
+
 // ── CoinGecko kripto tablosu ──────────────────────────────────────────────────
 // CoinGecko: API key gerektirmez, 30 istek/dk, GH Actions'dan kesinlikle çalışır
 const COINGECKO_CRYPTO = [
@@ -162,6 +193,7 @@ async function run() {
             const chgStr = String(row['Değişim'] || '0').replace('%', '');
             const chg    = parseTR(chgStr);
             if (isNaN(satis) || satis <= 0) return;
+            if (CURRENCY_BLACKLIST.has(sym)) return;
             current[sym] = {
                 name: CURRENCY_NAMES[sym] || sym, code: sym, type: 'currency',
                 current: satis, selling: satis,
@@ -214,7 +246,33 @@ async function run() {
         console.warn('  ⚠️ GenelPara emtia verisi alınamadı');
     }
 
-    // ── 3. CoinGecko (Kripto) ────────────────────────────────────────────────
+    // ── 3. Yahoo Finance (BIST Hisse) ───────────────────────────────────────
+    console.log('⬇️  Yahoo Finance BIST hisseler çekiliyor...');
+    let stockCount = 0;
+    for (const stock of BIST_STOCKS) {
+        const url  = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(stock.yahoo)}?interval=1d&range=2d`;
+        const data = await fetchJson(url);
+        try {
+            const r      = data.chart.result[0];
+            const meta   = r.meta;
+            const price  = meta.regularMarketPrice;
+            const prev   = meta.chartPreviousClose || meta.previousClose;
+            if (!price || price <= 0) continue;
+            const chg = prev ? parseFloat(((price - prev) / prev * 100).toFixed(2)) : 0;
+            current[stock.key] = {
+                name: stock.name, code: stock.code, type: 'stock',
+                current: parseFloat(price.toFixed(2)),
+                selling: parseFloat(price.toFixed(2)),
+                buying:  parseFloat(price.toFixed(2)),
+                change:  chg
+            };
+            stockCount++;
+        } catch { /* veri yoksa atla */ }
+        await new Promise(r => setTimeout(r, 300));
+    }
+    console.log(`  ✅ Yahoo Finance: ${stockCount} hisse işlendi`);
+
+    // ── 4. CoinGecko (Kripto) ────────────────────────────────────────────────
     console.log('⬇️  CoinGecko kripto çekiliyor...');
     const geckoIds = COINGECKO_CRYPTO.map(m => m.gecko);
     const cgData   = await fetchJson(coinGeckoUrl(geckoIds));
@@ -247,7 +305,7 @@ async function run() {
     // ── Meta bilgisi ekle ve kaydet ───────────────────────────────────────────
     current['_meta'] = {
         updated_at: new Date().toISOString(),
-        source: 'Truncgil (altın+döviz) | GenelPara (emtia) | CoinGecko (kripto)'
+        source: 'Truncgil (altın+döviz) | GenelPara (emtia) | Yahoo Finance (hisse) | CoinGecko (kripto)'
     };
 
     fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
