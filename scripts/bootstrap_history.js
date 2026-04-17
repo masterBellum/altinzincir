@@ -249,81 +249,94 @@ async function run() {
     // ────────────────────────────────────────────────────────────────────────
     // BÖLÜM 3 — DÖVİZ (current.json'daki tüm dövizler)
     // ────────────────────────────────────────────────────────────────────────
-    console.log('\n═══ 3/5  Döviz ═══');
+    // Strateji: XXXUSD=X çek → usdMap ile × USDTRY → TRY fiyatı
+    // (XXXTRY=X çiftleri Yahoo'da çoğu zaman mevcut değil)
+    // ────────────────────────────────────────────────────────────────────────
+    console.log('\n═══ 3/5  Döviz (USD üzerinden TRY) ═══');
+
+    // EURUSD=X gibi çiftler zaten USD base — direkt çarp
+    // Ters çiftler (USDJPY=X): close = USDJPY → 1/close = JPYUSD → × USDTRY
     const FOREX_PAIRS = [
-        { yahoo: 'USDTRY=X',  key: 'USD' },
-        { yahoo: 'EURTRY=X',  key: 'EUR' },
-        { yahoo: 'GBPTRY=X',  key: 'GBP' },
-        { yahoo: 'JPYTRY=X',  key: 'JPY' },
-        { yahoo: 'CHFTRY=X',  key: 'CHF' },
-        { yahoo: 'CADTRY=X',  key: 'CAD' },
-        { yahoo: 'AUDTRY=X',  key: 'AUD' },
-        { yahoo: 'NZDTRY=X',  key: 'NZD' },
-        { yahoo: 'SEKTRY=X',  key: 'SEK' },
-        { yahoo: 'NOKTRY=X',  key: 'NOK' },
-        { yahoo: 'DKKTRY=X',  key: 'DKK' },
-        { yahoo: 'RUBTRY=X',  key: 'RUB' },
-        { yahoo: 'CNYTRY=X',  key: 'CNY' },
-        { yahoo: 'HKDTRY=X',  key: 'HKD' },
-        { yahoo: 'SGDTRY=X',  key: 'SGD' },
-        { yahoo: 'INRTRY=X',  key: 'INR' },
-        { yahoo: 'SARTRY=X',  key: 'SAR' },
-        { yahoo: 'AEDTRY=X',  key: 'AED' },
-        { yahoo: 'KWDTRY=X',  key: 'KWD' },
-        { yahoo: 'ZARTRY=X',  key: 'ZAR' },
-        { yahoo: 'BRLTRY=X',  key: 'BRL' },
-        { yahoo: 'MXNTRY=X',  key: 'MXN' },
-        { yahoo: 'ILSTRY=X',  key: 'ILS' },
-        { yahoo: 'PLNTRY=X',  key: 'PLN' },
-        { yahoo: 'CZKTRY=X',  key: 'CZK' },
-        { yahoo: 'HUFTRY=X',  key: 'HUF' },
-        { yahoo: 'RONTRY=X',  key: 'RON' },
-        { yahoo: 'QARTRY=X',  key: 'QAR' },
-        { yahoo: 'MYRTRY=X',  key: 'MYR' },
-        { yahoo: 'THBTRY=X',  key: 'THB' },
-        { yahoo: 'IDRTRY=X',  key: 'IDR' },
-        { yahoo: 'PHPTRY=X',  key: 'PHP' },
-        { yahoo: 'PKRTRY=X',  key: 'PKR' },
-        { yahoo: 'KRWTRY=X',  key: 'KRW' },
-        { yahoo: 'TWDTRY=X',  key: 'TWD' },
-        { yahoo: 'ISKTRY=X',  key: 'ISK' },
-        { yahoo: 'BGNTRY=X',  key: 'BGN' },
-        { yahoo: 'RSDTRY=X',  key: 'RSD' },
-        { yahoo: 'MDLTRY=X',  key: 'MDL' },
-        { yahoo: 'MKDTRY=X',  key: 'MKD' },
-        { yahoo: 'ALLTRY=X',  key: 'ALL' },
-        { yahoo: 'BAMTRY=X',  key: 'BAM' },
-        { yahoo: 'AZNTRY=X',  key: 'AZN' },
-        { yahoo: 'GELTRY=X',  key: 'GEL' },
-        { yahoo: 'UAHTRY=X',  key: 'UAH' },
-        { yahoo: 'KZTTRY=X',  key: 'KZT' },
-        { yahoo: 'OMRTRY=X',  key: 'OMR' },
-        { yahoo: 'BHDTRY=X',  key: 'BHD' },
-        { yahoo: 'EGPTRY=X',  key: 'EGP' },
-        { yahoo: 'MADTRY=X',  key: 'MAD' },
-        { yahoo: 'DZDTRY=X',  key: 'DZD' },
-        { yahoo: 'TNDTRY=X',  key: 'TND' },
-        { yahoo: 'LKRTRY=X',  key: 'LKR' },
-        { yahoo: 'COPTRY=X',  key: 'COP' },
-        { yahoo: 'CLPTRY=X',  key: 'CLP' },
-        { yahoo: 'PENTRY=X',  key: 'PEN' },
-        { yahoo: 'UYUTRY=X',  key: 'UYU' },
-        { yahoo: 'ARSTRY=X',  key: 'ARS' },
-        // Ek para birimleri (current.json'da mevcut)
-        { yahoo: 'LYDTRY=X',  key: 'LYD' },
-        { yahoo: 'IQDTRY=X',  key: 'IQD' },
-        { yahoo: 'CRCTRY=X',  key: 'CRC' },
-        { yahoo: 'LBPTRY=X',  key: 'LBP' },
-        { yahoo: 'SYPTRY=X',  key: 'SYP' },
+        { yahoo: 'USDTRY=X',  key: 'USD',  direct: true  }, // zaten TRY
+        { yahoo: 'EURUSD=X',  key: 'EUR'  },
+        { yahoo: 'GBPUSD=X',  key: 'GBP'  },
+        { yahoo: 'USDJPY=X',  key: 'JPY',  invert: true  },
+        { yahoo: 'CHFUSD=X',  key: 'CHF'  },
+        { yahoo: 'CADUSD=X',  key: 'CAD'  },
+        { yahoo: 'AUDUSD=X',  key: 'AUD'  },
+        { yahoo: 'NZDUSD=X',  key: 'NZD'  },
+        { yahoo: 'SEKUSD=X',  key: 'SEK'  },
+        { yahoo: 'NOKUSD=X',  key: 'NOK'  },
+        { yahoo: 'DKKUSD=X',  key: 'DKK'  },
+        { yahoo: 'RUBUSD=X',  key: 'RUB'  },
+        { yahoo: 'CNYUSD=X',  key: 'CNY'  },
+        { yahoo: 'HKDUSD=X',  key: 'HKD'  },
+        { yahoo: 'SGDUSD=X',  key: 'SGD'  },
+        { yahoo: 'INRUSD=X',  key: 'INR'  },
+        { yahoo: 'SARUSD=X',  key: 'SAR'  },
+        { yahoo: 'AEDUSD=X',  key: 'AED'  },
+        { yahoo: 'KWDUSD=X',  key: 'KWD'  },
+        { yahoo: 'ZARUSD=X',  key: 'ZAR'  },
+        { yahoo: 'BRLUSD=X',  key: 'BRL'  },
+        { yahoo: 'MXNUSD=X',  key: 'MXN'  },
+        { yahoo: 'ILSUSD=X',  key: 'ILS'  },
+        { yahoo: 'PLNUSD=X',  key: 'PLN'  },
+        { yahoo: 'CZKUSD=X',  key: 'CZK'  },
+        { yahoo: 'HUFUSD=X',  key: 'HUF'  },
+        { yahoo: 'RONUSD=X',  key: 'RON'  },
+        { yahoo: 'QARUSD=X',  key: 'QAR'  },
+        { yahoo: 'MYRUSD=X',  key: 'MYR'  },
+        { yahoo: 'THBUSD=X',  key: 'THB'  },
+        { yahoo: 'IDRUSD=X',  key: 'IDR'  },
+        { yahoo: 'PHPUSD=X',  key: 'PHP'  },
+        { yahoo: 'PKRUSD=X',  key: 'PKR'  },
+        { yahoo: 'KRWUSD=X',  key: 'KRW'  },
+        { yahoo: 'TWDUSD=X',  key: 'TWD'  },
+        { yahoo: 'ISKUSD=X',  key: 'ISK'  },
+        { yahoo: 'BGNUSD=X',  key: 'BGN'  },
+        { yahoo: 'RSDUSD=X',  key: 'RSD'  },
+        { yahoo: 'MDLUSD=X',  key: 'MDL'  },
+        { yahoo: 'MKDUSD=X',  key: 'MKD'  },
+        { yahoo: 'ALLUSD=X',  key: 'ALL'  },
+        { yahoo: 'BAMUSD=X',  key: 'BAM'  },
+        { yahoo: 'AZNUSD=X',  key: 'AZN'  },
+        { yahoo: 'GELUSD=X',  key: 'GEL'  },
+        { yahoo: 'UAHUSD=X',  key: 'UAH'  },
+        { yahoo: 'KZTUSD=X',  key: 'KZT'  },
+        { yahoo: 'OMRUSD=X',  key: 'OMR'  },
+        { yahoo: 'BHDUSD=X',  key: 'BHD'  },
+        { yahoo: 'EGPUSD=X',  key: 'EGP'  },
+        { yahoo: 'MADUSD=X',  key: 'MAD'  },
+        { yahoo: 'DZDUSD=X',  key: 'DZD'  },
+        { yahoo: 'TNDUSD=X',  key: 'TND'  },
+        { yahoo: 'LKRUSD=X',  key: 'LKR'  },
+        { yahoo: 'COPUSD=X',  key: 'COP'  },
+        { yahoo: 'CLPUSD=X',  key: 'CLP'  },
+        { yahoo: 'PENUSD=X',  key: 'PEN'  },
+        { yahoo: 'UYUUSD=X',  key: 'UYU'  },
+        { yahoo: 'ARSUSD=X',  key: 'ARS'  },
+        { yahoo: 'LYDUSD=X',  key: 'LYD'  },
+        { yahoo: 'IQDUSD=X',  key: 'IQD'  },
+        { yahoo: 'CRCUSD=X',  key: 'CRC'  },
+        { yahoo: 'LBPUSD=X',  key: 'LBP'  },
+        { yahoo: 'SYPUSD=X',  key: 'SYP'  },
     ];
 
     for (const pair of FOREX_PAIRS) {
-        if (pair.key === 'USD') { merge('USD', usdtrySeries); continue; }
+        if (pair.direct) { merge(pair.key, usdtrySeries); continue; }
         console.log(`  Fetching: ${pair.yahoo}...`);
         const raw    = await fetchJson(yahooUrl(pair.yahoo));
-        const series = parseYahooOHLC(raw || {});
+        const ohlc   = parseYahooOHLC(raw || {});
+        // USD fiyatını TRY'ye çevir
+        const series = ohlc.map(({ ts, close: priceUSD }) => {
+            const dateKey = new Date(ts).toISOString().slice(0, 10);
+            const rate    = usdMap[dateKey];
+            if (!rate) return null;
+            const usdVal  = pair.invert ? (1 / priceUSD) : priceUSD;
+            return { ts, close: usdVal * rate };
+        }).filter(Boolean);
         merge(pair.key, series);
-        await sleep(300);
+        await sleep(400);
     }
 
     // ────────────────────────────────────────────────────────────────────────
@@ -364,7 +377,7 @@ async function run() {
             return { ts, close: priceUSD * rate };
         }).filter(Boolean);
         merge(coin.key, trySeries);
-        await sleep(300);
+        await sleep(600);  // Binance rate limit için arttırıldı
     }
 
     // ────────────────────────────────────────────────────────────────────────
