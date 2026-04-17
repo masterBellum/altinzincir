@@ -308,42 +308,48 @@ async function run() {
     }
 
     // ────────────────────────────────────────────────────────────────────────
-    // BÖLÜM 4 — KRİPTO (CoinGecko market_chart — API key gerektirmez)
-    // /coins/{id}/market_chart?vs_currency=usd&days=1825&interval=daily
+    // BÖLÜM 4 — KRİPTO (CryptoCompare histoday — API key gerektirmez)
+    // https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=2000
     // ────────────────────────────────────────────────────────────────────────
-    console.log('\n═══ 4/5  Kripto (CoinGecko market_chart, 20 coin) ═══');
+    console.log('\n═══ 4/5  Kripto (CryptoCompare histoday, 20 coin) ═══');
 
-    const COINGECKO_CRYPTO = [
-        { gecko: 'bitcoin',              key: 'btc'   },
-        { gecko: 'ethereum',             key: 'eth'   },
-        { gecko: 'binancecoin',          key: 'bnb'   },
-        { gecko: 'solana',               key: 'sol'   },
-        { gecko: 'ripple',               key: 'xrp'   },
-        { gecko: 'dogecoin',             key: 'doge'  },
-        { gecko: 'litecoin',             key: 'ltc'   },
-        { gecko: 'cardano',              key: 'ada'   },
-        { gecko: 'avalanche-2',          key: 'avax'  },
-        { gecko: 'polkadot',             key: 'dot'   },
-        { gecko: 'chainlink',            key: 'link'  },
-        { gecko: 'cosmos',               key: 'atom'  },
-        { gecko: 'tron',                 key: 'trx'   },
-        { gecko: 'matic-network',        key: 'matic' },
-        { gecko: 'shiba-inu',            key: 'shib'  },
-        { gecko: 'near',                 key: 'near'  },
-        { gecko: 'uniswap',              key: 'uni'   },
-        { gecko: 'arbitrum',             key: 'arb'   },
-        { gecko: 'the-open-network',     key: 'ton'   },
-        { gecko: 'sui',                  key: 'sui'   },
+    const CRYPTO_LIST = [
+        { cc: 'BTC',   key: 'btc'   },
+        { cc: 'ETH',   key: 'eth'   },
+        { cc: 'BNB',   key: 'bnb'   },
+        { cc: 'SOL',   key: 'sol'   },
+        { cc: 'XRP',   key: 'xrp'   },
+        { cc: 'DOGE',  key: 'doge'  },
+        { cc: 'LTC',   key: 'ltc'   },
+        { cc: 'ADA',   key: 'ada'   },
+        { cc: 'AVAX',  key: 'avax'  },
+        { cc: 'DOT',   key: 'dot'   },
+        { cc: 'LINK',  key: 'link'  },
+        { cc: 'ATOM',  key: 'atom'  },
+        { cc: 'TRX',   key: 'trx'   },
+        { cc: 'MATIC', key: 'matic' },
+        { cc: 'SHIB',  key: 'shib'  },
+        { cc: 'NEAR',  key: 'near'  },
+        { cc: 'UNI',   key: 'uni'   },
+        { cc: 'ARB',   key: 'arb'   },
+        { cc: 'TON',   key: 'ton'   },
+        { cc: 'SUI',   key: 'sui'   },
     ];
 
-    for (const coin of COINGECKO_CRYPTO) {
-        console.log(`  Fetching CoinGecko: ${coin.gecko}...`);
-        const url  = `https://api.coingecko.com/api/v3/coins/${coin.gecko}/market_chart?vs_currency=usd&days=1825&interval=daily`;
+    for (const coin of CRYPTO_LIST) {
+        console.log(`  Fetching CryptoCompare: ${coin.cc}...`);
+        const url  = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${coin.cc}&tsym=USD&limit=2000`;
         const data = await fetchJson(url);
-        if (!data || !data.prices) { console.log(`  ⚠️  ${coin.key}: CoinGecko veri yok`); await sleep(2000); continue; }
+        if (!data || data.Response === 'Error' || !data.Data?.Data?.length) {
+            console.log(`  ⚠️  ${coin.key}: veri yok (${data?.Message || '?'})`);
+            await sleep(500);
+            continue;
+        }
 
-        // CoinGecko prices: [[timestamp_ms, price_usd], ...]
-        const trySeries = data.prices.map(([ts, priceUSD]) => {
+        // CryptoCompare: [{time: unix_sec, close: price}, ...]
+        const trySeries = data.Data.Data.map(({ time, close: priceUSD }) => {
+            if (!priceUSD || priceUSD <= 0) return null;
+            const ts      = time * 1000;
             const dateKey = new Date(ts).toISOString().slice(0, 10);
             const rate    = usdMap[dateKey];
             if (!rate) return null;
@@ -351,7 +357,7 @@ async function run() {
         }).filter(Boolean);
 
         merge(coin.key, trySeries);
-        await sleep(2000);  // CoinGecko public API: 30 req/dk → 2sn aralık güvenli
+        await sleep(300);
     }
 
     // ────────────────────────────────────────────────────────────────────────
