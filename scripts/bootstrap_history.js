@@ -80,38 +80,6 @@ function parseYahooOHLC(data) {
     } catch { return []; }
 }
 
-// ── Binance yardımcıları ──────────────────────────────────────────────────────
-/**
- * Binance klines → son N günlük kapanış (USD cinsinden)
- * Limit max 1000, 5 yıl için 2 istek gerekir.
- */
-async function fetchBinanceKlines(symbol, totalDays = 1825) {
-    const interval  = '1d';
-    const chunkSize = 1000;
-    const allPoints = [];
-    const endTime   = Date.now();
-    const startTime = endTime - totalDays * 24 * 60 * 60 * 1000;
-
-    let cursor = startTime;
-    while (cursor < endTime) {
-        const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${cursor}&limit=${chunkSize}`;
-        const data = await fetchJson(url);
-        if (!Array.isArray(data) || data.length === 0) break;
-
-        data.forEach(k => {
-            const closeTime  = k[6];  // close time ms
-            const closePrice = parseFloat(k[4]);
-            if (closePrice > 0) allPoints.push({ ts: closeTime, close: closePrice });
-        });
-
-        // Son veri noktasının kapanış zamanından devam et
-        cursor = data[data.length - 1][6] + 1;
-        if (data.length < chunkSize) break;
-        await sleep(200);  // Binance rate limit: 1200 istek/dk
-    }
-
-    return allPoints;
-}
 
 // ── Rollup: ham seri → {daily, monthly, yearly} ───────────────────────────────
 function buildArrays(series) {
@@ -369,11 +337,6 @@ async function run() {
     ];
 
     for (const coin of COINGECKO_CRYPTO) {
-        // Zaten yeterli verisi varsa atla
-        if (history[coin.key] && (history[coin.key].daily || []).length > 100) {
-            console.log(`  ✅ ${coin.key}: zaten dolu, atlandı`);
-            continue;
-        }
         console.log(`  Fetching CoinGecko: ${coin.gecko}...`);
         const url  = `https://api.coingecko.com/api/v3/coins/${coin.gecko}/market_chart?vs_currency=usd&days=1825&interval=daily`;
         const data = await fetchJson(url);
