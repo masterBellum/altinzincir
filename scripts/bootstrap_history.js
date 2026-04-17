@@ -25,6 +25,9 @@ const path  = require('path');
 
 const HISTORY_FILE = path.join(__dirname, '..', 'data', 'history.json');
 
+// Yahoo Finance / diğer kaynaklarda veri olmayan, desteklenmeyen para birimleri
+const BLACKLIST = new Set(['AZN', 'BAM', 'GEL', 'SYP']);
+
 // ── HTTP yardımcısı ───────────────────────────────────────────────────────────
 function fetchJson(url, extraHeaders = {}) {
     return new Promise(resolve => {
@@ -118,6 +121,7 @@ async function run() {
     }
 
     function merge(key, series) {
+        if (BLACKLIST.has(key)) { console.log(`  🚫 ${key}: kara listede, atlandı`); return; }
         if (!series || !series.length) { console.log(`  ⚠️  ${key}: veri yok, atlandı`); return; }
         const arrays = buildArrays(series);
         if (!history[key]) history[key] = { daily: [], monthly: [], yearly: [] };
@@ -424,6 +428,9 @@ async function run() {
         sources: 'Yahoo Finance (altın/döviz/hisse/emtia) | Binance klines (kripto)',
         note:    'Altın verileri GC=F×USDTRY hesabıdır. altın.in ile güncellenebilir.'
     };
+
+    // Kara listedeki anahtarları temizle (önceki bootstrap'tan kalmış olabilir)
+    for (const k of BLACKLIST) delete history[k];
 
     fs.mkdirSync(path.dirname(HISTORY_FILE), { recursive: true });
     const tmpFile = HISTORY_FILE + '.tmp';
