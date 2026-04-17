@@ -1,0 +1,35 @@
+name: Bootstrap Tarihsel Veri (Tek Seferlik)
+
+on:
+  workflow_dispatch: # Sadece manuel tetikleme
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Kodu Al
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: main
+
+      - name: Node.js Kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Bootstrap Çalıştır
+        run: node scripts/bootstrap_history.js
+
+      - name: Değişikliği Commit & Push Et
+        run: |
+          git config --global user.name  "AltinZincir-Bot"
+          git config --global user.email "bot@altinzincir.app"
+          git add data/history.json
+          git diff --cached --quiet && echo "Değişiklik yok" && exit 0
+          git commit -m "bootstrap: 5 yıllık tarihsel veri eklendi $(date -u '+%Y-%m-%d')"
+          git push

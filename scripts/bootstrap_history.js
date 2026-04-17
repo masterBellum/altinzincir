@@ -196,6 +196,8 @@ async function run() {
     }).filter(Boolean);
 
     merge('gram-altin', gramSeries);
+    // Ons altın USD fiyatı (current.json'da 'ons' key'i)
+    merge('ons', goldSeries);
 
     // Diğer altın türleri gram altın üzerinden katsayıyla hesaplanır
     // (grafik amaçlı — yeterince doğru)
@@ -245,11 +247,11 @@ async function run() {
     await sleep(500);
 
     // ────────────────────────────────────────────────────────────────────────
-    // BÖLÜM 3 — DÖVİZ (27 çift)
+    // BÖLÜM 3 — DÖVİZ (current.json'daki tüm dövizler)
     // ────────────────────────────────────────────────────────────────────────
-    console.log('\n═══ 3/5  Döviz (27 çift) ═══');
+    console.log('\n═══ 3/5  Döviz ═══');
     const FOREX_PAIRS = [
-        { yahoo: 'USDTRY=X',  key: 'USD' }, // zaten var ama yeniden mergelanmaz sorun değil
+        { yahoo: 'USDTRY=X',  key: 'USD' },
         { yahoo: 'EURTRY=X',  key: 'EUR' },
         { yahoo: 'GBPTRY=X',  key: 'GBP' },
         { yahoo: 'JPYTRY=X',  key: 'JPY' },
@@ -276,6 +278,43 @@ async function run() {
         { yahoo: 'CZKTRY=X',  key: 'CZK' },
         { yahoo: 'HUFTRY=X',  key: 'HUF' },
         { yahoo: 'RONTRY=X',  key: 'RON' },
+        { yahoo: 'QARTRY=X',  key: 'QAR' },
+        { yahoo: 'MYRTRY=X',  key: 'MYR' },
+        { yahoo: 'THBTRY=X',  key: 'THB' },
+        { yahoo: 'IDRTRY=X',  key: 'IDR' },
+        { yahoo: 'PHPTRY=X',  key: 'PHP' },
+        { yahoo: 'PKRTRY=X',  key: 'PKR' },
+        { yahoo: 'KRWTRY=X',  key: 'KRW' },
+        { yahoo: 'TWDTRY=X',  key: 'TWD' },
+        { yahoo: 'ISKTRY=X',  key: 'ISK' },
+        { yahoo: 'BGNTRY=X',  key: 'BGN' },
+        { yahoo: 'RSDTRY=X',  key: 'RSD' },
+        { yahoo: 'MDLTRY=X',  key: 'MDL' },
+        { yahoo: 'MKDTRY=X',  key: 'MKD' },
+        { yahoo: 'ALLTRY=X',  key: 'ALL' },
+        { yahoo: 'BAMTRY=X',  key: 'BAM' },
+        { yahoo: 'AZNTRY=X',  key: 'AZN' },
+        { yahoo: 'GELTRY=X',  key: 'GEL' },
+        { yahoo: 'UAHTRY=X',  key: 'UAH' },
+        { yahoo: 'KZTTRY=X',  key: 'KZT' },
+        { yahoo: 'OMRTRY=X',  key: 'OMR' },
+        { yahoo: 'BHDTRY=X',  key: 'BHD' },
+        { yahoo: 'EGPTRY=X',  key: 'EGP' },
+        { yahoo: 'MADTRY=X',  key: 'MAD' },
+        { yahoo: 'DZDTRY=X',  key: 'DZD' },
+        { yahoo: 'TNDTRY=X',  key: 'TND' },
+        { yahoo: 'LKRTRY=X',  key: 'LKR' },
+        { yahoo: 'COPTRY=X',  key: 'COP' },
+        { yahoo: 'CLPTRY=X',  key: 'CLP' },
+        { yahoo: 'PENTRY=X',  key: 'PEN' },
+        { yahoo: 'UYUTRY=X',  key: 'UYU' },
+        { yahoo: 'ARSTRY=X',  key: 'ARS' },
+        // Ek para birimleri (current.json'da mevcut)
+        { yahoo: 'LYDTRY=X',  key: 'LYD' },
+        { yahoo: 'IQDTRY=X',  key: 'IQD' },
+        { yahoo: 'CRCTRY=X',  key: 'CRC' },
+        { yahoo: 'LBPTRY=X',  key: 'LBP' },
+        { yahoo: 'SYPTRY=X',  key: 'SYP' },
     ];
 
     for (const pair of FOREX_PAIRS) {
@@ -346,18 +385,21 @@ async function run() {
         { yahoo: 'LOGO.IS',  key: 'logo'  }, { yahoo: 'ENKAI.IS', key: 'enkai' },
         { yahoo: 'BIMAS.IS', key: 'bimas' }, { yahoo: 'MGROS.IS', key: 'mgros' },
         { yahoo: 'PGSUS.IS', key: 'pgsus' }, { yahoo: 'ULKER.IS', key: 'ulker' },
-        // Emtia (USD → TRY dönüşümü gerekli)
-        { yahoo: 'CL=F',  key: 'petrol_wti',   usdToTry: true },
-        { yahoo: 'BZ=F',  key: 'petrol_brent', usdToTry: true },
-        { yahoo: 'NG=F',  key: 'dogalgaz',     usdToTry: true },
-        { yahoo: 'HG=F',  key: 'bakir',        usdToTry: true },
-        { yahoo: 'PA=F',  key: 'paladyum',     usdToTry: true },
-        { yahoo: 'KC=F',  key: 'kahve',        usdToTry: true },
-        { yahoo: 'ZW=F',  key: 'bugday',       usdToTry: true },
-        { yahoo: 'ZC=F',  key: 'misir',        usdToTry: true },
-        { yahoo: 'ZS=F',  key: 'soya',         usdToTry: true },
-        { yahoo: 'SB=F',  key: 'seker',        usdToTry: true },
-        { yahoo: 'CT=F',  key: 'pamuk',        usdToTry: true },
+        // Emtia (USD fiyatı — current.json'daki key'lerle eşleştirildi)
+        { yahoo: 'CL=F',  key: 'COIL',    usdToTry: true },   // WTI Ham Petrol
+        { yahoo: 'BZ=F',  key: 'XBRUSD',  usdToTry: true },   // Brent
+        { yahoo: 'NG=F',  key: 'NGAS',    usdToTry: true },   // Doğal Gaz
+        { yahoo: 'HG=F',  key: 'COPPER',  usdToTry: true },   // Bakır
+        { yahoo: 'PA=F',  key: 'XPDUSD',  usdToTry: true },   // Paladyum
+        { yahoo: 'KC=F',  key: 'COFFEE',  usdToTry: true },   // Kahve
+        { yahoo: 'ZW=F',  key: 'WHEAT',   usdToTry: true },   // Buğday
+        { yahoo: 'ZC=F',  key: 'CORN',    usdToTry: true },   // Mısır
+        { yahoo: 'ZS=F',  key: 'SOYBEAN', usdToTry: true },   // Soya
+        { yahoo: 'SB=F',  key: 'SUGAR',   usdToTry: true },   // Şeker
+        { yahoo: 'CT=F',  key: 'COTTON',  usdToTry: true },   // Pamuk
+        { yahoo: 'CC=F',  key: 'COCOA',   usdToTry: true },   // Kakao
+        { yahoo: 'SI=F',  key: 'XAGUSD',  usdOnly: true  },   // Gümüş (USD)
+        { yahoo: 'PL=F',  key: 'XPTUSD',  usdOnly: true  },   // Platin (USD)
     ];
 
     for (const asset of YAHOO_ASSETS) {
@@ -373,6 +415,9 @@ async function run() {
                 if (!rate) return null;
                 return { ts, close: priceUSD * rate };
             }).filter(Boolean);
+        } else if (asset.usdOnly) {
+            // USD fiyatı olduğu gibi sakla (XAGUSD, XPTUSD gibi)
+            finalSeries = series;
         }
 
         merge(asset.key, finalSeries);
@@ -388,7 +433,9 @@ async function run() {
     };
 
     fs.mkdirSync(path.dirname(HISTORY_FILE), { recursive: true });
-    fs.writeFileSync(HISTORY_FILE, JSON.stringify(history), 'utf8');
+    const tmpFile = HISTORY_FILE + '.tmp';
+    fs.writeFileSync(tmpFile, JSON.stringify(history), 'utf8');
+    fs.renameSync(tmpFile, HISTORY_FILE);
 
     const keys = Object.keys(history).filter(k => k !== '_meta');
     const totalSize = (Buffer.byteLength(JSON.stringify(history)) / 1024).toFixed(1);
