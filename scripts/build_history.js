@@ -134,5 +134,7 @@ history['_meta'] = {
 
 // ── Kaydet ────────────────────────────────────────────────────────────────────
 fs.mkdirSync(path.dirname(HISTORY_FILE), { recursive: true });
-fs.writeFileSync(HISTORY_FILE, JSON.stringify(history, null, 2), 'utf8');
+const tmpHist = HISTORY_FILE + '.tmp';
+fs.writeFileSync(tmpHist, JSON.stringify(history, null, 2), 'utf8');
+fs.renameSync(tmpHist, HISTORY_FILE);
 console.log(`\n✅ data/history.json kaydedildi (${updatedCount} varlık güncellendi)`);

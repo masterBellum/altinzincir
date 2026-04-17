@@ -20,7 +20,7 @@ const TRUNCGIL_URL  = 'https://finans.truncgil.com/today.json';
 const GENPARA_EMTIA = 'https://api.genelpara.com/json/?list=emtia&sembol=all';
 
 function coinGeckoUrl(ids) {
-    return `https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=usd&include_24hr_change=true&precision=8`;
+    return `https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=usd&include_24hr_change=true`;
 }
 
 // ── Yardımcı fonksiyonlar ─────────────────────────────────────────────────────
@@ -106,7 +106,7 @@ const COINGECKO_CRYPTO = [
     { gecko: 'chainlink',        key: 'link',  name: 'Chainlink',      code: 'LINK'  },
     { gecko: 'cosmos',           key: 'atom',  name: 'Cosmos',         code: 'ATOM'  },
     { gecko: 'tron',             key: 'trx',   name: 'TRON',           code: 'TRX'   },
-    { gecko: 'polygon-ecosystem-token', key: 'matic', name: 'Polygon (POL)', code: 'MATIC' },
+    { gecko: 'matic-network',    key: 'matic', name: 'Polygon',        code: 'MATIC' },
     { gecko: 'shiba-inu',        key: 'shib',  name: 'Shiba Inu',      code: 'SHIB'  },
     { gecko: 'near',             key: 'near',  name: 'NEAR Protocol',  code: 'NEAR'  },
     { gecko: 'uniswap',          key: 'uni',   name: 'Uniswap',        code: 'UNI'   },
@@ -251,7 +251,10 @@ async function run() {
     };
 
     fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(current, null, 2), 'utf8');
+    // Atomic write: önce .tmp yaz, sonra rename — yarım yazma corruption'ını önler
+    const tmpFile = OUTPUT_FILE + '.tmp';
+    fs.writeFileSync(tmpFile, JSON.stringify(current, null, 2), 'utf8');
+    fs.renameSync(tmpFile, OUTPUT_FILE);
     console.log(`\n✅ data/current.json kaydedildi (${Object.keys(current).length - 1} varlık)`);
 }
 
