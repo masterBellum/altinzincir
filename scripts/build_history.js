@@ -101,7 +101,7 @@ Object.entries(current).forEach(([key, asset]) => {
         // Ay sonu mu? → monthly'e al
         if (isMonthEnd) {
             h.monthly.push(dailyClose);
-            if (h.monthly.length > 12) h.monthly = h.monthly.slice(-12);
+            if (h.monthly.length > 60) h.monthly = h.monthly.slice(-60);
             console.log(`  📅 [AY SONU] ${key}: ${dailyClose} → monthly`);
 
             // Yıl sonu mu? → yearly'e al
@@ -112,9 +112,9 @@ Object.entries(current).forEach(([key, asset]) => {
             }
         }
 
-        // Her gün (ay sonu da dahil) daily'e ekle — son 365 gün tut
+        // Her gün (ay sonu da dahil) daily'e ekle — son 1825 gün tut (5 yıl)
         h.daily.push(dailyClose);
-        if (h.daily.length > 365) h.daily = h.daily.slice(-365);
+        if (h.daily.length > 1825) h.daily = h.daily.slice(-1825);
 
         // Hourly'i temizle (yeni güne sıfırla)
         h.hourly = [];
