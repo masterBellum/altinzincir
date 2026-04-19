@@ -252,6 +252,32 @@
             z-index: 2;
         }
 
+        /* Skeleton / stale-data shimmer */
+        @keyframes shimmer {
+            0%   { background-position: -400px 0; }
+            100% { background-position:  400px 0; }
+        }
+        .is-refreshing .asset-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 1.5rem;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255,255,255,0.06) 40%,
+                rgba(255,255,255,0.13) 50%,
+                rgba(255,255,255,0.06) 60%,
+                transparent 100%
+            );
+            background-size: 800px 100%;
+            animation: shimmer 1.6s infinite linear;
+            pointer-events: none;
+        }
+        .is-refreshing .asset-card {
+            opacity: 0.75;
+        }
+
         .icon-circle {
             width: 4rem;
             height: 4rem;
@@ -1060,6 +1086,12 @@
 
         async function fetchLivePrices() {
             debugLog('LIVE GitHub\'dan Canlı Fiyatlar Çekiliyor...');
+
+            // Stale data: eğer zaten veri varsa skeleton shimmer göster, kartları temizleme
+            const grid = document.getElementById('grid-container');
+            const hasStaleData = market.length > 0;
+            if (hasStaleData && grid) grid.classList.add('is-refreshing');
+
             try {
                 const res = await fetch(CURRENT_URL + '?t=' + Date.now());
                 if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -1086,6 +1118,9 @@
                 debugLog(`✅ Fiyatlar yüklendi${updatedAt ? ' (' + updatedAt.slice(11,16) + ' UTC)' : ''}`);
             } catch (e) {
                 debugLog('ERR Fiyat alınamadı: ' + e.message);
+                // Hata durumunda skeleton kaldır, eski data kalmaya devam eder
+                if (grid) grid.classList.remove('is-refreshing');
+                return;
             }
 
             // RENDER
@@ -1094,6 +1129,7 @@
                 renderAll();
                 setupConverter();
             }
+            if (grid) grid.classList.remove('is-refreshing');
         }
 
         function startAutoRefresh() {
