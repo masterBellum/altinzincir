@@ -17,6 +17,7 @@ const OUTPUT_FILE = path.join(__dirname, '..', 'data', 'current.json');
 
 // ── Kaynak URL'leri ───────────────────────────────────────────────────────────
 const TRUNCGIL_URL  = 'https://finans.truncgil.com/today.json';
+const GENPARA_ALTIN = 'https://api.genelpara.com/json/?list=altin&sembol=all';
 const GENPARA_EMTIA = 'https://api.genelpara.com/json/?list=emtia&sembol=all';
 
 function coinGeckoUrl(ids) {
@@ -57,6 +58,26 @@ function parseTR(val) {
     if (s.includes(',')) return parseFloat(s.replace(',', '.'));
     return parseFloat(s);
 }
+
+// ── GenelPara altın kodu → current.json key eşlemesi ─────────────────────────
+// GenelPara sikke fiyatlarını Truncgil'den farklı (doğru) olarak döndürür
+const GENPARA_ALTIN_MAP = {
+    'GA':    'gram-altin',
+    'XHGLD': 'gram-has-altin',
+    'C':     'ceyrek-altin',
+    'Y':     'yarim-altin',
+    'T':     'tam-altin',
+    'CMR':   'cumhuriyet-altini',
+    'ATA':   'ata-altin',
+    'RA':    'resat-altin',
+    'HA':    'hamit-altin',
+    '14':    '14-ayar-altin',
+    '18':    '18-ayar-altin',
+    '22':    '22-ayar-bilezik',
+    'IKB':   'ikibucuk-altin',
+    'GR':    'gremse-altin',
+    'BSL':   'besli-altin',
+};
 
 // ── Altın key → meta tablosu ──────────────────────────────────────────────────
 const GOLD_MAP = {
@@ -206,7 +227,35 @@ async function run() {
         console.warn('  ⚠️ Truncgil verisi alınamadı, mevcut fiyatlar korunuyor');
     }
 
-    // ── 2. GenelPara (Emtia) ─────────────────────────────────────────────────
+    // ── 2. GenelPara (Altın sikkeleri — Reşat/Hamit/Ata diferansiye fiyatlar) ──
+    // Truncgil Reşat/Hamit/Ata için aynı fiyatı döndürür; GenelPara gerçek prim
+    // farklarını yansıtır, bu yüzden sikke fiyatlarını buradan alıyoruz.
+    console.log('⬇️  GenelPara altın sikkeleri çekiliyor...');
+    const gpAltinData = await fetchJson(GENPARA_ALTIN);
+    if (gpAltinData?.data) {
+        Object.entries(GENPARA_ALTIN_MAP).forEach(([gpKey, jsonKey]) => {
+            const row = gpAltinData.data[gpKey];
+            if (!row) return;
+            const satis = parseTR(row.satis);
+            const alis  = parseTR(row.alis);
+            if (isNaN(satis) || satis <= 0) return;
+            const chg = parseTR(String(row.oran || 0).replace('%', '').replace('+', ''));
+            // Mevcut kaydı koru ama fiyatı güncelle
+            const existing = current[jsonKey] || {};
+            current[jsonKey] = {
+                ...existing,
+                current: satis,
+                selling: satis,
+                buying:  !isNaN(alis) && alis > 0 ? alis : parseFloat((satis * 0.995).toFixed(2)),
+                change:  !isNaN(chg) ? chg : (existing.change || 0),
+            };
+        });
+        console.log(`  ✅ GenelPara altın: ${Object.keys(GENPARA_ALTIN_MAP).length} sikke işlendi`);
+    } else {
+        console.warn('  ⚠️ GenelPara altın verisi alınamadı, Truncgil değerleri korunuyor');
+    }
+
+    // ── 3. GenelPara (Emtia) ─────────────────────────────────────────────────
     console.log('⬇️  GenelPara emtia çekiliyor...');
     const gpData = await fetchJson(GENPARA_EMTIA);
     if (gpData?.data) {
