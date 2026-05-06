@@ -9,9 +9,10 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-const fs    = require('fs');
-const https = require('https');
-const path  = require('path');
+const fs            = require('fs');
+const https         = require('https');
+const path          = require('path');
+const { spawnSync } = require('child_process');
 
 const OUTPUT_FILE = path.join(__dirname, '..', 'data', 'current.json');
 
@@ -25,6 +26,30 @@ function coinGeckoUrl(ids) {
 }
 
 // ── Yardımcı fonksiyonlar ─────────────────────────────────────────────────────
+
+// curl tabanlı fetch: Türk finansal API'leri Node'un https modülünü
+// datacenter IP olarak tanıyıp bloke ediyor; curl'ün TLS parmak izi bunu aşar.
+async function fetchWithCurl(url, referer = '') {
+    const args = [
+        '-s', '--max-time', '15', '--compressed', '-L',
+        '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        '-H', 'Accept: application/json, text/javascript, */*; q=0.01',
+        '-H', 'Accept-Language: tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
+        '-H', 'Connection: keep-alive',
+        '-H', 'Cache-Control: no-cache',
+    ];
+    if (referer) args.push('-H', `Referer: ${referer}`);
+    args.push(url);
+    try {
+        const r = spawnSync('curl', args, { timeout: 20000, maxBuffer: 5 * 1024 * 1024 });
+        if (r.status !== 0 || !r.stdout) return null;
+        const raw = r.stdout.toString('utf8');
+        if (!raw || raw.trimStart().startsWith('<')) return null;
+        return JSON.parse(raw);
+    } catch { return null; }
+}
+
+// Yahoo Finance ve CoinGecko için: bu API'ler Node https modülünü kabul ediyor
 function fetchJson(url) {
     return new Promise(resolve => {
         const req = https.get(url, {
@@ -174,7 +199,7 @@ async function run() {
 
     // ── 1. Truncgil (Altın + Döviz) ──────────────────────────────────────────
     console.log('⬇️  Truncgil çekiliyor...');
-    const tData = await fetchJson(TRUNCGIL_URL);
+    const tData = await fetchWithCurl(TRUNCGIL_URL, 'https://finans.truncgil.com/');
     let usdTry = current['USD']?.current || 38;
 
     if (tData) {
@@ -231,7 +256,7 @@ async function run() {
     // Truncgil Reşat/Hamit/Ata için aynı fiyatı döndürür; GenelPara gerçek prim
     // farklarını yansıtır, bu yüzden sikke fiyatlarını buradan alıyoruz.
     console.log('⬇️  GenelPara altın sikkeleri çekiliyor...');
-    const gpAltinData = await fetchJson(GENPARA_ALTIN);
+    const gpAltinData = await fetchWithCurl(GENPARA_ALTIN, 'https://www.genelpara.com/');
     if (gpAltinData?.data) {
         Object.entries(GENPARA_ALTIN_MAP).forEach(([gpKey, jsonKey]) => {
             const row = gpAltinData.data[gpKey];
@@ -257,7 +282,7 @@ async function run() {
 
     // ── 3. GenelPara (Emtia) ─────────────────────────────────────────────────
     console.log('⬇️  GenelPara emtia çekiliyor...');
-    const gpData = await fetchJson(GENPARA_EMTIA);
+    const gpData = await fetchWithCurl(GENPARA_EMTIA, 'https://www.genelpara.com/');
     if (gpData?.data) {
         const EMTIA_MAP = {
             XAGUSD: { name: 'Gümüş',              code: 'XAG'    },
