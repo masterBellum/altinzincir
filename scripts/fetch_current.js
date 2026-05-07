@@ -226,6 +226,14 @@ async function run() {
     let current = {};
     try { current = JSON.parse(fs.readFileSync(OUTPUT_FILE, 'utf8')); } catch {}
 
+    // Istanbul günlük açılış takibi (UTC+3): her altın türü kendi değişimini hesaplar.
+    // Yeni gün → açılış fiyatları sıfırlanır; aynı gün → depolanmış açılıştan hesap yapılır.
+    const nowTR   = new Date(Date.now() + 3 * 60 * 60 * 1000);
+    const todayTR = nowTR.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+    const dailyOpen = (current['_daily_open']?.date === todayTR)
+        ? current['_daily_open']
+        : { date: todayTR, prices: {} };
+
     // ── 1. Truncgil (Altın + Döviz) ──────────────────────────────────────────
     console.log('⬇️  Truncgil çekiliyor...');
     const tData = await fetchWithCurl(TRUNCGIL_URL, 'https://finans.truncgil.com/');
@@ -252,11 +260,18 @@ async function run() {
                 satis = parseFloat((satis * usdTry).toFixed(2));
                 if (!isNaN(alis) && alis > 0) alis = parseFloat((alis * usdTry).toFixed(2));
             }
+            // İlk run'da (veya yeni günde) açılış fiyatı olarak kaydet
+            if (!dailyOpen.prices[tKey]) dailyOpen.prices[tKey] = satis;
+            const goldOpen    = dailyOpen.prices[tKey];
+            const chgComputed = goldOpen > 0
+                ? parseFloat(((satis - goldOpen) / goldOpen * 100).toFixed(2))
+                : (!isNaN(chg) ? chg : 0);
             current[tKey] = {
                 name: meta.name, code: meta.code, type: meta.type,
                 current: satis, selling: satis,
                 buying:  !isNaN(alis) && alis > 0 ? alis : parseFloat((satis * 0.995).toFixed(2)),
-                change:  !isNaN(chg) ? chg : 0
+                change:  chgComputed,
+                open:    goldOpen,
             };
         });
 
@@ -290,11 +305,18 @@ async function run() {
         const data = await fetchSikkeFiyati(sikke.slug);
         if (data) {
             const existing = current[sikke.key] || {};
+            if (!dailyOpen.prices[sikke.key]) dailyOpen.prices[sikke.key] = data.satis;
+            const sOpen = dailyOpen.prices[sikke.key];
+            const sChg  = sOpen > 0
+                ? parseFloat(((data.satis - sOpen) / sOpen * 100).toFixed(2))
+                : (existing.change || 0);
             current[sikke.key] = {
                 ...existing,
                 current: data.satis,
                 selling: data.satis,
                 buying:  data.alis,
+                open:    sOpen,
+                change:  sChg,
             };
             sikkeCount++;
         }
@@ -390,6 +412,7 @@ async function run() {
     }
 
     // ── Meta bilgisi ekle ve kaydet ───────────────────────────────────────────
+    current['_daily_open'] = dailyOpen;
     current['_meta'] = {
         updated_at: new Date().toISOString(),
         source: 'Truncgil (altın+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)'
