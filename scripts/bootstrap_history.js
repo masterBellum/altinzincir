@@ -456,21 +456,21 @@ async function run() {
         { yahoo: 'LOGO.IS',  key: 'logo'  }, { yahoo: 'ENKAI.IS', key: 'enkai' },
         { yahoo: 'BIMAS.IS', key: 'bimas' }, { yahoo: 'MGROS.IS', key: 'mgros' },
         { yahoo: 'PGSUS.IS', key: 'pgsus' }, { yahoo: 'ULKER.IS', key: 'ulker' },
-        // Emtia (USD fiyatı — current.json'daki key'lerle eşleştirildi)
-        { yahoo: 'CL=F',  key: 'COIL',    usdToTry: true },   // WTI Ham Petrol
-        { yahoo: 'BZ=F',  key: 'XBRUSD',  usdToTry: true },   // Brent
-        { yahoo: 'NG=F',  key: 'NGAS',    usdToTry: true },   // Doğal Gaz
-        { yahoo: 'HG=F',  key: 'COPPER',  usdToTry: true },   // Bakır
-        { yahoo: 'PA=F',  key: 'XPDUSD',  usdToTry: true },   // Paladyum
-        { yahoo: 'KC=F',  key: 'COFFEE',  usdToTry: true },   // Kahve
-        { yahoo: 'ZW=F',  key: 'WHEAT',   usdToTry: true },   // Buğday
-        { yahoo: 'ZC=F',  key: 'CORN',    usdToTry: true },   // Mısır
-        { yahoo: 'ZS=F',  key: 'SOYBEAN', usdToTry: true },   // Soya
-        { yahoo: 'SB=F',  key: 'SUGAR',   usdToTry: true },   // Şeker
-        { yahoo: 'CT=F',  key: 'COTTON',  usdToTry: true },   // Pamuk
-        { yahoo: 'CC=F',  key: 'COCOA',   usdToTry: true },   // Kakao
-        { yahoo: 'SI=F',  key: 'XAGUSD',  usdOnly: true  },   // Gümüş (USD)
-        { yahoo: 'PL=F',  key: 'XPTUSD',  usdOnly: true  },   // Platin (USD)
+        // Emtia (current.json'daki key'lerle eşleştirildi — hepsi TRY)
+        { yahoo: 'CL=F',  key: 'COIL',    usdToTry: true },              // WTI Ham Petrol
+        { yahoo: 'BZ=F',  key: 'XBRUSD',  usdToTry: true },              // Brent
+        { yahoo: 'NG=F',  key: 'NGAS',    usdToTry: true },              // Doğal Gaz
+        { yahoo: 'HG=F',  key: 'COPPER',  usdToTry: true },              // Bakır
+        { yahoo: 'PA=F',  key: 'XPDUSD',  usdToTry: true },              // Paladyum
+        { yahoo: 'KC=F',  key: 'COFFEE',  usdToTry: true, isUSX: true }, // Kahve (USX→USD÷100)
+        { yahoo: 'ZW=F',  key: 'WHEAT',   usdToTry: true, isUSX: true }, // Buğday (USX→USD÷100)
+        { yahoo: 'ZC=F',  key: 'CORN',    usdToTry: true, isUSX: true }, // Mısır (USX→USD÷100)
+        { yahoo: 'ZS=F',  key: 'SOYBEAN', usdToTry: true, isUSX: true }, // Soya (USX→USD÷100)
+        { yahoo: 'SB=F',  key: 'SUGAR',   usdToTry: true, isUSX: true }, // Şeker (USX→USD÷100)
+        { yahoo: 'CT=F',  key: 'COTTON',  usdToTry: true, isUSX: true }, // Pamuk (USX→USD÷100)
+        { yahoo: 'CC=F',  key: 'COCOA',   usdToTry: true },              // Kakao
+        { yahoo: 'SI=F',  key: 'XAGUSD',  usdToTry: true },              // Gümüş troy ons TRY
+        { yahoo: 'PL=F',  key: 'XPTUSD',  usdToTry: true },              // Platin troy ons TRY
     ];
 
     for (const asset of YAHOO_ASSETS) {
@@ -480,15 +480,13 @@ async function run() {
 
         let finalSeries = series;
         if (asset.usdToTry) {
-            finalSeries = series.map(({ ts, close: priceUSD }) => {
+            finalSeries = series.map(({ ts, close: rawPrice }) => {
                 const dateKey = new Date(ts).toISOString().slice(0, 10);
                 const rate    = usdMap[dateKey];
                 if (!rate) return null;
+                const priceUSD = asset.isUSX ? rawPrice / 100 : rawPrice;
                 return { ts, close: priceUSD * rate };
             }).filter(Boolean);
-        } else if (asset.usdOnly) {
-            // USD fiyatı olduğu gibi sakla (XAGUSD, XPTUSD gibi)
-            finalSeries = series;
         }
 
         merge(asset.key, finalSeries);

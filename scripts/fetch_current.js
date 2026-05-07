@@ -17,9 +17,32 @@ const { spawnSync } = require('child_process');
 const OUTPUT_FILE = path.join(__dirname, '..', 'data', 'current.json');
 
 // ── Kaynak URL'leri ───────────────────────────────────────────────────────────
-const TRUNCGIL_URL  = 'https://finans.truncgil.com/today.json';
-const GENPARA_ALTIN = 'https://api.genelpara.com/json/?list=altin&sembol=all';
-const GENPARA_EMTIA = 'https://api.genelpara.com/json/?list=emtia&sembol=all';
+const TRUNCGIL_URL    = 'https://finans.truncgil.com/today.json';
+// canlidoviz.com: Truncgil'in aynı değer döndürdüğü Reşat/Hamit/Ata için HTML scraping
+const CANLIDOVIZ_BASE = 'https://canlidoviz.com/altin-fiyatlari';
+const SIKKE_SLUGS = [
+    { slug: 'resat-lira-altin', key: 'resat-altin' },
+    { slug: 'hamit-altin',      key: 'hamit-altin' },
+    { slug: 'ata-altin',        key: 'ata-altin'   },
+];
+
+// Yahoo Finance futures: GenelPara tüm sunucu IP'lerini bloke ediyor (403)
+const EMTIA_MAP = [
+    { yahoo: 'SI=F',  key: 'XAGUSD',  name: 'Gümüş',           code: 'XAG'    },
+    { yahoo: 'PL=F',  key: 'XPTUSD',  name: 'Platin',           code: 'XPT'    },
+    { yahoo: 'PA=F',  key: 'XPDUSD',  name: 'Paladyum',         code: 'XPD'    },
+    { yahoo: 'BZ=F',  key: 'XBRUSD',  name: 'Brent Ham Petrol', code: 'BRENT'  },
+    { yahoo: 'CL=F',  key: 'COIL',    name: 'Ham Petrol (WTI)', code: 'WTI'    },
+    { yahoo: 'HG=F',  key: 'COPPER',  name: 'Bakır',            code: 'COPPER' },
+    { yahoo: 'NG=F',  key: 'NGAS',    name: 'Doğal Gaz',        code: 'NGAS'   },
+    { yahoo: 'ZW=F',  key: 'WHEAT',   name: 'Buğday',           code: 'WHEAT'  },
+    { yahoo: 'ZC=F',  key: 'CORN',    name: 'Mısır',            code: 'CORN'   },
+    { yahoo: 'KC=F',  key: 'COFFEE',  name: 'Kahve',            code: 'COFFEE' },
+    { yahoo: 'SB=F',  key: 'SUGAR',   name: 'Şeker',            code: 'SUGAR'  },
+    { yahoo: 'CC=F',  key: 'COCOA',   name: 'Kakao',            code: 'COCOA'  },
+    { yahoo: 'ZS=F',  key: 'SOYBEAN', name: 'Soya Fasulyesi',   code: 'SOYBEAN'},
+    { yahoo: 'CT=F',  key: 'COTTON',  name: 'Pamuk',            code: 'COTTON' },
+];
 
 function coinGeckoUrl(ids) {
     return `https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=usd&include_24hr_change=true`;
@@ -46,6 +69,32 @@ async function fetchWithCurl(url, referer = '') {
         const raw = r.stdout.toString('utf8');
         if (!raw || raw.trimStart().startsWith('<')) return null;
         return JSON.parse(raw);
+    } catch { return null; }
+}
+
+// canlidoviz.com sikke sayfası scraper: fiyatlar server-rendered HTML içinde
+async function fetchSikkeFiyati(slug) {
+    const url  = `${CANLIDOVIZ_BASE}/${slug}`;
+    const args = [
+        '-s', '--max-time', '15', '-L',
+        '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        '-H', 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        '-H', 'Accept-Language: tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
+        '-H', 'Referer: https://canlidoviz.com/',
+        url,
+    ];
+    try {
+        const r = spawnSync('curl', args, { timeout: 20000, maxBuffer: 2 * 1024 * 1024 });
+        if (r.status !== 0 || !r.stdout) return null;
+        const html = r.stdout.toString('utf8');
+        if (!html || html.length < 500) return null;
+        // itemprop="price" → satış (ana ekran); dt="bA" → BAYİ ALIŞ
+        const satisM = html.match(/itemprop="price"[^>]*>\s*([\d]{5,6}\.[\d]{1,4})/);
+        const alisM  = html.match(/dt="bA"[^>]*>\s*([\d]{5,6}\.[\d]{1,4})/);
+        const satis  = satisM ? parseFloat(satisM[1]) : NaN;
+        const alis   = alisM  ? parseFloat(alisM[1])  : NaN;
+        if (isNaN(satis) || satis <= 0) return null;
+        return { alis: isNaN(alis) || alis <= 0 ? parseFloat((satis * 0.986).toFixed(4)) : alis, satis };
     } catch { return null; }
 }
 
@@ -83,26 +132,6 @@ function parseTR(val) {
     if (s.includes(',')) return parseFloat(s.replace(',', '.'));
     return parseFloat(s);
 }
-
-// ── GenelPara altın kodu → current.json key eşlemesi ─────────────────────────
-// GenelPara sikke fiyatlarını Truncgil'den farklı (doğru) olarak döndürür
-const GENPARA_ALTIN_MAP = {
-    'GA':    'gram-altin',
-    'XHGLD': 'gram-has-altin',
-    'C':     'ceyrek-altin',
-    'Y':     'yarim-altin',
-    'T':     'tam-altin',
-    'CMR':   'cumhuriyet-altini',
-    'ATA':   'ata-altin',
-    'RA':    'resat-altin',
-    'HA':    'hamit-altin',
-    '14':    '14-ayar-altin',
-    '18':    '18-ayar-altin',
-    '22':    '22-ayar-bilezik',
-    'IKB':   'ikibucuk-altin',
-    'GR':    'gremse-altin',
-    'BSL':   'besli-altin',
-};
 
 // ── Altın key → meta tablosu ──────────────────────────────────────────────────
 const GOLD_MAP = {
@@ -252,75 +281,59 @@ async function run() {
         console.warn('  ⚠️ Truncgil verisi alınamadı, mevcut fiyatlar korunuyor');
     }
 
-    // ── 2. GenelPara (Altın sikkeleri — Reşat/Hamit/Ata diferansiye fiyatlar) ──
-    // Truncgil Reşat/Hamit/Ata için aynı fiyatı döndürür; GenelPara gerçek prim
-    // farklarını yansıtır, bu yüzden sikke fiyatlarını buradan alıyoruz.
-    console.log('⬇️  GenelPara altın sikkeleri çekiliyor...');
-    const gpAltinData = await fetchWithCurl(GENPARA_ALTIN, 'https://www.genelpara.com/');
-    if (gpAltinData?.data) {
-        Object.entries(GENPARA_ALTIN_MAP).forEach(([gpKey, jsonKey]) => {
-            const row = gpAltinData.data[gpKey];
-            if (!row) return;
-            const satis = parseTR(row.satis);
-            const alis  = parseTR(row.alis);
-            if (isNaN(satis) || satis <= 0) return;
-            const chg = parseTR(String(row.oran || 0).replace('%', '').replace('+', ''));
-            // Mevcut kaydı koru ama fiyatı güncelle
-            const existing = current[jsonKey] || {};
-            current[jsonKey] = {
+    // ── 2. canlidoviz (Reşat/Hamit/Ata — diferansiye koleksiyoncu fiyatları) ───
+    // Truncgil üçü için aynı değeri döndürür; canlidoviz gerçek prim farklarını
+    // yansıtır. Server-rendered HTML, curl ile erişilebilir.
+    console.log('⬇️  canlidoviz sikke fiyatları çekiliyor...');
+    let sikkeCount = 0;
+    for (const sikke of SIKKE_SLUGS) {
+        const data = await fetchSikkeFiyati(sikke.slug);
+        if (data) {
+            const existing = current[sikke.key] || {};
+            current[sikke.key] = {
                 ...existing,
-                current: satis,
-                selling: satis,
-                buying:  !isNaN(alis) && alis > 0 ? alis : parseFloat((satis * 0.995).toFixed(2)),
-                change:  !isNaN(chg) ? chg : (existing.change || 0),
+                current: data.satis,
+                selling: data.satis,
+                buying:  data.alis,
             };
-        });
-        console.log(`  ✅ GenelPara altın: ${Object.keys(GENPARA_ALTIN_MAP).length} sikke işlendi`);
-    } else {
-        console.warn('  ⚠️ GenelPara altın verisi alınamadı, Truncgil değerleri korunuyor');
+            sikkeCount++;
+        }
     }
+    console.log(`  ${sikkeCount > 0 ? '✅' : '⚠️'} canlidoviz: ${sikkeCount}/3 sikke işlendi`);
 
-    // ── 3. GenelPara (Emtia) ─────────────────────────────────────────────────
-    console.log('⬇️  GenelPara emtia çekiliyor...');
-    const gpData = await fetchWithCurl(GENPARA_EMTIA, 'https://www.genelpara.com/');
-    if (gpData?.data) {
-        const EMTIA_MAP = {
-            XAGUSD: { name: 'Gümüş',              code: 'XAG'    },
-            XPTUSD: { name: 'Platin',              code: 'XPT'    },
-            XPDUSD: { name: 'Paladyum',            code: 'XPD'    },
-            XBRUSD: { name: 'Brent Ham Petrol',    code: 'BRENT'  },
-            COIL:   { name: 'Ham Petrol (WTI)',    code: 'WTI'    },
-            COPPER: { name: 'Bakır',               code: 'COPPER' },
-            NGAS:   { name: 'Doğal Gaz',           code: 'NGAS'   },
-            WHEAT:  { name: 'Buğday',              code: 'WHEAT'  },
-            CORN:   { name: 'Mısır',               code: 'CORN'   },
-            COFFEE: { name: 'Kahve',               code: 'COFFEE' },
-            SUGAR:  { name: 'Şeker',               code: 'SUGAR'  },
-            COCOA:  { name: 'Kakao',               code: 'COCOA'  },
-            SOYBEAN:{ name: 'Soya Fasulyesi',      code: 'SOYBEAN'},
-            COTTON: { name: 'Pamuk',               code: 'COTTON' },
-        };
-        Object.entries(gpData.data).forEach(([sym, row]) => {
-            const meta = EMTIA_MAP[sym];
-            if (!meta) return;
-            const satis = parseTR(row.satis);
-            if (isNaN(satis) || satis <= 0) return;
-            const satisTRY = parseFloat((satis * usdTry).toFixed(2));
-            const oran = parseTR(String(row.oran || 0).replace('%', '').replace('+', ''));
-            current[sym] = {
-                name: meta.name, code: meta.code, type: 'commodity',
-                current: satisTRY, selling: satisTRY,
-                buying:  parseFloat((satisTRY * 0.998).toFixed(2)),
-                change:  !isNaN(oran) ? oran : 0,
-                priceUSD: satis
+    // ── 3. Yahoo Finance (Emtia) ────────────────────────────────────────────────
+    console.log('⬇️  Yahoo Finance emtia çekiliyor...');
+    let emtiaCount = 0;
+    for (const emtia of EMTIA_MAP) {
+        const url  = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(emtia.yahoo)}?interval=1d&range=2d`;
+        const data = await fetchJson(url);
+        try {
+            const r    = data.chart.result[0];
+            const meta = r.meta;
+            let price  = meta.regularMarketPrice;
+            const prev = meta.chartPreviousClose || meta.previousClose;
+            if (!price || price <= 0) continue;
+            // Tarım futures Yahoo'da USX (sent) döner — USD'ye çevir
+            const isUSX = meta.currency === 'USX';
+            if (isUSX) price = price / 100;
+            const priceUSD = parseFloat(price.toFixed(4));
+            const priceTRY = parseFloat((priceUSD * usdTry).toFixed(2));
+            const prevUSD  = prev ? (isUSX ? prev / 100 : prev) : null;
+            const chg      = prevUSD ? parseFloat(((price - prevUSD) / prevUSD * 100).toFixed(2)) : 0;
+            current[emtia.key] = {
+                name: emtia.name, code: emtia.code, type: 'commodity',
+                current: priceTRY, selling: priceTRY,
+                buying:  parseFloat((priceTRY * 0.998).toFixed(2)),
+                change:  chg,
+                priceUSD
             };
-        });
-        console.log(`  ✅ GenelPara: ${Object.keys(gpData.data).length} emtia işlendi`);
-    } else {
-        console.warn('  ⚠️ GenelPara emtia verisi alınamadı');
+            emtiaCount++;
+        } catch { /* veri yoksa atla */ }
+        await new Promise(r => setTimeout(r, 200));
     }
+    console.log(`  ${emtiaCount > 0 ? '✅' : '⚠️'} Yahoo Finance emtia: ${emtiaCount}/14 işlendi`);
 
-    // ── 3. Yahoo Finance (BIST Hisse) ───────────────────────────────────────
+    // ── 4. Yahoo Finance (BIST Hisse) ────────────────────────────────────────
     console.log('⬇️  Yahoo Finance BIST hisseler çekiliyor...');
     let stockCount = 0;
     for (const stock of BIST_STOCKS) {
@@ -379,7 +392,7 @@ async function run() {
     // ── Meta bilgisi ekle ve kaydet ───────────────────────────────────────────
     current['_meta'] = {
         updated_at: new Date().toISOString(),
-        source: 'Truncgil (altın+döviz) | GenelPara (emtia) | Yahoo Finance (hisse) | CoinGecko (kripto)'
+        source: 'Truncgil (altın+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)'
     };
 
     fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
