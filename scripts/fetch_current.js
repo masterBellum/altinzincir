@@ -15,6 +15,8 @@ const path          = require('path');
 const { spawnSync } = require('child_process');
 
 const OUTPUT_FILE = path.join(__dirname, '..', 'data', 'current.json');
+const HISTORY_DIR = path.join(__dirname, '..', 'data', 'history');
+const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 
 // ── Kaynak URL'leri ───────────────────────────────────────────────────────────
 const TRUNCGIL_URL    = 'https://finans.truncgil.com/today.json';
@@ -133,6 +135,53 @@ function parseTR(val) {
     return parseFloat(s);
 }
 
+// ── History cache yardımcıları ───────────────────────────────────────────────
+
+function sanitizeYahoo(symbol) {
+    return symbol.replace(/=/g, '_').replace(/\./g, '_');
+}
+
+function historyFilePath(symbol, rangeName) {
+    return path.join(HISTORY_DIR, `${sanitizeYahoo(symbol)}-${rangeName}.json`);
+}
+
+function isHistoryStale(symbol, rangeName, maxAgeMs) {
+    try {
+        const stats = fs.statSync(historyFilePath(symbol, rangeName));
+        return (Date.now() - stats.mtimeMs) > maxAgeMs;
+    } catch {
+        return true; // dosya yok
+    }
+}
+
+async function fetchAndSaveHistory(symbol, rangeName, interval, range) {
+    const url  = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${interval}&range=${range}`;
+    const data = await fetchJson(url);
+    if (!data) return false;
+    try {
+        const result = data.chart.result[0];
+        const quote  = result.indicators.quote[0];
+        const closes = (quote.close || []).filter(v => v != null && !isNaN(v) && v > 0);
+        if (closes.length === 0) return false;
+        const highs  = (quote.high  || []).filter(v => v != null && !isNaN(v) && v > 0);
+        const lows   = (quote.low   || []).filter(v => v != null && !isNaN(v) && v > 0);
+        const opens  = (quote.open  || []).filter(v => v != null && !isNaN(v) && v > 0);
+        const histData = {
+            points:    closes,
+            open:      opens[0]   ?? closes[0],
+            high:      highs.length > 0 ? Math.max(...highs)  : Math.max(...closes),
+            low:       lows.length  > 0 ? Math.min(...lows)   : Math.min(...closes),
+            close:     closes[closes.length - 1],
+            updatedAt: new Date().toISOString(),
+        };
+        fs.mkdirSync(HISTORY_DIR, { recursive: true });
+        fs.writeFileSync(historyFilePath(symbol, rangeName), JSON.stringify(histData), 'utf8');
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 // ── Altın key → meta tablosu ──────────────────────────────────────────────────
 const GOLD_MAP = {
     'gram-altin':       { name: 'Gram Altın',          code: 'GRAM',    type: 'gold' },
@@ -219,6 +268,22 @@ const COINGECKO_CRYPTO = [
     { gecko: 'arbitrum',         key: 'arb',   name: 'Arbitrum',       code: 'ARB'   },
     { gecko: 'the-open-network', key: 'ton',   name: 'Toncoin',        code: 'TON'   },
     { gecko: 'sui',              key: 'sui',   name: 'Sui',            code: 'SUI'   },
+];
+
+// ── History için Yahoo sembol listeleri ──────────────────────────────────────
+const FOREX_YAHOO_SYMBOLS = [
+    'USDTRY=X','EURTRY=X','GBPTRY=X','JPYTRY=X','CHFTRY=X','CADTRY=X',
+    'AUDTRY=X','NZDTRY=X','SEKTRY=X','NOKTRY=X','DKKTRY=X','RUBTRY=X',
+    'CNYTRY=X','HKDTRY=X','SGDTRY=X','INRTRY=X','SARTRY=X','AEDTRY=X',
+    'KWDTRY=X','ZARTRY=X','BRLTRY=X','MXNTRY=X','ILSTRY=X','PLNTRY=X',
+    'CZKTRY=X','HUFTRY=X','RONTRY=X','AZNTRY=X','QARTRY=X',
+];
+
+const CRYPTO_YAHOO_SYMBOLS = [
+    'BTC-USD','ETH-USD','BNB-USD','SOL-USD','XRP-USD','DOGE-USD',
+    'LTC-USD','ADA-USD','AVAX-USD','DOT-USD','LINK-USD','ATOM-USD',
+    'TRX-USD','MATIC-USD','SHIB-USD','NEAR-USD','UNI7083-USD',
+    'ARB11841-USD','TON11419-USD','SUI20947-USD',
 ];
 
 // ── Ana fonksiyon ─────────────────────────────────────────────────────────────
@@ -410,6 +475,38 @@ async function run() {
         console.warn('  ⚠️ CoinGecko verisi alınamadı, bir önceki değerler korunuyor');
         if (cgData?.status) console.warn('  CoinGecko hata:', cgData.status.error_message);
     }
+
+    // ── 5. History cache (GitHub Pages CDN) ──────────────────────────────────
+    // Her varlığın GÜN/HAFTA/AY/YIL geçmişi data/history/{sembol}-{aralık}.json'a yazılır.
+    // Android app önce buradan okur; Yahoo Finance sadece fallback olarak kullanılır.
+    const ALL_YAHOO_SYMBOLS = [...new Set([
+        'GC=F', 'SI=F', 'PL=F',                       // Altın / kıymetli maden
+        ...EMTIA_MAP.map(e => e.yahoo),                 // Emtia
+        ...BIST_STOCKS.map(s => s.yahoo),               // BIST hisseler
+        ...FOREX_YAHOO_SYMBOLS,                          // Döviz (TRY bazlı)
+        ...CRYPTO_YAHOO_SYMBOLS,                         // Kripto (Yahoo)
+    ])];
+
+    const HISTORY_RANGES = [
+        { name: 'gun',   interval: '5m',  yahooRange: '1d'  },
+        { name: 'hafta', interval: '1d',  yahooRange: '7d'  },
+        { name: 'ay',    interval: '1d',  yahooRange: '1mo' },
+        { name: 'yil',   interval: '1wk', yahooRange: '1y'  },
+    ];
+
+    console.log(`⬇️  History cache: ${ALL_YAHOO_SYMBOLS.length} sembol × 4 aralık güncelleniyor...`);
+    let historyCount = 0, historySkipped = 0;
+    for (const symbol of ALL_YAHOO_SYMBOLS) {
+        for (const r of HISTORY_RANGES) {
+            // GÜN: her zaman tazele (intraday); diğerleri: 6 saatten eskiyse tazele
+            const maxAge = r.name === 'gun' ? 0 : SIX_HOURS_MS;
+            if (!isHistoryStale(symbol, r.name, maxAge)) { historySkipped++; continue; }
+            const ok = await fetchAndSaveHistory(symbol, r.name, r.interval, r.yahooRange);
+            if (ok) historyCount++;
+            await new Promise(res => setTimeout(res, 150));
+        }
+    }
+    console.log(`  ✅ History cache: ${historyCount} dosya güncellendi, ${historySkipped} atlandı`);
 
     // ── Meta bilgisi ekle ve kaydet ───────────────────────────────────────────
     current['_daily_open'] = dailyOpen;
