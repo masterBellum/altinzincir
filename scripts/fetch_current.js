@@ -2,8 +2,8 @@
  * fetch_current.js
  * ─────────────────────────────────────────────────────────────────────────────
  * Her 5 dakikada GitHub Actions tarafından çalıştırılır.
- * Truncgil (altın + döviz), GenelPara (emtia) ve Binance (kripto) kaynaklarından
- * anlık fiyatları çeker, data/current.json dosyasına yazar.
+ * Truncgil V3 (altın + döviz), Yahoo Finance (emtia + BIST) ve CoinGecko (kripto)
+ * kaynaklarından anlık fiyatları çeker, data/current.json dosyasına yazar.
  *
  * App artık doğrudan API'lere istek atmaz — sadece bu dosyayı okur.
  * ─────────────────────────────────────────────────────────────────────────────
@@ -19,7 +19,7 @@ const HISTORY_DIR = path.join(__dirname, '..', 'data', 'history');
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 
 // ── Kaynak URL'leri ───────────────────────────────────────────────────────────
-const TRUNCGIL_URL    = 'https://finans.truncgil.com/today.json';
+const TRUNCGIL_URL    = 'https://finans.truncgil.com/v3/today.json';
 // canlidoviz.com: Truncgil'in aynı değer döndürdüğü Reşat/Hamit/Ata için HTML scraping
 const CANLIDOVIZ_BASE = 'https://canlidoviz.com/altin-fiyatlari';
 const SIKKE_SLUGS = [
@@ -306,20 +306,17 @@ async function run() {
 
     if (tData) {
         if (tData['USD']) {
-            const u = parseTR(tData['USD']['Satış'] || tData['USD']['Satis']);
+            const u = parseTR(tData['USD'].Selling);
             if (!isNaN(u) && u > 0) usdTry = u;
         }
 
-        // Altın & Emtia
+        // Altın & Emtia (V3 API: Buying/Selling/Type/Change — İngilizce alan adları)
         Object.entries(GOLD_MAP).forEach(([tKey, meta]) => {
             const row = tData[tKey];
             if (!row) return;
-            const satisKey = Object.keys(row).find(k => /sat/i.test(k));
-            const alisKey  = Object.keys(row).find(k => /al/i.test(k) && !/sat/i.test(k));
-            const degKey   = Object.keys(row).find(k => /değ|deg/i.test(k));
-            let satis = parseTR(satisKey ? row[satisKey] : null);
-            let alis  = parseTR(alisKey  ? row[alisKey]  : null);
-            const chg = parseTR(String(degKey ? row[degKey] : 0).replace('%', ''));
+            let satis = parseTR(row.Selling);
+            let alis  = parseTR(row.Buying);
+            const chg = parseTR(String(row.Change || '0').replace('%', ''));
             if (isNaN(satis) || satis <= 0) return;
             if (meta.isUSD) {
                 satis = parseFloat((satis * usdTry).toFixed(2));
@@ -340,12 +337,12 @@ async function run() {
             };
         });
 
-        // Döviz
+        // Döviz (V3 API: Type === 'Currency')
         Object.entries(tData).forEach(([sym, row]) => {
-            if (!row || row['Tür'] !== 'Döviz') return;
-            const satis  = parseTR(row['Satış'] || row['Satis']);
-            const alis   = parseTR(row['Alış']  || row['Alis']);
-            const chgStr = String(row['Değişim'] || '0').replace('%', '');
+            if (!row || row.Type !== 'Currency') return;
+            const satis  = parseTR(row.Selling);
+            const alis   = parseTR(row.Buying);
+            const chgStr = String(row.Change || '0').replace('%', '');
             const chg    = parseTR(chgStr);
             if (isNaN(satis) || satis <= 0) return;
             if (CURRENCY_BLACKLIST.has(sym)) return;
@@ -512,7 +509,7 @@ async function run() {
     current['_daily_open'] = dailyOpen;
     current['_meta'] = {
         updated_at: new Date().toISOString(),
-        source: 'Truncgil (altın+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)'
+        source: 'Truncgil V3 (altın+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)'
     };
 
     fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
