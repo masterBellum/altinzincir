@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-05-11T23:36:45.192Z",
+    "updated_at": "2026-05-12T01:21:30.966Z",
     "source": "Truncgil V3 (altın+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)"
   },
   "gram-altin": {
@@ -67,30 +67,30 @@
     "name": "Ata Altın",
     "code": "ATAALT",
     "type": "gold",
-    "current": 46634.8751,
-    "selling": 46634.8751,
-    "buying": 45840.6963,
-    "change": 0.37,
+    "current": 46593.5714,
+    "selling": 46593.5714,
+    "buying": 45803.5995,
+    "change": 0.28,
     "open": 46462.52
   },
   "resat-altin": {
     "name": "Reşat Altın",
     "code": "RESAT",
     "type": "gold",
-    "current": 46813.0758,
-    "selling": 46813.0758,
-    "buying": 46069.6203,
-    "change": 0.75,
+    "current": 46793.7677,
+    "selling": 46793.7677,
+    "buying": 46074.7144,
+    "change": 0.71,
     "open": 46462.52
   },
   "hamit-altin": {
     "name": "Hamit Altın",
     "code": "HAMIT",
     "type": "gold",
-    "current": 47172.2745,
-    "selling": 47172.2745,
-    "buying": 45779.0751,
-    "change": 1.53,
+    "current": 47155.5367,
+    "selling": 47155.5367,
+    "buying": 45743.9712,
+    "change": 1.49,
     "open": 46462.52
   },
   "gram-has-altin": {
@@ -717,31 +717,31 @@
     "name": "Ham Petrol (WTI)",
     "code": "WTI",
     "type": "commodity",
-    "current": 4455.91,
-    "selling": 4455.91,
-    "buying": 4447,
-    "change": 0.11,
-    "priceUSD": 98.18
+    "current": 4467.71,
+    "selling": 4467.71,
+    "buying": 4458.77,
+    "change": 0.38,
+    "priceUSD": 98.44
   },
   "COPPER": {
     "name": "Bakır",
     "code": "COPPER",
     "type": "commodity",
-    "current": 294.66,
-    "selling": 294.66,
-    "buying": 294.07,
-    "change": 0.5,
-    "priceUSD": 6.4925
+    "current": 294.21,
+    "selling": 294.21,
+    "buying": 293.62,
+    "change": 0.34,
+    "priceUSD": 6.4825
   },
   "CORN": {
     "name": "Mısır",
     "code": "CORN",
     "type": "commodity",
-    "current": 215.35,
-    "selling": 215.35,
-    "buying": 214.92,
-    "change": -0.16,
-    "priceUSD": 4.745
+    "current": 215.58,
+    "selling": 215.58,
+    "buying": 215.15,
+    "change": -0.05,
+    "priceUSD": 4.75
   },
   "COTTON": {
     "name": "Pamuk",
@@ -757,21 +757,21 @@
     "name": "Doğal Gaz",
     "code": "NGAS",
     "type": "commodity",
-    "current": 132.75,
-    "selling": 132.75,
-    "buying": 132.48,
-    "change": 0.52,
-    "priceUSD": 2.925
+    "current": 132.48,
+    "selling": 132.48,
+    "buying": 132.22,
+    "change": 0.31,
+    "priceUSD": 2.919
   },
   "SOYBEAN": {
     "name": "Soya Fasulyesi",
     "code": "SOYBEAN",
     "type": "commodity",
-    "current": 549.61,
-    "selling": 549.61,
-    "buying": 548.51,
-    "change": -0.16,
-    "priceUSD": 12.11
+    "current": 550.75,
+    "selling": 550.75,
+    "buying": 549.65,
+    "change": 0.04,
+    "priceUSD": 12.135
   },
   "SUGAR": {
     "name": "Şeker",
@@ -787,91 +787,91 @@
     "name": "Buğday",
     "code": "WHEAT",
     "type": "commodity",
-    "current": 288.65,
-    "selling": 288.65,
-    "buying": 288.07,
-    "change": 0.32,
-    "priceUSD": 6.36
+    "current": 291.03,
+    "selling": 291.03,
+    "buying": 290.45,
+    "change": 1.14,
+    "priceUSD": 6.4125
   },
   "XAGUSD": {
     "name": "Gümüş",
     "code": "XAG",
     "type": "commodity",
-    "current": 3964.62,
-    "selling": 3964.62,
-    "buying": 3956.69,
-    "change": 1.64,
-    "priceUSD": 87.355
+    "current": 3973.47,
+    "selling": 3973.47,
+    "buying": 3965.52,
+    "change": 1.86,
+    "priceUSD": 87.55
   },
   "XBRUSD": {
     "name": "Brent Ham Petrol",
     "code": "BRENT",
     "type": "commodity",
-    "current": 4732.76,
-    "selling": 4732.76,
-    "buying": 4723.29,
-    "change": 0.07,
-    "priceUSD": 104.28
+    "current": 4745.01,
+    "selling": 4745.01,
+    "buying": 4735.52,
+    "change": 0.33,
+    "priceUSD": 104.55
   },
   "XPDUSD": {
     "name": "Paladyum",
     "code": "XPD",
     "type": "commodity",
-    "current": 69529.97,
-    "selling": 69529.97,
-    "buying": 69390.91,
-    "change": 0.89,
-    "priceUSD": 1532
+    "current": 69166.89,
+    "selling": 69166.89,
+    "buying": 69028.56,
+    "change": 0.36,
+    "priceUSD": 1524
   },
   "XPTUSD": {
     "name": "Platin",
     "code": "XPT",
     "type": "commodity",
-    "current": 98009.12,
-    "selling": 98009.12,
-    "buying": 97813.1,
-    "change": 1.56,
-    "priceUSD": 2159.5
+    "current": 97006.11,
+    "selling": 97006.11,
+    "buying": 96812.1,
+    "change": 0.52,
+    "priceUSD": 2137.4
   },
   "btc": {
     "name": "Bitcoin",
     "code": "BTC",
     "type": "crypto",
-    "current": 3708598.06,
-    "selling": 3708598.06,
-    "buying": 3708598.06,
-    "change": -0.77,
-    "priceUSD": 81714
+    "current": 3692395.58,
+    "selling": 3692395.58,
+    "buying": 3692395.58,
+    "change": -0.41,
+    "priceUSD": 81357
   },
   "eth": {
     "name": "Ethereum",
     "code": "ETH",
     "type": "crypto",
-    "current": 106144.4,
-    "selling": 106144.4,
-    "buying": 106144.4,
-    "change": -1.7,
-    "priceUSD": 2338.75
+    "current": 105502.66,
+    "selling": 105502.66,
+    "buying": 105502.66,
+    "change": -1.66,
+    "priceUSD": 2324.61
   },
   "bnb": {
     "name": "BNB",
     "code": "BNB",
     "type": "crypto",
-    "current": 30393.04,
-    "selling": 30393.04,
-    "buying": 30393.04,
-    "change": 0.54,
-    "priceUSD": 669.67
+    "current": 30248.26,
+    "selling": 30248.26,
+    "buying": 30248.26,
+    "change": 0.97,
+    "priceUSD": 666.48
   },
   "sol": {
     "name": "Solana",
     "code": "SOL",
     "type": "crypto",
-    "current": 4413.7,
-    "selling": 4413.7,
-    "buying": 4413.7,
-    "change": 0.52,
-    "priceUSD": 97.25
+    "current": 4401.45,
+    "selling": 4401.45,
+    "buying": 4401.45,
+    "change": 0.8,
+    "priceUSD": 96.98
   },
   "xrp": {
     "name": "XRP",
@@ -880,48 +880,48 @@
     "current": 67.17,
     "selling": 67.17,
     "buying": 67.17,
-    "change": 0,
+    "change": 0.75,
     "priceUSD": 1.48
   },
   "doge": {
     "name": "Dogecoin",
     "code": "DOGE",
     "type": "crypto",
-    "current": 5.05,
-    "selling": 5.05,
-    "buying": 5.05,
-    "change": -0.99,
-    "priceUSD": 0.111177
+    "current": 5.04,
+    "selling": 5.04,
+    "buying": 5.04,
+    "change": -0.51,
+    "priceUSD": 0.110963
   },
   "ltc": {
     "name": "Litecoin",
     "code": "LTC",
     "type": "crypto",
-    "current": 2650.49,
-    "selling": 2650.49,
-    "buying": 2650.49,
-    "change": -3.03,
-    "priceUSD": 58.4
+    "current": 2641.87,
+    "selling": 2641.87,
+    "buying": 2641.87,
+    "change": -2.56,
+    "priceUSD": 58.21
   },
   "ada": {
     "name": "Cardano",
     "code": "ADA",
     "type": "crypto",
-    "current": 12.71,
-    "selling": 12.71,
-    "buying": 12.71,
-    "change": -1.11,
-    "priceUSD": 0.280006
+    "current": 12.7,
+    "selling": 12.7,
+    "buying": 12.7,
+    "change": -0.23,
+    "priceUSD": 0.279751
   },
   "avax": {
     "name": "Avalanche",
     "code": "AVAX",
     "type": "crypto",
-    "current": 459.75,
-    "selling": 459.75,
-    "buying": 459.75,
-    "change": -1.35,
-    "priceUSD": 10.13
+    "current": 458.39,
+    "selling": 458.39,
+    "buying": 458.39,
+    "change": -1.01,
+    "priceUSD": 10.1
   },
   "dot": {
     "name": "Polkadot",
@@ -930,38 +930,38 @@
     "current": 61.72,
     "selling": 61.72,
     "buying": 61.72,
-    "change": -1.78,
+    "change": -0.85,
     "priceUSD": 1.36
   },
   "link": {
     "name": "Chainlink",
     "code": "LINK",
     "type": "crypto",
-    "current": 479.72,
-    "selling": 479.72,
-    "buying": 479.72,
-    "change": -1.58,
-    "priceUSD": 10.57
+    "current": 477.45,
+    "selling": 477.45,
+    "buying": 477.45,
+    "change": -1.77,
+    "priceUSD": 10.52
   },
   "atom": {
     "name": "Cosmos",
     "code": "ATOM",
     "type": "crypto",
-    "current": 92.59,
-    "selling": 92.59,
-    "buying": 92.59,
-    "change": 1.02,
-    "priceUSD": 2.04
+    "current": 92.13,
+    "selling": 92.13,
+    "buying": 92.13,
+    "change": 0.19,
+    "priceUSD": 2.03
   },
   "trx": {
     "name": "TRON",
     "code": "TRX",
     "type": "crypto",
-    "current": 15.94,
-    "selling": 15.94,
-    "buying": 15.94,
-    "change": 0.19,
-    "priceUSD": 0.351255
+    "current": 15.92,
+    "selling": 15.92,
+    "buying": 15.92,
+    "change": 0.38,
+    "priceUSD": 0.35074
   },
   "matic": {
     "name": "Polygon (POL)",
@@ -980,58 +980,58 @@
     "current": 0.000299,
     "selling": 0.000299,
     "buying": 0.000299,
-    "change": -0.31,
+    "change": 0,
     "priceUSD": 0.00000658
   },
   "near": {
     "name": "NEAR Protocol",
     "code": "NEAR",
     "type": "crypto",
-    "current": 69.89,
-    "selling": 69.89,
-    "buying": 69.89,
-    "change": -1.98,
-    "priceUSD": 1.54
+    "current": 69.44,
+    "selling": 69.44,
+    "buying": 69.44,
+    "change": -1.47,
+    "priceUSD": 1.53
   },
   "uni": {
     "name": "Uniswap",
     "code": "UNI",
     "type": "crypto",
-    "current": 176.09,
-    "selling": 176.09,
-    "buying": 176.09,
-    "change": -3.29,
-    "priceUSD": 3.88
+    "current": 175.19,
+    "selling": 175.19,
+    "buying": 175.19,
+    "change": -2.98,
+    "priceUSD": 3.86
   },
   "arb": {
     "name": "Arbitrum",
     "code": "ARB",
     "type": "crypto",
-    "current": 6.4,
-    "selling": 6.4,
-    "buying": 6.4,
-    "change": -2.34,
-    "priceUSD": 0.140944
+    "current": 6.37,
+    "selling": 6.37,
+    "buying": 6.37,
+    "change": -2.29,
+    "priceUSD": 0.140325
   },
   "ton": {
     "name": "Toncoin",
     "code": "TON",
     "type": "crypto",
-    "current": 109.83,
-    "selling": 109.83,
-    "buying": 109.83,
-    "change": -1.72,
-    "priceUSD": 2.42
+    "current": 109.38,
+    "selling": 109.38,
+    "buying": 109.38,
+    "change": -1.41,
+    "priceUSD": 2.41
   },
   "sui": {
     "name": "Sui",
     "code": "SUI",
     "type": "crypto",
-    "current": 58.55,
-    "selling": 58.55,
-    "buying": 58.55,
-    "change": -3.94,
-    "priceUSD": 1.29
+    "current": 58.09,
+    "selling": 58.09,
+    "buying": 58.09,
+    "change": -4.28,
+    "priceUSD": 1.28
   },
   "garan": {
     "name": "Garanti BBVA",
