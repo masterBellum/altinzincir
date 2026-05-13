@@ -311,6 +311,18 @@ async function run() {
             if (!isNaN(u) && u > 0) usdTry = u;
         }
 
+        // Truncgil V3 sikkeler ve ayar bilezikler için stale +0,02% placeholder döndürüyor;
+        // sadece gram-altin gerçek piyasa hareketini yansıtıyor. Gram türevi altın türleri
+        // için gram-altin'in change'ini referans alarak tutarlı yüzdeler göster.
+        const gramRow = tData['gram-altin'];
+        const gramChange = gramRow ? parseTR(String(gramRow.Change || '0').replace('%', '')) : NaN;
+        // Sadece bu anahtarlar gram-bağımlı — gümüş/platin/ons ayrı varlık
+        const GRAM_LINKED = new Set([
+            'ceyrek-altin','yarim-altin','tam-altin','cumhuriyet-altini',
+            'ata-altin','resat-altin','hamit-altin','gram-has-altin',
+            '14-ayar-altin','18-ayar-altin','22-ayar-bilezik'
+        ]);
+
         // Altın & Emtia (V3 API: Buying/Selling/Type/Change — İngilizce alan adları)
         Object.entries(GOLD_MAP).forEach(([tKey, meta]) => {
             const row = tData[tKey];
@@ -323,18 +335,19 @@ async function run() {
                 satis = parseFloat((satis * usdTry).toFixed(2));
                 if (!isNaN(alis) && alis > 0) alis = parseFloat((alis * usdTry).toFixed(2));
             }
-            // İlk run'da (veya yeni günde) açılış fiyatı olarak kaydet
-            if (!dailyOpen.prices[tKey]) dailyOpen.prices[tKey] = satis;
-            const goldOpen    = dailyOpen.prices[tKey];
-            const chgComputed = goldOpen > 0
-                ? parseFloat(((satis - goldOpen) / goldOpen * 100).toFixed(2))
-                : (!isNaN(chg) ? chg : 0);
+            // Gram türevi altın için gram-altin'in change'ini kullan (Truncgil stale veri sorunu).
+            // Aksi halde Truncgil'in kendi Change'ini al — gümüş/platin/ons için bu doğru.
+            const useGramChg = GRAM_LINKED.has(tKey) && !isNaN(gramChange);
+            const realChg = useGramChg ? gramChange : (!isNaN(chg) ? chg : 0);
+            const computedOpen = realChg !== -100
+                ? parseFloat((satis / (1 + realChg / 100)).toFixed(2))
+                : satis;
             current[tKey] = {
                 name: meta.name, code: meta.code, type: meta.type,
                 current: satis, selling: satis,
                 buying:  !isNaN(alis) && alis > 0 ? alis : parseFloat((satis * 0.995).toFixed(2)),
-                change:  chgComputed,
-                open:    goldOpen,
+                change:  realChg,
+                open:    computedOpen,
             };
         });
 
@@ -368,18 +381,20 @@ async function run() {
         const data = await fetchSikkeFiyati(sikke.slug);
         if (data) {
             const existing = current[sikke.key] || {};
-            if (!dailyOpen.prices[sikke.key]) dailyOpen.prices[sikke.key] = data.satis;
-            const sOpen = dailyOpen.prices[sikke.key];
-            const sChg  = sOpen > 0
-                ? parseFloat(((data.satis - sOpen) / sOpen * 100).toFixed(2))
-                : (existing.change || 0);
+            // canlidoviz gerçek sikke fiyatını verir ama günlük değişim göstermez.
+            // Truncgil'in zaten yazdığı change% korunmalı (gerçek günlük piyasa değişimi).
+            // Open'ı yeni fiyata göre backward-compute et (UI tutarlılığı için).
+            const keepChg = typeof existing.change === 'number' ? existing.change : 0;
+            const computedOpen = keepChg !== -100
+                ? parseFloat((data.satis / (1 + keepChg / 100)).toFixed(2))
+                : data.satis;
             current[sikke.key] = {
                 ...existing,
                 current: data.satis,
                 selling: data.satis,
                 buying:  data.alis,
-                open:    sOpen,
-                change:  sChg,
+                open:    computedOpen,
+                change:  keepChg,
             };
             sikkeCount++;
         }
