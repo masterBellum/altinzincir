@@ -20,14 +20,31 @@ const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 
 // ── Kaynak URL'leri ───────────────────────────────────────────────────────────
 const TRUNCGIL_URL    = 'https://finans.truncgil.com/v3/today.json';
-// canlidoviz.com: Truncgil'in aynı değer döndürdüğü Reşat/Hamit/Ata için HTML scraping
+// canlidoviz.com: TÜM altın türleri için baz veri kaynağı.
+// Truncgil V3 çeyrek/yarım/tam/14-18-22 ayar/sikkeler için stale placeholder
+// (+0.02% her zaman aynı) döndürdüğü için canlidoviz'in dt="change" verisini
+// kullanıyoruz. Tüm türler aynı kaynaktan = tutarlı change%.
 const CANLIDOVIZ_BASE = 'https://canlidoviz.com/altin-fiyatlari';
-const SIKKE_SLUGS = [
-    { slug: 'resat-lira-altin', key: 'resat-altin'        },
-    { slug: 'hamit-altin',      key: 'hamit-altin'        },
-    { slug: 'ata-altin',        key: 'ata-altin'          },
-    { slug: 'cumhuriyet-altini',key: 'cumhuriyet-altini'  },
+const GOLD_SLUGS = [
+    { slug: 'gram-altin',         key: 'gram-altin'        },
+    { slug: 'ceyrek-altin',       key: 'ceyrek-altin'      },
+    { slug: 'yarim-altin',        key: 'yarim-altin'       },
+    { slug: 'tam-altin',          key: 'tam-altin'         },
+    { slug: 'cumhuriyet-altini',  key: 'cumhuriyet-altini' },
+    { slug: 'ata-altin',          key: 'ata-altin'         },
+    { slug: 'resat-lira-altin',   key: 'resat-altin'       },
+    { slug: 'hamit-altin',        key: 'hamit-altin'       },
+    { slug: 'gram-has-altin',     key: 'gram-has-altin'    },
+    { slug: '14-ayar-altin',      key: '14-ayar-altin'     },
+    { slug: '18-ayar-altin',      key: '18-ayar-altin'     },
+    { slug: '22-ayar-bilezik',    key: '22-ayar-bilezik'   },
+    { slug: 'gumus',              key: 'gumus'             },
+    // gram-platin: canlidoviz'de yok (redirect); ons: USD veriyor ama TRY etiketli (bug)
+    // → bu ikisi Truncgil V3'ten çekilir (aşağıdaki Truncgil-only fallback bölümü)
 ];
+
+// canlidoviz'de mevcut olmayan, sadece Truncgil V3'ten alınacak altın türleri
+const TRUNCGIL_ONLY_GOLD_KEYS = ['gram-platin', 'ons'];
 
 // Yahoo Finance futures: GenelPara tüm sunucu IP'lerini bloke ediyor (403)
 const EMTIA_MAP = [
@@ -92,8 +109,9 @@ async function fetchSikkeFiyati(slug) {
         const html = r.stdout.toString('utf8');
         if (!html || html.length < 500) return null;
         // itemprop="price" → satış; dt="bA" → BAYİ ALIŞ; dt="change" → günlük %
-        const satisM = html.match(/itemprop="price"[^>]*>\s*([\d]{5,6}\.[\d]{1,4})/);
-        const alisM  = html.match(/dt="bA"[^>]*>\s*([\d]{5,6}\.[\d]{1,4})/);
+        // Esnek regex: gram (6800.50), gümüş (128.14), ons (213000.00) hepsi destekli.
+        const satisM = html.match(/itemprop="price"[^>]*>\s*([\d]+(?:\.\d+)?)/);
+        const alisM  = html.match(/dt="bA"[^>]*>\s*([\d]+(?:\.\d+)?)/);
         const chgM   = html.match(/dt="change"[^>]*>\s*%(-?\d+(?:\.\d+)?)/);
         const satis  = satisM ? parseFloat(satisM[1]) : NaN;
         const alis   = alisM  ? parseFloat(alisM[1])  : NaN;
@@ -318,23 +336,12 @@ async function run() {
             if (!isNaN(u) && u > 0) usdTry = u;
         }
 
-        // Truncgil V3 sikkeler ve ayar bilezikler için stale +0,02% placeholder döndürüyor;
-        // sadece gram-altin gerçek piyasa hareketini yansıtıyor. Gram türevi altın türleri
-        // için gram-altin'in change'ini referans alarak tutarlı yüzdeler göster.
-        const gramRow = tData['gram-altin'];
-        const gramChange = gramRow ? parseTR(String(gramRow.Change || '0').replace('%', '')) : NaN;
-        // Sadece bu türler gram'la lockstep hareket eder (saf gram türevi).
-        // Sikkeler (cumhuriyet/ata/reşat/hamit) ayrı tutuldu — kendi arz/talep
-        // dinamikleri olduğu için canlidoviz'den ayrı change% çekilir.
-        const GRAM_LINKED = new Set([
-            'ceyrek-altin','yarim-altin','tam-altin','gram-has-altin',
-            '14-ayar-altin','18-ayar-altin','22-ayar-bilezik'
-        ]);
-
-        // Altın & Emtia (V3 API: Buying/Selling/Type/Change — İngilizce alan adları)
-        Object.entries(GOLD_MAP).forEach(([tKey, meta]) => {
+        // Altın türlerinin çoğu canlidoviz'den çekilir (aşağıdaki bölüm).
+        // Sadece canlidoviz'de bulunmayanlar (gram-platin, ons) Truncgil V3'ten:
+        TRUNCGIL_ONLY_GOLD_KEYS.forEach(tKey => {
             const row = tData[tKey];
-            if (!row) return;
+            const meta = GOLD_MAP[tKey];
+            if (!row || !meta) return;
             let satis = parseTR(row.Selling);
             let alis  = parseTR(row.Buying);
             const chg = parseTR(String(row.Change || '0').replace('%', ''));
@@ -343,10 +350,7 @@ async function run() {
                 satis = parseFloat((satis * usdTry).toFixed(2));
                 if (!isNaN(alis) && alis > 0) alis = parseFloat((alis * usdTry).toFixed(2));
             }
-            // Gram türevi altın için gram-altin'in change'ini kullan (Truncgil stale veri sorunu).
-            // Aksi halde Truncgil'in kendi Change'ini al — gümüş/platin/ons için bu doğru.
-            const useGramChg = GRAM_LINKED.has(tKey) && !isNaN(gramChange);
-            const realChg = useGramChg ? gramChange : (!isNaN(chg) ? chg : 0);
+            const realChg = !isNaN(chg) ? chg : 0;
             const computedOpen = realChg !== -100
                 ? parseFloat((satis / (1 + realChg / 100)).toFixed(2))
                 : satis;
@@ -380,36 +384,33 @@ async function run() {
         console.warn('  ⚠️ Truncgil verisi alınamadı, mevcut fiyatlar korunuyor');
     }
 
-    // ── 2. canlidoviz (Reşat/Hamit/Ata — diferansiye koleksiyoncu fiyatları) ───
-    // Truncgil üçü için aynı değeri döndürür; canlidoviz gerçek prim farklarını
-    // yansıtır. Server-rendered HTML, curl ile erişilebilir.
-    console.log('⬇️  canlidoviz sikke fiyatları çekiliyor...');
-    let sikkeCount = 0;
-    for (const sikke of SIKKE_SLUGS) {
-        const data = await fetchSikkeFiyati(sikke.slug);
-        if (data) {
-            const existing = current[sikke.key] || {};
-            // canlidoviz HTML'de dt="change" attribute'u gerçek günlük değişim verir.
-            // Her sikkenin kendi arz/talep dinamiği farklı olduğu için bu değer
-            // Truncgil'in stale +0.02% placeholder'ından çok daha doğru.
-            const realChg = data.change !== null
-                ? data.change
-                : (typeof existing.change === 'number' ? existing.change : 0);
-            const computedOpen = realChg !== -100
-                ? parseFloat((data.satis / (1 + realChg / 100)).toFixed(2))
-                : data.satis;
-            current[sikke.key] = {
-                ...existing,
-                current: data.satis,
-                selling: data.satis,
-                buying:  data.alis,
-                open:    computedOpen,
-                change:  realChg,
-            };
-            sikkeCount++;
-        }
+    // ── 2. canlidoviz (TÜM altın türleri — tek baz kaynak) ──────────────────
+    // canlidoviz dt="change" attribute'u her altın türü için gerçek günlük
+    // değişimi verir. Truncgil V3 türevler için stale +0.02% placeholder
+    // döndürdüğünden tutarsız UI ortaya çıkıyordu (gram düşerken çeyrek sabit).
+    // canlidoviz tek kaynak → gram düşerken çeyrek/yarım/tam da yakın yüzdede düşer.
+    console.log('⬇️  canlidoviz altın fiyatları çekiliyor...');
+    let goldCount = 0;
+    for (const item of GOLD_SLUGS) {
+        const data = await fetchSikkeFiyati(item.slug);
+        if (!data) continue;
+        const meta = GOLD_MAP[item.key] || { name: item.key, code: item.key.toUpperCase(), type: 'gold' };
+        const realChg = data.change !== null ? data.change : 0;
+        const computedOpen = realChg !== -100
+            ? parseFloat((data.satis / (1 + realChg / 100)).toFixed(2))
+            : data.satis;
+        current[item.key] = {
+            name: meta.name, code: meta.code, type: meta.type,
+            current: data.satis,
+            selling: data.satis,
+            buying:  data.alis,
+            change:  realChg,
+            open:    computedOpen,
+        };
+        goldCount++;
+        await new Promise(r => setTimeout(r, 100));
     }
-    console.log(`  ${sikkeCount > 0 ? '✅' : '⚠️'} canlidoviz: ${sikkeCount}/3 sikke işlendi`);
+    console.log(`  ${goldCount > 0 ? '✅' : '⚠️'} canlidoviz: ${goldCount}/${GOLD_SLUGS.length} altın işlendi`);
 
     // ── 3. Yahoo Finance (Emtia) ────────────────────────────────────────────────
     console.log('⬇️  Yahoo Finance emtia çekiliyor...');
