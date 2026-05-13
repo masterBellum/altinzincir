@@ -162,7 +162,8 @@ async function fetchAndSaveHistory(symbol, rangeName, interval, range) {
         const result = data.chart.result[0];
         const quote  = result.indicators.quote[0];
         const closes = (quote.close || []).filter(v => v != null && !isNaN(v) && v > 0);
-        if (closes.length === 0) return false;
+        // En az 2 nokta yoksa dosyayı yazma — sparkline çizilemez, Android Yahoo fallback'a düşsün
+        if (closes.length < 2) return false;
         const highs  = (quote.high  || []).filter(v => v != null && !isNaN(v) && v > 0);
         const lows   = (quote.low   || []).filter(v => v != null && !isNaN(v) && v > 0);
         const opens  = (quote.open  || []).filter(v => v != null && !isNaN(v) && v > 0);
