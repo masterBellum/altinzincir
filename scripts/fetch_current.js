@@ -23,9 +23,10 @@ const TRUNCGIL_URL    = 'https://finans.truncgil.com/v3/today.json';
 // canlidoviz.com: Truncgil'in aynı değer döndürdüğü Reşat/Hamit/Ata için HTML scraping
 const CANLIDOVIZ_BASE = 'https://canlidoviz.com/altin-fiyatlari';
 const SIKKE_SLUGS = [
-    { slug: 'resat-lira-altin', key: 'resat-altin' },
-    { slug: 'hamit-altin',      key: 'hamit-altin' },
-    { slug: 'ata-altin',        key: 'ata-altin'   },
+    { slug: 'resat-lira-altin', key: 'resat-altin'        },
+    { slug: 'hamit-altin',      key: 'hamit-altin'        },
+    { slug: 'ata-altin',        key: 'ata-altin'          },
+    { slug: 'cumhuriyet-altini',key: 'cumhuriyet-altini'  },
 ];
 
 // Yahoo Finance futures: GenelPara tüm sunucu IP'lerini bloke ediyor (403)
@@ -90,13 +91,19 @@ async function fetchSikkeFiyati(slug) {
         if (r.status !== 0 || !r.stdout) return null;
         const html = r.stdout.toString('utf8');
         if (!html || html.length < 500) return null;
-        // itemprop="price" → satış (ana ekran); dt="bA" → BAYİ ALIŞ
+        // itemprop="price" → satış; dt="bA" → BAYİ ALIŞ; dt="change" → günlük %
         const satisM = html.match(/itemprop="price"[^>]*>\s*([\d]{5,6}\.[\d]{1,4})/);
         const alisM  = html.match(/dt="bA"[^>]*>\s*([\d]{5,6}\.[\d]{1,4})/);
+        const chgM   = html.match(/dt="change"[^>]*>\s*%(-?\d+(?:\.\d+)?)/);
         const satis  = satisM ? parseFloat(satisM[1]) : NaN;
         const alis   = alisM  ? parseFloat(alisM[1])  : NaN;
+        const change = chgM   ? parseFloat(chgM[1])   : NaN;
         if (isNaN(satis) || satis <= 0) return null;
-        return { alis: isNaN(alis) || alis <= 0 ? parseFloat((satis * 0.986).toFixed(4)) : alis, satis };
+        return {
+            alis: isNaN(alis) || alis <= 0 ? parseFloat((satis * 0.986).toFixed(4)) : alis,
+            satis,
+            change: isNaN(change) ? null : change,
+        };
     } catch { return null; }
 }
 
@@ -316,10 +323,11 @@ async function run() {
         // için gram-altin'in change'ini referans alarak tutarlı yüzdeler göster.
         const gramRow = tData['gram-altin'];
         const gramChange = gramRow ? parseTR(String(gramRow.Change || '0').replace('%', '')) : NaN;
-        // Sadece bu anahtarlar gram-bağımlı — gümüş/platin/ons ayrı varlık
+        // Sadece bu türler gram'la lockstep hareket eder (saf gram türevi).
+        // Sikkeler (cumhuriyet/ata/reşat/hamit) ayrı tutuldu — kendi arz/talep
+        // dinamikleri olduğu için canlidoviz'den ayrı change% çekilir.
         const GRAM_LINKED = new Set([
-            'ceyrek-altin','yarim-altin','tam-altin','cumhuriyet-altini',
-            'ata-altin','resat-altin','hamit-altin','gram-has-altin',
+            'ceyrek-altin','yarim-altin','tam-altin','gram-has-altin',
             '14-ayar-altin','18-ayar-altin','22-ayar-bilezik'
         ]);
 
@@ -381,12 +389,14 @@ async function run() {
         const data = await fetchSikkeFiyati(sikke.slug);
         if (data) {
             const existing = current[sikke.key] || {};
-            // canlidoviz gerçek sikke fiyatını verir ama günlük değişim göstermez.
-            // Truncgil'in zaten yazdığı change% korunmalı (gerçek günlük piyasa değişimi).
-            // Open'ı yeni fiyata göre backward-compute et (UI tutarlılığı için).
-            const keepChg = typeof existing.change === 'number' ? existing.change : 0;
-            const computedOpen = keepChg !== -100
-                ? parseFloat((data.satis / (1 + keepChg / 100)).toFixed(2))
+            // canlidoviz HTML'de dt="change" attribute'u gerçek günlük değişim verir.
+            // Her sikkenin kendi arz/talep dinamiği farklı olduğu için bu değer
+            // Truncgil'in stale +0.02% placeholder'ından çok daha doğru.
+            const realChg = data.change !== null
+                ? data.change
+                : (typeof existing.change === 'number' ? existing.change : 0);
+            const computedOpen = realChg !== -100
+                ? parseFloat((data.satis / (1 + realChg / 100)).toFixed(2))
                 : data.satis;
             current[sikke.key] = {
                 ...existing,
@@ -394,7 +404,7 @@ async function run() {
                 selling: data.satis,
                 buying:  data.alis,
                 open:    computedOpen,
-                change:  keepChg,
+                change:  realChg,
             };
             sikkeCount++;
         }
