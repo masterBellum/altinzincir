@@ -151,6 +151,50 @@ function fetchJson(url) {
     });
 }
 
+// TCMB resmi döviz kurları (today.xml) — Türk Merkez Bankası açık veri
+async function fetchTcmbRates() {
+    const args = [
+        '-s', '--max-time', '15', '--compressed', '-L',
+        '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'https://www.tcmb.gov.tr/kurlar/today.xml',
+    ];
+    let xml = '';
+    try {
+        const r = spawnSync('curl', args, { timeout: 20000, maxBuffer: 5 * 1024 * 1024 });
+        if (r.status !== 0 || !r.stdout) return null;
+        xml = r.stdout.toString('utf8');
+        if (!xml || xml.length < 100) return null;
+    } catch { return null; }
+    const rates = {};
+    const re = /<Currency[^>]*CurrencyCode="([A-Z]{3})"[^>]*>([\s\S]*?)<\/Currency>/g;
+    let m;
+    while ((m = re.exec(xml)) !== null) {
+        const code  = m[1];
+        const block = m[2];
+        const unit  = parseFloat((block.match(/<Unit>([^<]+)<\/Unit>/) || [])[1] || '1');
+        const sel   = parseFloat((block.match(/<ForexSelling>([^<]+)<\/ForexSelling>/) || [])[1] || '0');
+        const buy   = parseFloat((block.match(/<ForexBuying>([^<]+)<\/ForexBuying>/) || [])[1] || '0');
+        if (sel > 0 && unit > 0) {
+            rates[code] = {
+                selling: parseFloat((sel / unit).toFixed(4)),
+                buying:  buy > 0 ? parseFloat((buy / unit).toFixed(4))
+                                 : parseFloat((sel * 0.998 / unit).toFixed(4)),
+            };
+        }
+    }
+    return Object.keys(rates).length > 0 ? rates : null;
+}
+
+// fawazahmed0/currency-api (jsdelivr CDN) — CC0 lisans, 200+ para birimi
+async function fetchFawazRate(currencyCode) {
+    const base = currencyCode.toLowerCase();
+    const url  = `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${base}.json`;
+    const data = await fetchJson(url);
+    if (!data || !data[base]) return null;
+    const rate = data[base]['try'];
+    return (rate && rate > 0) ? parseFloat(rate.toFixed(4)) : null;
+}
+
 function parseTR(val) {
     if (val == null) return NaN;
     const s = String(val).replace(/[\s$€£¥TL]/gi, '').trim();
@@ -329,6 +373,9 @@ async function run() {
     console.log('⬇️  Truncgil çekiliyor...');
     const tData = await fetchWithCurl(TRUNCGIL_URL, 'https://finans.truncgil.com/');
     let usdTry = current['USD']?.current || 38;
+    // Bu run'da hangi dövizlerin yazıldığını izle — fallback'lar eski current.json
+    // değerlerini değil sadece bu run'da yazılmayanları doldurur.
+    const writtenCurrencies = new Set();
 
     if (tData) {
         if (tData['USD']) {
@@ -378,10 +425,63 @@ async function run() {
                 buying:  !isNaN(alis) && alis > 0 ? alis : parseFloat((satis * 0.995).toFixed(2)),
                 change:  !isNaN(chg) ? chg : 0
             };
+            writtenCurrencies.add(sym);
         });
-        console.log(`  ✅ Truncgil: altın + döviz işlendi`);
+        console.log(`  ✅ Truncgil: altın + döviz işlendi (${writtenCurrencies.size} döviz)`);
     } else {
-        console.warn('  ⚠️ Truncgil verisi alınamadı, mevcut fiyatlar korunuyor');
+        console.warn('  ⚠️ Truncgil verisi alınamadı — TCMB/fawazahmed0 fallback denenecek');
+    }
+
+    // ── 1b. Döviz fallback: TCMB → fawazahmed0 ───────────────────────────────
+    // Truncgil tamamen fail olduysa veya bazı dövizleri atladıysa boşlukları doldur.
+    // CURRENCY_NAMES'deki tüm major dövizleri hedefle.
+    const targetCurrencies = Object.keys(CURRENCY_NAMES).filter(c => !CURRENCY_BLACKLIST.has(c));
+    const missingAfterTruncgil = targetCurrencies.filter(c => !writtenCurrencies.has(c));
+
+    if (missingAfterTruncgil.length > 0) {
+        console.log(`⬇️  TCMB döviz fallback (${missingAfterTruncgil.length} eksik döviz)...`);
+        const tcmb = await fetchTcmbRates();
+        let tcmbCount = 0;
+        if (tcmb) {
+            for (const sym of missingAfterTruncgil) {
+                const r = tcmb[sym];
+                if (!r) continue;
+                // USD/TRY Truncgil'den gelemediyse usdTry değişkenini de güncelle (emtia/kripto için kritik)
+                if (sym === 'USD') usdTry = r.selling;
+                current[sym] = {
+                    name: CURRENCY_NAMES[sym] || sym, code: sym, type: 'currency',
+                    current: r.selling, selling: r.selling, buying: r.buying,
+                    // TCMB günlük resmi referans veriyor; change için intraday yok → 0
+                    change: 0,
+                };
+                writtenCurrencies.add(sym);
+                tcmbCount++;
+            }
+            console.log(`  ${tcmbCount > 0 ? '✅' : '⚠️'} TCMB: ${tcmbCount} döviz eklendi`);
+        } else {
+            console.warn('  ⚠️ TCMB verisi alınamadı');
+        }
+    }
+
+    const missingAfterTcmb = targetCurrencies.filter(c => !writtenCurrencies.has(c));
+    if (missingAfterTcmb.length > 0) {
+        console.log(`⬇️  fawazahmed0 fallback (${missingAfterTcmb.length} eksik döviz)...`);
+        let fawazCount = 0;
+        for (const sym of missingAfterTcmb) {
+            const rate = await fetchFawazRate(sym);
+            if (!rate) continue;
+            if (sym === 'USD' && rate > 0) usdTry = rate;
+            current[sym] = {
+                name: CURRENCY_NAMES[sym] || sym, code: sym, type: 'currency',
+                current: rate, selling: rate,
+                buying:  parseFloat((rate * 0.998).toFixed(4)),
+                change:  0,
+            };
+            writtenCurrencies.add(sym);
+            fawazCount++;
+            await new Promise(r => setTimeout(r, 150));
+        }
+        console.log(`  ${fawazCount > 0 ? '✅' : '⚠️'} fawazahmed0: ${fawazCount} döviz eklendi`);
     }
 
     // ── 2. canlidoviz (TÜM altın türleri — tek baz kaynak) ──────────────────
