@@ -274,26 +274,26 @@ const BIST_STOCKS = [
 // ── CoinGecko kripto tablosu ──────────────────────────────────────────────────
 // CoinGecko: API key gerektirmez, 30 istek/dk, GH Actions'dan kesinlikle çalışır
 const COINGECKO_CRYPTO = [
-    { gecko: 'bitcoin',          key: 'btc',   name: 'Bitcoin',        code: 'BTC'   },
-    { gecko: 'ethereum',         key: 'eth',   name: 'Ethereum',       code: 'ETH'   },
-    { gecko: 'binancecoin',      key: 'bnb',   name: 'BNB',            code: 'BNB'   },
-    { gecko: 'solana',           key: 'sol',   name: 'Solana',         code: 'SOL'   },
-    { gecko: 'ripple',           key: 'xrp',   name: 'XRP',            code: 'XRP'   },
-    { gecko: 'dogecoin',         key: 'doge',  name: 'Dogecoin',       code: 'DOGE'  },
-    { gecko: 'litecoin',         key: 'ltc',   name: 'Litecoin',       code: 'LTC'   },
-    { gecko: 'cardano',          key: 'ada',   name: 'Cardano',        code: 'ADA'   },
-    { gecko: 'avalanche-2',      key: 'avax',  name: 'Avalanche',      code: 'AVAX'  },
-    { gecko: 'polkadot',         key: 'dot',   name: 'Polkadot',       code: 'DOT'   },
-    { gecko: 'chainlink',        key: 'link',  name: 'Chainlink',      code: 'LINK'  },
-    { gecko: 'cosmos',           key: 'atom',  name: 'Cosmos',         code: 'ATOM'  },
-    { gecko: 'tron',             key: 'trx',   name: 'TRON',           code: 'TRX'   },
-    { gecko: 'matic-network',    key: 'matic', name: 'Polygon',        code: 'MATIC' },
-    { gecko: 'shiba-inu',        key: 'shib',  name: 'Shiba Inu',      code: 'SHIB'  },
-    { gecko: 'near',             key: 'near',  name: 'NEAR Protocol',  code: 'NEAR'  },
-    { gecko: 'uniswap',          key: 'uni',   name: 'Uniswap',        code: 'UNI'   },
-    { gecko: 'arbitrum',         key: 'arb',   name: 'Arbitrum',       code: 'ARB'   },
-    { gecko: 'the-open-network', key: 'ton',   name: 'Toncoin',        code: 'TON'   },
-    { gecko: 'sui',              key: 'sui',   name: 'Sui',            code: 'SUI'   },
+    { gecko: 'bitcoin',          yahoo: 'BTC-USD',       key: 'btc',   name: 'Bitcoin',        code: 'BTC'   },
+    { gecko: 'ethereum',         yahoo: 'ETH-USD',       key: 'eth',   name: 'Ethereum',       code: 'ETH'   },
+    { gecko: 'binancecoin',      yahoo: 'BNB-USD',       key: 'bnb',   name: 'BNB',            code: 'BNB'   },
+    { gecko: 'solana',           yahoo: 'SOL-USD',       key: 'sol',   name: 'Solana',         code: 'SOL'   },
+    { gecko: 'ripple',           yahoo: 'XRP-USD',       key: 'xrp',   name: 'XRP',            code: 'XRP'   },
+    { gecko: 'dogecoin',         yahoo: 'DOGE-USD',      key: 'doge',  name: 'Dogecoin',       code: 'DOGE'  },
+    { gecko: 'litecoin',         yahoo: 'LTC-USD',       key: 'ltc',   name: 'Litecoin',       code: 'LTC'   },
+    { gecko: 'cardano',          yahoo: 'ADA-USD',       key: 'ada',   name: 'Cardano',        code: 'ADA'   },
+    { gecko: 'avalanche-2',      yahoo: 'AVAX-USD',      key: 'avax',  name: 'Avalanche',      code: 'AVAX'  },
+    { gecko: 'polkadot',         yahoo: 'DOT-USD',       key: 'dot',   name: 'Polkadot',       code: 'DOT'   },
+    { gecko: 'chainlink',        yahoo: 'LINK-USD',      key: 'link',  name: 'Chainlink',      code: 'LINK'  },
+    { gecko: 'cosmos',           yahoo: 'ATOM-USD',      key: 'atom',  name: 'Cosmos',         code: 'ATOM'  },
+    { gecko: 'tron',             yahoo: 'TRX-USD',       key: 'trx',   name: 'TRON',           code: 'TRX'   },
+    { gecko: 'matic-network',    yahoo: 'POL28321-USD',  key: 'matic', name: 'Polygon',        code: 'POL'   },
+    { gecko: 'shiba-inu',        yahoo: 'SHIB-USD',      key: 'shib',  name: 'Shiba Inu',      code: 'SHIB'  },
+    { gecko: 'near',             yahoo: 'NEAR-USD',      key: 'near',  name: 'NEAR Protocol',  code: 'NEAR'  },
+    { gecko: 'uniswap',          yahoo: 'UNI7083-USD',   key: 'uni',   name: 'Uniswap',        code: 'UNI'   },
+    { gecko: 'arbitrum',         yahoo: 'ARB11841-USD',  key: 'arb',   name: 'Arbitrum',       code: 'ARB'   },
+    { gecko: 'the-open-network', yahoo: 'TON11419-USD',  key: 'ton',   name: 'Toncoin',        code: 'TON'   },
+    { gecko: 'sui',              yahoo: 'SUI20947-USD',  key: 'sui',   name: 'Sui',            code: 'SUI'   },
 ];
 
 // ── History için Yahoo sembol listeleri ──────────────────────────────────────
@@ -470,34 +470,70 @@ async function run() {
     }
     console.log(`  ✅ Yahoo Finance: ${stockCount} hisse işlendi`);
 
-    // ── 4. CoinGecko (Kripto) ────────────────────────────────────────────────
+    // ── 4. CoinGecko (Kripto) — Yahoo Finance fallback'lı ───────────────────
     console.log('⬇️  CoinGecko kripto çekiliyor...');
     const geckoIds = COINGECKO_CRYPTO.map(m => m.gecko);
     const cgData   = await fetchJson(coinGeckoUrl(geckoIds));
     let cryptoCount = 0;
 
-    if (cgData && typeof cgData === 'object' && !cgData.status) {
+    // Ortak yazma yardımcısı — TRY hesaplama ve precision tek yerden
+    const writeCrypto = (meta, priceUSD, chg) => {
+        if (!priceUSD || priceUSD <= 0) return false;
+        const raw      = priceUSD * usdTry;
+        // Çok küçük fiyatlar (SHIB gibi) için anlamlı basamak sayısı koru
+        const decimals = raw >= 1 ? 2 : raw >= 0.01 ? 4 : raw >= 0.0001 ? 6 : 8;
+        const priceTRY = parseFloat(raw.toFixed(decimals));
+        current[meta.key] = {
+            name: meta.name, code: meta.code, type: 'crypto',
+            current: priceTRY, selling: priceTRY, buying: priceTRY,
+            change: chg, priceUSD: parseFloat(priceUSD.toFixed(8))
+        };
+        return true;
+    };
+
+    const geckoOk = cgData && typeof cgData === 'object' && !cgData.status;
+    const geckoKeysWritten = new Set();
+    if (geckoOk) {
         for (const meta of COINGECKO_CRYPTO) {
             const row = cgData[meta.gecko];
             if (!row) continue;
-            const priceUSD = row['usd'];
-            if (!priceUSD || priceUSD <= 0) continue;
-            const chg      = parseFloat((row['usd_24h_change'] || 0).toFixed(2));
-            const raw      = priceUSD * usdTry;
-            // Çok küçük fiyatlar (SHIB gibi) için anlamlı basamak sayısı koru
-            const decimals = raw >= 1 ? 2 : raw >= 0.01 ? 4 : raw >= 0.0001 ? 6 : 8;
-            const priceTRY = parseFloat(raw.toFixed(decimals));
-            current[meta.key] = {
-                name: meta.name, code: meta.code, type: 'crypto',
-                current: priceTRY, selling: priceTRY, buying: priceTRY,
-                change: chg, priceUSD
-            };
-            cryptoCount++;
+            const chg = parseFloat((row['usd_24h_change'] || 0).toFixed(2));
+            if (writeCrypto(meta, row['usd'], chg)) {
+                cryptoCount++;
+                geckoKeysWritten.add(meta.key);
+            }
         }
         console.log(`  ✅ CoinGecko: ${cryptoCount} kripto işlendi`);
     } else {
-        console.warn('  ⚠️ CoinGecko verisi alınamadı, bir önceki değerler korunuyor');
+        console.warn('  ⚠️ CoinGecko verisi alınamadı — Yahoo Finance fallback deneniyor');
         if (cgData?.status) console.warn('  CoinGecko hata:', cgData.status.error_message);
+    }
+
+    // Yahoo Finance fallback: CoinGecko fail olduysa tüm coinler, kısmi başarı varsa
+    // CoinGecko'nun atladığı coinler. Bu run'da CoinGecko'nun YAZDIĞI key'leri atla
+    // (eski current.json değerlerini değil).
+    let yahooCryptoCount = 0;
+    for (const meta of COINGECKO_CRYPTO) {
+        if (geckoKeysWritten.has(meta.key)) continue;
+        if (!meta.yahoo) continue;
+        const url  = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(meta.yahoo)}?interval=1d&range=2d`;
+        const data = await fetchJson(url);
+        try {
+            const r        = data.chart.result[0];
+            const m        = r.meta;
+            const priceUSD = m.regularMarketPrice;
+            const prev     = m.chartPreviousClose || m.previousClose;
+            const chg = (prev && priceUSD)
+                ? parseFloat(((priceUSD - prev) / prev * 100).toFixed(2))
+                : 0;
+            if (writeCrypto(meta, priceUSD, chg)) yahooCryptoCount++;
+        } catch { /* veri yoksa atla */ }
+        await new Promise(res => setTimeout(res, 200));
+    }
+    if (yahooCryptoCount > 0) {
+        console.log(`  ✅ Yahoo Finance fallback: ${yahooCryptoCount} kripto eklendi`);
+    } else if (!geckoOk) {
+        console.warn('  ⚠️ Yahoo Finance fallback da başarısız — eski değerler korunuyor');
     }
 
     // ── 5. History cache (GitHub Pages CDN) ──────────────────────────────────
