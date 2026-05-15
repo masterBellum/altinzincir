@@ -108,14 +108,28 @@ async function fetchSikkeFiyati(slug) {
         if (r.status !== 0 || !r.stdout) return null;
         const html = r.stdout.toString('utf8');
         if (!html || html.length < 500) return null;
-        // itemprop="price" → satış; dt="bA" → BAYİ ALIŞ; dt="change" → günlük %
-        // Esnek regex: gram (6800.50), gümüş (128.14), ons (213000.00) hepsi destekli.
+        // itemprop="price" → satış; dt="bA" → BAYİ ALIŞ.
+        // dt="change" üst banner'da onlarca kez geçer (USD/EUR/GBP tickerları).
+        // Sayfanın asıl varlığının değişimi `class="currency-change-text-lg"` hero
+        // etiketinde. Yedek: itemprop=price'ın hemen yakınındaki `cp` (önceki kapanış)
+        // ile current price farkını hesapla.
         const satisM = html.match(/itemprop="price"[^>]*>\s*([\d]+(?:\.\d+)?)/);
         const alisM  = html.match(/dt="bA"[^>]*>\s*([\d]+(?:\.\d+)?)/);
-        const chgM   = html.match(/dt="change"[^>]*>\s*%(-?\d+(?:\.\d+)?)/);
+        // Hero badge: class="currency-change-text-lg" ... dt="change" ... > %X.YZ
+        let chgM = html.match(/class="currency-change-text-lg"[^>]*dt="change"[^>]*>\s*%(-?\d+(?:\.\d+)?)/);
+        // Alternatif sıra: dt="change" ... class="currency-change-text-lg"
+        if (!chgM) chgM = html.match(/dt="change"[^>]*class="currency-change-text-lg"[^>]*>\s*%(-?\d+(?:\.\d+)?)/);
+        // Son çare: hero `dt="amount"` etiketindeki cp (prev close) ile satış farkı
+        let chgFromCp = null;
+        const cpM = html.match(/itemprop="price"[\s\S]{0,300}cp="([\d.]+)"/);
+        if (cpM && satisM) {
+            const cp = parseFloat(cpM[1]);
+            const px = parseFloat(satisM[1]);
+            if (cp > 0 && px > 0) chgFromCp = parseFloat(((px - cp) / cp * 100).toFixed(2));
+        }
         const satis  = satisM ? parseFloat(satisM[1]) : NaN;
         const alis   = alisM  ? parseFloat(alisM[1])  : NaN;
-        const change = chgM   ? parseFloat(chgM[1])   : NaN;
+        const change = chgM   ? parseFloat(chgM[1])   : (chgFromCp != null ? chgFromCp : NaN);
         if (isNaN(satis) || satis <= 0) return null;
         return {
             alis: isNaN(alis) || alis <= 0 ? parseFloat((satis * 0.986).toFixed(4)) : alis,
