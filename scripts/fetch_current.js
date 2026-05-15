@@ -14,8 +14,9 @@ const https         = require('https');
 const path          = require('path');
 const { spawnSync } = require('child_process');
 
-const OUTPUT_FILE = path.join(__dirname, '..', 'data', 'current.json');
-const HISTORY_DIR = path.join(__dirname, '..', 'data', 'history');
+const OUTPUT_FILE  = path.join(__dirname, '..', 'data', 'current.json');
+const HISTORY_DIR  = path.join(__dirname, '..', 'data', 'history');
+const HISTORY_FILE = path.join(__dirname, '..', 'data', 'history.json');
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 
 // ── Kaynak URL'leri ───────────────────────────────────────────────────────────
@@ -235,6 +236,31 @@ function isHistoryStale(symbol, rangeName, maxAgeMs) {
     } catch {
         return true; // dosya yok
     }
+}
+
+// Gerçek piyasa history (build_history.js accumulator'ından):
+// data/history.json içinde her varlık için hourly[]/daily[]/monthly[]/yearly[] var.
+// Bunları per-asset {key}-{range}.json formatına çevirir. Sentetik'in üstüne yazılır
+// (gerçek piyasa premium dalgalanması — ata/reşat/hamit gibi sikkeler için kritik).
+function writeRealHistoryFromAccumulator(key, rangeName, hSeries) {
+    if (!Array.isArray(hSeries) || hSeries.length < 2) return false;
+    const points = hSeries
+        .map(v => parseFloat(v))
+        .filter(v => Number.isFinite(v) && v > 0);
+    if (points.length < 2) return false;
+    const histData = {
+        points,
+        open:  points[0],
+        high:  Math.max(...points),
+        low:   Math.min(...points),
+        close: points[points.length - 1],
+        updatedAt: new Date().toISOString(),
+        source: 'accumulator',
+    };
+    try {
+        fs.writeFileSync(historyFilePath(key, rangeName), JSON.stringify(histData), 'utf8');
+        return true;
+    } catch { return false; }
 }
 
 // Sentetik history: spot (USD/oz) × USDTRY ÷ 31.1035 → gram TRY,
@@ -759,6 +785,33 @@ async function run() {
         }
     }
     console.log(`  ✅ Sentetik history: ${synthCount} dosya yazıldı (${synthSkipped} atlandı)`);
+
+    // ── 7. Gerçek piyasa history overlay (accumulator'dan) ───────────────────
+    // data/history.json'da build_history.js'in 3+ yıldır biriktirdiği gerçek
+    // piyasa kapanışları var (ata/reşat/hamit gibi sikkelerin kendi premium'lu
+    // değerleri). Sentetik dosyaların üstüne yazıp gerçek seriyi sun.
+    let realHistoryWritten = 0;
+    try {
+        const accumulator = JSON.parse(fs.readFileSync(HISTORY_FILE, 'utf8'));
+        // TÜM varlıklar için overlay — sadece altın değil; ata/reşat ekstra önemli.
+        for (const [key, h] of Object.entries(accumulator)) {
+            if (key.startsWith('_') || !h || typeof h !== 'object') continue;
+            // gun: hourly (24'e kadar)  — en azından 2 nokta varsa
+            if (h.hourly  && h.hourly.length  >= 2 && writeRealHistoryFromAccumulator(key, 'gun',   h.hourly))  realHistoryWritten++;
+            // hafta: daily son 7-8 gün
+            if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'hafta', h.daily.slice(-8)))   realHistoryWritten++;
+            // ay: daily son 30 gün
+            if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'ay',    h.daily.slice(-31)))  realHistoryWritten++;
+            // yil: monthly son 12 ay (yoksa daily son 365 günden örnekle)
+            const yearlySeries = (h.monthly && h.monthly.length >= 2)
+                ? h.monthly.slice(-12)
+                : (h.daily && h.daily.length > 30 ? h.daily.filter((_, i, a) => i % 7 === 0 || i === a.length - 1).slice(-60) : null);
+            if (yearlySeries && writeRealHistoryFromAccumulator(key, 'yil', yearlySeries)) realHistoryWritten++;
+        }
+        console.log(`  ✅ Gerçek piyasa history overlay: ${realHistoryWritten} dosya yazıldı`);
+    } catch (e) {
+        console.warn(`  ⚠️ data/history.json okunamadı (${e.message}) — sadece sentetik kullanılacak`);
+    }
 
     // ── Meta bilgisi ekle ve kaydet ───────────────────────────────────────────
     current['_daily_open'] = dailyOpen;
