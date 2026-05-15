@@ -237,6 +237,49 @@ function isHistoryStale(symbol, rangeName, maxAgeMs) {
     }
 }
 
+// Sentetik history: spot (USD/oz) × USDTRY ÷ 31.1035 → gram TRY,
+// sonra "ratio = currentPrice / synthetic[last]" ile her key'e özel ölçeğe çek.
+// Çıktı dosyası `data/history/{key}-{range}.json` (app key-first arama yapıyor).
+function buildSyntheticHistory(key, sourceSymbol, rangeName, currentPriceTRY) {
+    const TROY_OZ_GRAMS = 31.1034768;
+    try {
+        const spotPath = historyFilePath(sourceSymbol, rangeName);
+        const fxPath   = historyFilePath('USDTRY=X',   rangeName);
+        if (!fs.existsSync(spotPath) || !fs.existsSync(fxPath)) return false;
+        const spot = JSON.parse(fs.readFileSync(spotPath, 'utf8'));
+        const fx   = JSON.parse(fs.readFileSync(fxPath,   'utf8'));
+        const sp = spot.points || [];
+        const fp = fx.points   || [];
+        if (sp.length < 2 || fp.length < 2) return false;
+        // Sondan başa hizala (uzunluklar farklı olabilir — Yahoo aralık döndürmesi tutarsız)
+        const n = Math.min(sp.length, fp.length);
+        const sTail = sp.slice(-n);
+        const fTail = fp.slice(-n);
+        // gram TRY synthetic
+        const synth = new Array(n);
+        for (let i = 0; i < n; i++) synth[i] = (sTail[i] / TROY_OZ_GRAMS) * fTail[i];
+        // Ratio: son nokta = mevcut TRY fiyat (kuyumcu premium'unu korur)
+        const last = synth[n - 1];
+        if (!last || last <= 0) return false;
+        const ratio = currentPriceTRY / last;
+        if (!isFinite(ratio) || ratio <= 0) return false;
+        const points = synth.map(v => parseFloat((v * ratio).toFixed(4)));
+        const histData = {
+            points,
+            open:  points[0],
+            high:  Math.max(...points),
+            low:   Math.min(...points),
+            close: points[points.length - 1],
+            updatedAt: new Date().toISOString(),
+            synthetic: { source: sourceSymbol, ratio: parseFloat(ratio.toFixed(6)) },
+        };
+        fs.writeFileSync(historyFilePath(key, rangeName), JSON.stringify(histData), 'utf8');
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 async function fetchAndSaveHistory(symbol, rangeName, interval, range) {
     const url  = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${interval}&range=${range}`;
     const data = await fetchJson(url);
@@ -681,6 +724,41 @@ async function run() {
         }
     }
     console.log(`  ✅ History cache: ${historyCount} dosya güncellendi, ${historySkipped} atlandı`);
+
+    // ── 6. Sentetik history (Türkiye altın/gümüş/platin gram TRY) ────────────
+    // gram-altin/çeyrek/yarım/.../gümüş/gram-platin için public history endpoint yok.
+    // Yahoo spot (USD/oz) × USDTRY ÷ 31.1035 = gram TRY, sonra current.json'daki
+    // fiyat ile ratio'la (kuyumcu premium'u korunsun, son nokta = canlı fiyat).
+    const SYNTHETIC_GOLD_SOURCES = {
+        // Altın türleri — kaynak GC=F (gold futures USD/oz)
+        'gram-altin':        'GC=F',
+        'ceyrek-altin':      'GC=F',
+        'yarim-altin':       'GC=F',
+        'tam-altin':         'GC=F',
+        'cumhuriyet-altini': 'GC=F',
+        'ata-altin':         'GC=F',
+        'resat-altin':       'GC=F',
+        'hamit-altin':       'GC=F',
+        'gram-has-altin':    'GC=F',
+        '14-ayar-altin':     'GC=F',
+        '18-ayar-altin':     'GC=F',
+        '22-ayar-bilezik':   'GC=F',
+        'ons':               'GC=F',
+        // Gümüş & platin — kaynak SI=F, PL=F
+        'gumus':             'SI=F',
+        'gram-platin':       'PL=F',
+    };
+    let synthCount = 0, synthSkipped = 0;
+    for (const [key, sourceSymbol] of Object.entries(SYNTHETIC_GOLD_SOURCES)) {
+        const row = current[key];
+        if (!row) { synthSkipped++; continue; }
+        const px = row.selling || row.current;
+        if (!px || px <= 0) { synthSkipped++; continue; }
+        for (const r of HISTORY_RANGES) {
+            if (buildSyntheticHistory(key, sourceSymbol, r.name, px)) synthCount++;
+        }
+    }
+    console.log(`  ✅ Sentetik history: ${synthCount} dosya yazıldı (${synthSkipped} atlandı)`);
 
     // ── Meta bilgisi ekle ve kaydet ───────────────────────────────────────────
     current['_daily_open'] = dailyOpen;
