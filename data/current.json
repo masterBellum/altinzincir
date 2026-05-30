@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-05-30T20:53:26.238Z",
+    "updated_at": "2026-05-30T21:46:54.286Z",
     "source": "Truncgil V3 (altın+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)"
   },
   "gram-altin": {
@@ -10,8 +10,8 @@
     "current": 6687.67,
     "selling": 6687.67,
     "buying": 6686.84,
-    "change": -0.25,
-    "open": 6704.43
+    "change": 0,
+    "open": 6687.67
   },
   "ons": {
     "name": "Ons Altın",
@@ -140,8 +140,8 @@
     "current": 110.9373,
     "selling": 110.9373,
     "buying": 110.9225,
-    "change": -0.35,
-    "open": 111.33
+    "change": 0,
+    "open": 110.94
   },
   "gram-platin": {
     "name": "Gram Platin",
@@ -837,41 +837,41 @@
     "name": "Bitcoin",
     "code": "BTC",
     "type": "crypto",
-    "current": 3390520.28,
-    "selling": 3390520.28,
-    "buying": 3390520.28,
-    "change": 0.35,
-    "priceUSD": 73841
+    "current": 3393091.6,
+    "selling": 3393091.6,
+    "buying": 3393091.6,
+    "change": 0.61,
+    "priceUSD": 73897
   },
   "eth": {
     "name": "Ethereum",
     "code": "ETH",
     "type": "crypto",
-    "current": 92938.67,
-    "selling": 92938.67,
-    "buying": 92938.67,
-    "change": 0.41,
-    "priceUSD": 2024.08
+    "current": 93075.04,
+    "selling": 93075.04,
+    "buying": 93075.04,
+    "change": 0.85,
+    "priceUSD": 2027.05
   },
   "bnb": {
     "name": "BNB",
     "code": "BNB",
     "type": "crypto",
-    "current": 33016.72,
-    "selling": 33016.72,
-    "buying": 33016.72,
-    "change": 12.1,
-    "priceUSD": 719.06
+    "current": 33328.03,
+    "selling": 33328.03,
+    "buying": 33328.03,
+    "change": 13.08,
+    "priceUSD": 725.84
   },
   "sol": {
     "name": "Solana",
     "code": "SOL",
     "type": "crypto",
-    "current": 3802.35,
-    "selling": 3802.35,
-    "buying": 3802.35,
-    "change": 0.77,
-    "priceUSD": 82.81
+    "current": 3810.15,
+    "selling": 3810.15,
+    "buying": 3810.15,
+    "change": 1.29,
+    "priceUSD": 82.98
   },
   "xrp": {
     "name": "XRP",
@@ -880,48 +880,48 @@
     "current": 61.99,
     "selling": 61.99,
     "buying": 61.99,
-    "change": 1.72,
+    "change": 2.25,
     "priceUSD": 1.35
   },
   "doge": {
     "name": "Dogecoin",
     "code": "DOGE",
     "type": "crypto",
-    "current": 4.64,
-    "selling": 4.64,
-    "buying": 4.64,
-    "change": 1.14,
-    "priceUSD": 0.101118
+    "current": 4.65,
+    "selling": 4.65,
+    "buying": 4.65,
+    "change": 1.39,
+    "priceUSD": 0.101314
   },
   "ltc": {
     "name": "Litecoin",
     "code": "LTC",
     "type": "crypto",
-    "current": 2409.24,
-    "selling": 2409.24,
-    "buying": 2409.24,
-    "change": 1.17,
-    "priceUSD": 52.47
+    "current": 2411.08,
+    "selling": 2411.08,
+    "buying": 2411.08,
+    "change": 1.26,
+    "priceUSD": 52.51
   },
   "ada": {
     "name": "Cardano",
     "code": "ADA",
     "type": "crypto",
-    "current": 10.88,
-    "selling": 10.88,
-    "buying": 10.88,
-    "change": 1.83,
-    "priceUSD": 0.23694
+    "current": 10.93,
+    "selling": 10.93,
+    "buying": 10.93,
+    "change": 1.99,
+    "priceUSD": 0.23799
   },
   "avax": {
     "name": "Avalanche",
     "code": "AVAX",
     "type": "crypto",
-    "current": 412.33,
-    "selling": 412.33,
-    "buying": 412.33,
-    "change": 1.78,
-    "priceUSD": 8.98
+    "current": 413.25,
+    "selling": 413.25,
+    "buying": 413.25,
+    "change": 1.92,
+    "priceUSD": 9
   },
   "dot": {
     "name": "Polkadot",
@@ -930,18 +930,18 @@
     "current": 55.1,
     "selling": 55.1,
     "buying": 55.1,
-    "change": 0.3,
+    "change": 0.75,
     "priceUSD": 1.2
   },
   "link": {
     "name": "Chainlink",
     "code": "LINK",
     "type": "crypto",
-    "current": 423.81,
-    "selling": 423.81,
-    "buying": 423.81,
-    "change": 2.63,
-    "priceUSD": 9.23
+    "current": 425.65,
+    "selling": 425.65,
+    "buying": 425.65,
+    "change": 3.03,
+    "priceUSD": 9.27
   },
   "atom": {
     "name": "Cosmos",
@@ -950,28 +950,28 @@
     "current": 93.21,
     "selling": 93.21,
     "buying": 93.21,
-    "change": -0.43,
+    "change": 0.03,
     "priceUSD": 2.03
   },
   "trx": {
     "name": "TRON",
     "code": "TRX",
     "type": "crypto",
-    "current": 15.93,
-    "selling": 15.93,
-    "buying": 15.93,
-    "change": 0.91,
-    "priceUSD": 0.346826
+    "current": 15.94,
+    "selling": 15.94,
+    "buying": 15.94,
+    "change": 0.9,
+    "priceUSD": 0.347153
   },
   "matic": {
     "name": "Polygon",
     "code": "POL",
     "type": "crypto",
-    "current": 4.15,
-    "selling": 4.15,
-    "buying": 4.15,
-    "change": 0.48,
-    "priceUSD": 0.0904
+    "current": 4.16,
+    "selling": 4.16,
+    "buying": 4.16,
+    "change": 0.6,
+    "priceUSD": 0.0905
   },
   "shib": {
     "name": "Shiba Inu",
@@ -980,18 +980,18 @@
     "current": 0.000254,
     "selling": 0.000254,
     "buying": 0.000254,
-    "change": 2.1,
-    "priceUSD": 0.00000553
+    "change": 2.07,
+    "priceUSD": 0.00000554
   },
   "near": {
     "name": "NEAR Protocol",
     "code": "NEAR",
     "type": "crypto",
-    "current": 106.07,
-    "selling": 106.07,
-    "buying": 106.07,
-    "change": -7.62,
-    "priceUSD": 2.31
+    "current": 105.61,
+    "selling": 105.61,
+    "buying": 105.61,
+    "change": -5.72,
+    "priceUSD": 2.3
   },
   "uni": {
     "name": "Uniswap",
@@ -1000,38 +1000,38 @@
     "current": 140.96,
     "selling": 140.96,
     "buying": 140.96,
-    "change": 1.7,
+    "change": 1.86,
     "priceUSD": 3.07
   },
   "arb": {
     "name": "Arbitrum",
     "code": "ARB",
     "type": "crypto",
-    "current": 4.8,
-    "selling": 4.8,
-    "buying": 4.8,
-    "change": 1.16,
-    "priceUSD": 0.104518
+    "current": 4.81,
+    "selling": 4.81,
+    "buying": 4.81,
+    "change": 1.51,
+    "priceUSD": 0.104741
   },
   "ton": {
     "name": "Toncoin",
     "code": "TON",
     "type": "crypto",
-    "current": 84.95,
-    "selling": 84.95,
-    "buying": 84.95,
-    "change": 5.3,
-    "priceUSD": 1.85
+    "current": 84.49,
+    "selling": 84.49,
+    "buying": 84.49,
+    "change": 4.73,
+    "priceUSD": 1.84
   },
   "sui": {
     "name": "Sui",
     "code": "SUI",
     "type": "crypto",
-    "current": 41.72,
-    "selling": 41.72,
-    "buying": 41.72,
-    "change": 0.92,
-    "priceUSD": 0.90856
+    "current": 41.92,
+    "selling": 41.92,
+    "buying": 41.92,
+    "change": 1.64,
+    "priceUSD": 0.912943
   },
   "garan": {
     "name": "Garanti BBVA",
@@ -1250,7 +1250,7 @@
     "change": 0
   },
   "_daily_open": {
-    "date": "2026-05-30",
+    "date": "2026-05-31",
     "prices": {}
   },
   "gremse-altin": {
