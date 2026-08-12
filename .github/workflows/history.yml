@@ -8,9 +8,10 @@ on:
     types: [build-history]
   workflow_dispatch:
 
-# prices/news ile aynı ref'e push ediliyor — seri çalışsınlar
+# Sadece kendi kendine üst üste binmeyi engeller; çapraz push çakışması
+# commit adımındaki pull --rebase + retry döngüsüyle çözülüyor.
 concurrency:
-  group: data-push
+  group: data-push-history
   cancel-in-progress: false
 
 jobs:

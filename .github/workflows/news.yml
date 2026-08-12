@@ -7,9 +7,10 @@ on:
     types: [fetch-news]
   workflow_dispatch:           # Manuel tetikleme
 
-# prices/history ile aynı ref'e push ediliyor — seri çalışsınlar
+# Sadece kendi kendine üst üste binmeyi engeller; çapraz push çakışması
+# commit adımındaki pull --rebase + retry döngüsüyle çözülüyor.
 concurrency:
-  group: data-push
+  group: data-push-news
   cancel-in-progress: false
 
 jobs:

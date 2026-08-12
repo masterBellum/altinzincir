@@ -10,10 +10,11 @@ on:
     types: [fetch-prices]
   workflow_dispatch: # Manuel tetikleme butonu
 
-# Üç workflow (prices/history/news) da aynı ref'e push ediyor.
-# Aynı grupta seri çalışsınlar ki push yarışı oluşmasın.
+# Sadece kendi kendine üst üste binmeyi engeller. Diğer workflow'larla olan
+# push çakışması commit adımındaki pull --rebase + retry döngüsüyle çözülüyor;
+# ortak grup kullanılırsa bekleyen history/news run'ları iptal olabiliyordu.
 concurrency:
-  group: data-push
+  group: data-push-prices
   cancel-in-progress: false
 
 jobs:
