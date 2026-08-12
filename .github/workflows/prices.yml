@@ -2,9 +2,19 @@ name: Canlı Fiyat Güncellemesi (5 dk)
 
 on:
   schedule:
-    # Her 5 dakikada bir — GitHub'ın minimum desteklediği aralık
+    # YEDEK tetikleyici. GitHub scheduled cron'u ağır throttle'lıyor —
+    # ölçülen gerçek aralık ~57 dk. Asıl tetikleme repository_dispatch ile
+    # harici cron servisinden (cron-job.org) geliyor.
     - cron: '*/5 * * * *'
+  repository_dispatch:
+    types: [fetch-prices]
   workflow_dispatch: # Manuel tetikleme butonu
+
+# Üç workflow (prices/history/news) da aynı ref'e push ediyor.
+# Aynı grupta seri çalışsınlar ki push yarışı oluşmasın.
+concurrency:
+  group: data-push
+  cancel-in-progress: false
 
 jobs:
   fetch-prices:
@@ -30,6 +40,19 @@ jobs:
           git config --global user.name  "AltinZincir-Bot"
           git config --global user.email "bot@altinzincir.app"
           git add data/current.json data/history/
-          git diff --cached --quiet && echo "Değişiklik yok" && exit 0
+          if git diff --cached --quiet; then
+            echo "Değişiklik yok"
+            exit 0
+          fi
           git commit -m "fiyat+tarih: $(date -u '+%H:%M UTC')"
-          git push
+          # Eşzamanlı push'lara karşı rebase + tekrar denemeli push
+          for i in 1 2 3 4 5; do
+            if git pull --rebase --autostash origin main && git push; then
+              echo "✅ Push başarılı (deneme $i)"
+              exit 0
+            fi
+            echo "⚠️  Push denemesi $i başarısız — yeniden deneniyor"
+            sleep $((i * 5))
+          done
+          echo "❌ Push 5 denemede de başarısız oldu"
+          exit 1
