@@ -835,6 +835,15 @@ async function run() {
         console.warn('  ⚠️ Yahoo Finance fallback da başarısız — eski değerler korunuyor');
     }
 
+    // ── History üretimi (adım 5-6-7) ─────────────────────────────────────────
+    // SKIP_HISTORY=1 ile atlanır. 5 dakikalık fiyat run'ı bu adımları atlar:
+    // her çalıştırmada ~962 dosya değiştirip repoyu şişiriyor ve run'a ~45 sn
+    // ekliyorlardı. History'yi saatlik workflow bayraksız çalışıp üretir.
+    const SKIP_HISTORY = process.env.SKIP_HISTORY === '1';
+    if (SKIP_HISTORY) {
+        console.log('⏭️  SKIP_HISTORY=1 — history üretimi atlanıyor (adım 5-6-7)');
+    }
+
     // ── 5. History cache (GitHub Pages CDN) ──────────────────────────────────
     // Her varlığın GÜN/HAFTA/AY/YIL geçmişi data/history/{sembol}-{aralık}.json'a yazılır.
     // Android app önce buradan okur; Yahoo Finance sadece fallback olarak kullanılır.
@@ -853,19 +862,21 @@ async function run() {
         { name: 'yil',   interval: '1wk', yahooRange: '1y'  },
     ];
 
-    console.log(`⬇️  History cache: ${ALL_YAHOO_SYMBOLS.length} sembol × 4 aralık güncelleniyor...`);
-    let historyCount = 0, historySkipped = 0;
-    for (const symbol of ALL_YAHOO_SYMBOLS) {
-        for (const r of HISTORY_RANGES) {
-            // GÜN: her zaman tazele (intraday); diğerleri: 6 saatten eskiyse tazele
-            const maxAge = r.name === 'gun' ? 0 : SIX_HOURS_MS;
-            if (!isHistoryStale(symbol, r.name, maxAge)) { historySkipped++; continue; }
-            const ok = await fetchAndSaveHistory(symbol, r.name, r.interval, r.yahooRange);
-            if (ok) historyCount++;
-            await new Promise(res => setTimeout(res, 150));
+    if (!SKIP_HISTORY) {
+        console.log(`⬇️  History cache: ${ALL_YAHOO_SYMBOLS.length} sembol × 4 aralık güncelleniyor...`);
+        let historyCount = 0, historySkipped = 0;
+        for (const symbol of ALL_YAHOO_SYMBOLS) {
+            for (const r of HISTORY_RANGES) {
+                // GÜN: her zaman tazele (intraday); diğerleri: 6 saatten eskiyse tazele
+                const maxAge = r.name === 'gun' ? 0 : SIX_HOURS_MS;
+                if (!isHistoryStale(symbol, r.name, maxAge)) { historySkipped++; continue; }
+                const ok = await fetchAndSaveHistory(symbol, r.name, r.interval, r.yahooRange);
+                if (ok) historyCount++;
+                await new Promise(res => setTimeout(res, 150));
+            }
         }
+        console.log(`  ✅ History cache: ${historyCount} dosya güncellendi, ${historySkipped} atlandı`);
     }
-    console.log(`  ✅ History cache: ${historyCount} dosya güncellendi, ${historySkipped} atlandı`);
 
     // ── 6. Sentetik history (Türkiye altın/gümüş/platin gram TRY) ────────────
     // gram-altin/çeyrek/yarım/.../gümüş/gram-platin için public history endpoint yok.
@@ -891,51 +902,76 @@ async function run() {
         'gumus':             'SI=F',
         'gram-platin':       'PL=F',
     };
-    let synthCount = 0, synthSkipped = 0;
-    for (const [key, sourceSymbol] of Object.entries(SYNTHETIC_GOLD_SOURCES)) {
-        const row = current[key];
-        if (!row) { synthSkipped++; continue; }
-        const px = row.selling || row.current;
-        if (!px || px <= 0) { synthSkipped++; continue; }
-        for (const r of HISTORY_RANGES) {
-            if (buildSyntheticHistory(key, sourceSymbol, r.name, px)) synthCount++;
+    if (!SKIP_HISTORY) {
+        let synthCount = 0, synthSkipped = 0;
+        for (const [key, sourceSymbol] of Object.entries(SYNTHETIC_GOLD_SOURCES)) {
+            const row = current[key];
+            if (!row) { synthSkipped++; continue; }
+            const px = row.selling || row.current;
+            if (!px || px <= 0) { synthSkipped++; continue; }
+            for (const r of HISTORY_RANGES) {
+                if (buildSyntheticHistory(key, sourceSymbol, r.name, px)) synthCount++;
+            }
         }
+        console.log(`  ✅ Sentetik history: ${synthCount} dosya yazıldı (${synthSkipped} atlandı)`);
     }
-    console.log(`  ✅ Sentetik history: ${synthCount} dosya yazıldı (${synthSkipped} atlandı)`);
 
     // ── 7. Gerçek piyasa history overlay (accumulator'dan) ───────────────────
     // data/history.json'da build_history.js'in 3+ yıldır biriktirdiği gerçek
     // piyasa kapanışları var (ata/reşat/hamit gibi sikkelerin kendi premium'lu
     // değerleri). Sentetik dosyaların üstüne yazıp gerçek seriyi sun.
-    let realHistoryWritten = 0;
-    try {
-        const accumulator = JSON.parse(fs.readFileSync(HISTORY_FILE, 'utf8'));
-        // TÜM varlıklar için overlay — sadece altın değil; ata/reşat ekstra önemli.
-        for (const [key, h] of Object.entries(accumulator)) {
-            if (key.startsWith('_') || !h || typeof h !== 'object') continue;
-            // gun: hourly (24'e kadar)  — en azından 2 nokta varsa
-            if (h.hourly  && h.hourly.length  >= 2 && writeRealHistoryFromAccumulator(key, 'gun',   h.hourly))  realHistoryWritten++;
-            // hafta: daily son 7-8 gün
-            if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'hafta', h.daily.slice(-8)))   realHistoryWritten++;
-            // ay: daily son 30 gün
-            if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'ay',    h.daily.slice(-31)))  realHistoryWritten++;
-            // yil: monthly son 12 ay (yoksa daily son 365 günden örnekle)
-            const yearlySeries = (h.monthly && h.monthly.length >= 2)
-                ? h.monthly.slice(-12)
-                : (h.daily && h.daily.length > 30 ? h.daily.filter((_, i, a) => i % 7 === 0 || i === a.length - 1).slice(-60) : null);
-            if (yearlySeries && writeRealHistoryFromAccumulator(key, 'yil', yearlySeries)) realHistoryWritten++;
+    if (!SKIP_HISTORY) {
+        let realHistoryWritten = 0;
+        try {
+            const accumulator = JSON.parse(fs.readFileSync(HISTORY_FILE, 'utf8'));
+            // TÜM varlıklar için overlay — sadece altın değil; ata/reşat ekstra önemli.
+            for (const [key, h] of Object.entries(accumulator)) {
+                if (key.startsWith('_') || !h || typeof h !== 'object') continue;
+                // gun: hourly (24'e kadar)  — en azından 2 nokta varsa
+                if (h.hourly  && h.hourly.length  >= 2 && writeRealHistoryFromAccumulator(key, 'gun',   h.hourly))  realHistoryWritten++;
+                // hafta: daily son 7-8 gün
+                if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'hafta', h.daily.slice(-8)))   realHistoryWritten++;
+                // ay: daily son 30 gün
+                if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'ay',    h.daily.slice(-31)))  realHistoryWritten++;
+                // yil: monthly son 12 ay (yoksa daily son 365 günden örnekle)
+                const yearlySeries = (h.monthly && h.monthly.length >= 2)
+                    ? h.monthly.slice(-12)
+                    : (h.daily && h.daily.length > 30 ? h.daily.filter((_, i, a) => i % 7 === 0 || i === a.length - 1).slice(-60) : null);
+                if (yearlySeries && writeRealHistoryFromAccumulator(key, 'yil', yearlySeries)) realHistoryWritten++;
+            }
+            console.log(`  ✅ Gerçek piyasa history overlay: ${realHistoryWritten} dosya yazıldı`);
+        } catch (e) {
+            console.warn(`  ⚠️ data/history.json okunamadı (${e.message}) — sadece sentetik kullanılacak`);
         }
-        console.log(`  ✅ Gerçek piyasa history overlay: ${realHistoryWritten} dosya yazıldı`);
-    } catch (e) {
-        console.warn(`  ⚠️ data/history.json okunamadı (${e.message}) — sadece sentetik kullanılacak`);
     }
 
     // ── Meta bilgisi ekle ve kaydet ───────────────────────────────────────────
     current['_daily_open'] = dailyOpen;
+    // Kaynak sağlık raporu. Bir kaynak çökerse eski değerler korunuyor (kasıtlı),
+    // ama updated_at yine de tazeleniyor — bu, donmuş fiyatları "az önce
+    // güncellendi" gibi gösteriyordu. Sayaçlar hangi kaynağın bu run'da gerçekten
+    // veri yazdığını söyler; 0 olan bir kategori sessiz bayatlama demektir.
+    const counts = {
+        gold:      goldCount,
+        commodity: emtiaCount,
+        stock:     stockCount,
+        crypto:    cryptoCount + yahooCryptoCount,
+        currency:  writtenCurrencies.size,
+    };
+    const warnings = Object.entries(counts)
+        .filter(([, n]) => n === 0)
+        .map(([k]) => `${k}: bu run'da hiç veri yazılmadı — değerler önceki run'dan geliyor`);
+
     current['_meta'] = {
         updated_at: new Date().toISOString(),
-        source: 'canlidoviz (altın) | Truncgil V3 (ons+platin+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)'
+        source: 'canlidoviz (altın) | Truncgil V3 (ons+platin+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)',
+        counts,
+        ...(warnings.length ? { warnings } : {}),
     };
+
+    if (warnings.length) {
+        console.warn(`\n⚠️  KAYNAK UYARISI:\n   ${warnings.join('\n   ')}`);
+    }
 
     fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
     // Atomic write: önce .tmp yaz, sonra rename — yarım yazma corruption'ını önler
