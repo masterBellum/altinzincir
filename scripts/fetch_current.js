@@ -625,8 +625,8 @@ async function run() {
                 current[sym] = {
                     name: CURRENCY_NAMES[sym] || sym, code: sym, type: 'currency',
                     current: r.selling, selling: r.selling, buying: r.buying,
-                    // TCMB günlük resmi referans veriyor; change için intraday yok → 0
-                    change: 0,
+                    // TCMB intraday change vermiyor; önceki run'daki gerçek değeri koru (yoksa 0)
+                    change: current[sym]?.change ?? 0,
                 };
                 writtenCurrencies.add(sym);
                 tcmbCount++;
@@ -649,7 +649,8 @@ async function run() {
                 name: CURRENCY_NAMES[sym] || sym, code: sym, type: 'currency',
                 current: rate, selling: rate,
                 buying:  parseFloat((rate * 0.998).toFixed(4)),
-                change:  0,
+                // fawazahmed0 intraday change vermiyor; önceki run'daki gerçek değeri koru (yoksa 0)
+                change:  current[sym]?.change ?? 0,
             };
             writtenCurrencies.add(sym);
             fawazCount++;
@@ -717,6 +718,30 @@ async function run() {
         await new Promise(r => setTimeout(r, 200));
     }
     console.log(`  ${emtiaCount > 0 ? '✅' : '⚠️'} Yahoo Finance emtia: ${emtiaCount}/14 işlendi`);
+
+    // ── Truncgil-only varlıklar için change% senkronizasyonu ─────────────────
+    // Truncgil'in row.Change alanı hafta sonu/tatil günü stale (son işlem günü değeri)
+    // döndürebilir; Yahoo Finance / canlidoviz market kapalıyken doğru 0.00% verir.
+
+    // gram-platin: % değişim PL=F (XPTUSD) ile aynı → Yahoo'dan al
+    if (current['gram-platin'] && current['XPTUSD'] !== undefined) {
+        const chg   = current['XPTUSD'].change;
+        const satis = current['gram-platin'].current;
+        current['gram-platin'].change = chg;
+        current['gram-platin'].open   = chg !== -100
+            ? parseFloat((satis / (1 + chg / 100)).toFixed(2))
+            : satis;
+    }
+
+    // ons: % değişim gram-altin (canlidoviz) ile aynı — aynı underlying varlık
+    if (current['ons'] && current['gram-altin']) {
+        const chg   = current['gram-altin'].change;
+        const satis = current['ons'].current;
+        current['ons'].change = chg;
+        current['ons'].open   = chg !== -100
+            ? parseFloat((satis / (1 + chg / 100)).toFixed(2))
+            : satis;
+    }
 
     // ── 4. Yahoo Finance (BIST Hisse) ────────────────────────────────────────
     console.log('⬇️  Yahoo Finance BIST hisseler çekiliyor...');
@@ -909,7 +934,7 @@ async function run() {
     current['_daily_open'] = dailyOpen;
     current['_meta'] = {
         updated_at: new Date().toISOString(),
-        source: 'Truncgil V3 (altın+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)'
+        source: 'canlidoviz (altın) | Truncgil V3 (ons+platin+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)'
     };
 
     fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
