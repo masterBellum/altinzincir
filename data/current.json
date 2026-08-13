@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-08-13T08:04:05.537Z",
+    "updated_at": "2026-08-13T08:14:44.007Z",
     "source": "canlidoviz (altın) | Truncgil V3 (ons+platin+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)",
     "counts": {
       "gold": 14,
@@ -14,10 +14,10 @@
     "name": "Gram Altın",
     "code": "GRAM",
     "type": "gold",
-    "current": 6721.44,
-    "selling": 6721.44,
-    "buying": 6720.64,
-    "change": -0.69,
+    "current": 6713.32,
+    "selling": 6713.32,
+    "buying": 6712.56,
+    "change": -0.81,
     "open": 6768.14
   },
   "ons": {
@@ -27,88 +27,88 @@
     "current": 208801.24,
     "selling": 208801.24,
     "buying": 208780.69,
-    "change": -0.69,
-    "open": 210251.98
+    "change": -0.81,
+    "open": 210506.34
   },
   "ceyrek-altin": {
     "name": "Çeyrek Altın",
     "code": "CEYREK",
     "type": "gold",
-    "current": 11039.01,
-    "selling": 11039.01,
-    "buying": 10869.92,
-    "change": -0.9,
-    "open": 11139.26
+    "current": 11032.49,
+    "selling": 11032.49,
+    "buying": 10861.59,
+    "change": -0.96,
+    "open": 11139.43
   },
   "yarim-altin": {
     "name": "Yarım Altın",
     "code": "YARIM",
     "type": "gold",
-    "current": 22113.1,
-    "selling": 22113.1,
-    "buying": 21735.76,
-    "change": -0.9,
-    "open": 22313.93
+    "current": 22098.51,
+    "selling": 22098.51,
+    "buying": 21723.19,
+    "change": -0.96,
+    "open": 22312.71
   },
   "tam-altin": {
     "name": "Tam Altın",
     "code": "TAM",
     "type": "gold",
-    "current": 44024.87,
-    "selling": 44024.87,
-    "buying": 43337.35,
-    "change": -0.9,
-    "open": 44424.69
+    "current": 43995.82,
+    "selling": 43995.82,
+    "buying": 43312.28,
+    "change": -0.96,
+    "open": 44422.27
   },
   "cumhuriyet-altini": {
     "name": "Cumhuriyet Altını",
     "code": "CUMHUR",
     "type": "gold",
-    "current": 45098.6519,
-    "selling": 45098.6519,
-    "buying": 44343.6302,
-    "change": -0.9,
-    "open": 45508.23
+    "current": 45068.8925,
+    "selling": 45068.8925,
+    "buying": 44317.9833,
+    "change": -0.96,
+    "open": 45505.75
   },
   "ata-altin": {
     "name": "Ata Altın",
     "code": "ATAALT",
     "type": "gold",
-    "current": 45095.5195,
-    "selling": 45095.5195,
-    "buying": 44351.967,
-    "change": -0.9,
-    "open": 45505.07
+    "current": 45063.9732,
+    "selling": 45063.9732,
+    "buying": 44314.3022,
+    "change": -0.97,
+    "open": 45505.38
   },
   "resat-altin": {
     "name": "Reşat Altın",
     "code": "RESAT",
     "type": "gold",
-    "current": 45313.1517,
-    "selling": 45313.1517,
-    "buying": 44622.8947,
-    "change": -0.87,
-    "open": 45710.84
+    "current": 45268.187,
+    "selling": 45268.187,
+    "buying": 44582.0977,
+    "change": -0.97,
+    "open": 45711.59
   },
   "hamit-altin": {
     "name": "Hamit Altın",
     "code": "HAMIT",
     "type": "gold",
-    "current": 45682.814,
-    "selling": 45682.814,
-    "buying": 44328.7507,
-    "change": -0.79,
-    "open": 46046.58
+    "current": 45627.8105,
+    "selling": 45627.8105,
+    "buying": 44280.4424,
+    "change": -0.91,
+    "open": 46046.84
   },
   "gram-has-altin": {
     "name": "Gram Has Altın",
     "code": "HAS",
     "type": "gold",
-    "current": 6720.03,
-    "selling": 6720.03,
-    "buying": 6719.29,
+    "current": 6713.84,
+    "selling": 6713.84,
+    "buying": 6713.1,
     "change": 0,
-    "open": 6720.03
+    "open": 6713.84
   },
   "14-ayar-altin": {
     "name": "14 Ayar Altın",
@@ -134,20 +134,20 @@
     "name": "22 Ayar Bilezik",
     "code": "22AYAR",
     "type": "gold",
-    "current": 6308.8896,
-    "selling": 6308.8896,
-    "buying": 6104.9656,
-    "change": -0.89,
-    "open": 6365.54
+    "current": 6303.9998,
+    "selling": 6303.9998,
+    "buying": 6100.6382,
+    "change": -0.97,
+    "open": 6365.75
   },
   "gumus": {
     "name": "Gümüş",
     "code": "GUMUS",
     "type": "commodity",
-    "current": 99.3622,
-    "selling": 99.3622,
-    "buying": 99.2547,
-    "change": -0.98,
+    "current": 99.285,
+    "selling": 99.285,
+    "buying": 99.1928,
+    "change": -1.06,
     "open": 100.35
   },
   "gram-platin": {
@@ -157,8 +157,8 @@
     "current": 2660.69,
     "selling": 2660.69,
     "buying": 2653.53,
-    "change": -1.53,
-    "open": 2702.03
+    "change": -1.66,
+    "open": 2705.6
   },
   "USD": {
     "name": "ABD Doları",
@@ -724,171 +724,171 @@
     "name": "Ham Petrol (WTI)",
     "code": "WTI",
     "type": "commodity",
-    "current": 3922.02,
-    "selling": 3922.02,
-    "buying": 3914.18,
-    "change": -1.43,
-    "priceUSD": 82.08
+    "current": 3931.1,
+    "selling": 3931.1,
+    "buying": 3923.24,
+    "change": -1.2,
+    "priceUSD": 82.27
   },
   "COPPER": {
     "name": "Bakır",
     "code": "COPPER",
     "type": "commodity",
-    "current": 311.07,
-    "selling": 311.07,
-    "buying": 310.45,
-    "change": -1.32,
-    "priceUSD": 6.51
+    "current": 311.16,
+    "selling": 311.16,
+    "buying": 310.54,
+    "change": -1.29,
+    "priceUSD": 6.512
   },
   "CORN": {
     "name": "Mısır",
     "code": "CORN",
     "type": "commodity",
-    "current": 227.69,
-    "selling": 227.69,
-    "buying": 227.23,
-    "change": 4.27,
-    "priceUSD": 4.765
+    "current": 227.8,
+    "selling": 227.8,
+    "buying": 227.34,
+    "change": 4.32,
+    "priceUSD": 4.7675
   },
   "COTTON": {
     "name": "Pamuk",
     "code": "COTTON",
     "type": "commodity",
-    "current": 39.55,
-    "selling": 39.55,
-    "buying": 39.47,
-    "change": -0.52,
-    "priceUSD": 0.8278
+    "current": 39.63,
+    "selling": 39.63,
+    "buying": 39.55,
+    "change": -0.34,
+    "priceUSD": 0.8293
   },
   "NGAS": {
     "name": "Doğal Gaz",
     "code": "NGAS",
     "type": "commodity",
-    "current": 133.51,
-    "selling": 133.51,
-    "buying": 133.24,
-    "change": -0.36,
-    "priceUSD": 2.794
+    "current": 133.12,
+    "selling": 133.12,
+    "buying": 132.85,
+    "change": -0.64,
+    "priceUSD": 2.786
   },
   "SOYBEAN": {
     "name": "Soya Fasulyesi",
     "code": "SOYBEAN",
     "type": "commodity",
-    "current": 564.67,
-    "selling": 564.67,
-    "buying": 563.54,
-    "change": 1.46,
-    "priceUSD": 11.8175
+    "current": 564.91,
+    "selling": 564.91,
+    "buying": 563.78,
+    "change": 1.5,
+    "priceUSD": 11.8225
   },
   "SUGAR": {
     "name": "Şeker",
     "code": "SUGAR",
     "type": "commodity",
-    "current": 7.83,
-    "selling": 7.83,
-    "buying": 7.81,
-    "change": -0.18,
-    "priceUSD": 0.1639
+    "current": 7.86,
+    "selling": 7.86,
+    "buying": 7.84,
+    "change": 0.12,
+    "priceUSD": 0.1644
   },
   "WHEAT": {
     "name": "Buğday",
     "code": "WHEAT",
     "type": "commodity",
-    "current": 310.47,
-    "selling": 310.47,
-    "buying": 309.85,
-    "change": -0.46,
-    "priceUSD": 6.4975
+    "current": 310.83,
+    "selling": 310.83,
+    "buying": 310.21,
+    "change": -0.34,
+    "priceUSD": 6.505
   },
   "XAGUSD": {
     "name": "Gümüş",
     "code": "XAG",
     "type": "commodity",
-    "current": 3091.08,
-    "selling": 3091.08,
-    "buying": 3084.9,
-    "change": -1.32,
-    "priceUSD": 64.69
+    "current": 3088.93,
+    "selling": 3088.93,
+    "buying": 3082.75,
+    "change": -1.39,
+    "priceUSD": 64.645
   },
   "XBRUSD": {
     "name": "Brent Ham Petrol",
     "code": "BRENT",
     "type": "commodity",
-    "current": 4193.43,
-    "selling": 4193.43,
-    "buying": 4185.04,
-    "change": -1.37,
-    "priceUSD": 87.76
+    "current": 4205.37,
+    "selling": 4205.37,
+    "buying": 4196.96,
+    "change": -1.09,
+    "priceUSD": 88.01
   },
   "XPDUSD": {
     "name": "Paladyum",
     "code": "XPD",
     "type": "commodity",
-    "current": 64339.67,
-    "selling": 64339.67,
-    "buying": 64210.99,
-    "change": -1.73,
-    "priceUSD": 1346.5
+    "current": 64148.54,
+    "selling": 64148.54,
+    "buying": 64020.24,
+    "change": -2.02,
+    "priceUSD": 1342.5
   },
   "XPTUSD": {
     "name": "Platin",
     "code": "XPT",
     "type": "commodity",
-    "current": 82860.33,
-    "selling": 82860.33,
-    "buying": 82694.61,
-    "change": -1.53,
-    "priceUSD": 1734.1
+    "current": 82755.2,
+    "selling": 82755.2,
+    "buying": 82589.69,
+    "change": -1.66,
+    "priceUSD": 1731.9
   },
   "btc": {
     "name": "Bitcoin",
     "code": "BTC",
     "type": "crypto",
-    "current": 3050078.07,
-    "selling": 3050078.07,
-    "buying": 3050078.07,
-    "change": 0.09,
-    "priceUSD": 63832
+    "current": 3049217.98,
+    "selling": 3049217.98,
+    "buying": 3049217.98,
+    "change": 0.11,
+    "priceUSD": 63814
   },
   "eth": {
     "name": "Ethereum",
     "code": "ETH",
     "type": "crypto",
-    "current": 90543.82,
-    "selling": 90543.82,
-    "buying": 90543.82,
-    "change": 0.24,
-    "priceUSD": 1894.9
+    "current": 90440.13,
+    "selling": 90440.13,
+    "buying": 90440.13,
+    "change": 0.07,
+    "priceUSD": 1892.73
   },
   "bnb": {
     "name": "BNB",
     "code": "BNB",
     "type": "crypto",
-    "current": 29298.56,
-    "selling": 29298.56,
-    "buying": 29298.56,
-    "change": 0.18,
-    "priceUSD": 613.16
+    "current": 29283.75,
+    "selling": 29283.75,
+    "buying": 29283.75,
+    "change": 0.25,
+    "priceUSD": 612.85
   },
   "sol": {
     "name": "Solana",
     "code": "SOL",
     "type": "crypto",
-    "current": 3651.09,
-    "selling": 3651.09,
-    "buying": 3651.09,
-    "change": 0.2,
-    "priceUSD": 76.41
+    "current": 3645.84,
+    "selling": 3645.84,
+    "buying": 3645.84,
+    "change": 0.07,
+    "priceUSD": 76.3
   },
   "xrp": {
     "name": "XRP",
     "code": "XRP",
     "type": "crypto",
-    "current": 48.4,
-    "selling": 48.4,
-    "buying": 48.4,
-    "change": -0.67,
-    "priceUSD": 1.013
+    "current": 48.36,
+    "selling": 48.36,
+    "buying": 48.36,
+    "change": -0.64,
+    "priceUSD": 1.012
   },
   "doge": {
     "name": "Dogecoin",
@@ -897,28 +897,28 @@
     "current": 3.37,
     "selling": 3.37,
     "buying": 3.37,
-    "change": -1.44,
-    "priceUSD": 0.070582
+    "change": -1.39,
+    "priceUSD": 0.070574
   },
   "ltc": {
     "name": "Litecoin",
     "code": "LTC",
     "type": "crypto",
-    "current": 2143.06,
-    "selling": 2143.06,
-    "buying": 2143.06,
-    "change": -0.84,
-    "priceUSD": 44.85
+    "current": 2142.11,
+    "selling": 2142.11,
+    "buying": 2142.11,
+    "change": -1,
+    "priceUSD": 44.83
   },
   "ada": {
     "name": "Cardano",
     "code": "ADA",
     "type": "crypto",
-    "current": 8.87,
-    "selling": 8.87,
-    "buying": 8.87,
-    "change": 0.21,
-    "priceUSD": 0.185668
+    "current": 8.86,
+    "selling": 8.86,
+    "buying": 8.86,
+    "change": 0.26,
+    "priceUSD": 0.185517
   },
   "avax": {
     "name": "Avalanche",
@@ -927,28 +927,28 @@
     "current": 311.54,
     "selling": 311.54,
     "buying": 311.54,
-    "change": 4.78,
+    "change": 4.81,
     "priceUSD": 6.52
   },
   "dot": {
     "name": "Polkadot",
     "code": "DOT",
     "type": "crypto",
-    "current": 36.99,
-    "selling": 36.99,
-    "buying": 36.99,
-    "change": -1.68,
-    "priceUSD": 0.774114
+    "current": 36.97,
+    "selling": 36.97,
+    "buying": 36.97,
+    "change": -1.77,
+    "priceUSD": 0.773736
   },
   "link": {
     "name": "Chainlink",
     "code": "LINK",
     "type": "crypto",
-    "current": 418.1,
-    "selling": 418.1,
-    "buying": 418.1,
-    "change": -0.02,
-    "priceUSD": 8.75
+    "current": 417.14,
+    "selling": 417.14,
+    "buying": 417.14,
+    "change": -0.33,
+    "priceUSD": 8.73
   },
   "atom": {
     "name": "Cosmos",
@@ -957,18 +957,18 @@
     "current": 67.37,
     "selling": 67.37,
     "buying": 67.37,
-    "change": -0.99,
+    "change": -0.88,
     "priceUSD": 1.41
   },
   "trx": {
     "name": "TRON",
     "code": "TRX",
     "type": "crypto",
-    "current": 16.09,
-    "selling": 16.09,
-    "buying": 16.09,
-    "change": 0.38,
-    "priceUSD": 0.336815
+    "current": 16.1,
+    "selling": 16.1,
+    "buying": 16.1,
+    "change": 0.45,
+    "priceUSD": 0.336997
   },
   "matic": {
     "name": "Polygon",
@@ -984,21 +984,21 @@
     "name": "Shiba Inu",
     "code": "SHIB",
     "type": "crypto",
-    "current": 0.000216,
-    "selling": 0.000216,
-    "buying": 0.000216,
-    "change": 1.11,
-    "priceUSD": 0.00000451
+    "current": 0.000215,
+    "selling": 0.000215,
+    "buying": 0.000215,
+    "change": 0.93,
+    "priceUSD": 0.0000045
   },
   "near": {
     "name": "NEAR Protocol",
     "code": "NEAR",
     "type": "crypto",
-    "current": 80.28,
-    "selling": 80.28,
-    "buying": 80.28,
-    "change": 1.8,
-    "priceUSD": 1.68
+    "current": 79.8,
+    "selling": 79.8,
+    "buying": 79.8,
+    "change": 1.48,
+    "priceUSD": 1.67
   },
   "uni": {
     "name": "Uniswap",
@@ -1007,18 +1007,18 @@
     "current": 171.54,
     "selling": 171.54,
     "buying": 171.54,
-    "change": 2.97,
+    "change": 2.54,
     "priceUSD": 3.59
   },
   "arb": {
     "name": "Arbitrum",
     "code": "ARB",
     "type": "crypto",
-    "current": 3.61,
-    "selling": 3.61,
-    "buying": 3.61,
-    "change": -3.86,
-    "priceUSD": 0.075478
+    "current": 3.6,
+    "selling": 3.6,
+    "buying": 3.6,
+    "change": -3.84,
+    "priceUSD": 0.075309
   },
   "ton": {
     "name": "Toncoin",
@@ -1027,234 +1027,234 @@
     "current": 64.03,
     "selling": 64.03,
     "buying": 64.03,
-    "change": -1.85,
+    "change": -1.58,
     "priceUSD": 1.34
   },
   "sui": {
     "name": "Sui",
     "code": "SUI",
     "type": "crypto",
-    "current": 32.96,
-    "selling": 32.96,
-    "buying": 32.96,
-    "change": -0.11,
-    "priceUSD": 0.689814
+    "current": 32.93,
+    "selling": 32.93,
+    "buying": 32.93,
+    "change": 0.13,
+    "priceUSD": 0.689253
   },
   "garan": {
     "name": "Garanti BBVA",
     "code": "GARAN",
     "type": "stock",
-    "current": 131.8,
-    "selling": 131.8,
-    "buying": 131.8,
-    "change": 0.61
+    "current": 130.5,
+    "selling": 130.5,
+    "buying": 130.5,
+    "change": -0.38
   },
   "akbnk": {
     "name": "Akbank",
     "code": "AKBNK",
     "type": "stock",
-    "current": 69.95,
-    "selling": 69.95,
-    "buying": 69.95,
-    "change": 1.67
+    "current": 68.9,
+    "selling": 68.9,
+    "buying": 68.9,
+    "change": 0.15
   },
   "ykbnk": {
     "name": "Yapı Kredi",
     "code": "YKBNK",
     "type": "stock",
-    "current": 36.02,
-    "selling": 36.02,
-    "buying": 36.02,
-    "change": 0.9
+    "current": 35.54,
+    "selling": 35.54,
+    "buying": 35.54,
+    "change": -0.45
   },
   "isctr": {
     "name": "İş Bankası (C)",
     "code": "ISCTR",
     "type": "stock",
-    "current": 12.63,
-    "selling": 12.63,
-    "buying": 12.63,
-    "change": 0.56
+    "current": 12.5,
+    "selling": 12.5,
+    "buying": 12.5,
+    "change": -0.48
   },
   "halkb": {
     "name": "Halkbank",
     "code": "HALKB",
     "type": "stock",
-    "current": 34.74,
-    "selling": 34.74,
-    "buying": 34.74,
-    "change": 0.75
+    "current": 34.14,
+    "selling": 34.14,
+    "buying": 34.14,
+    "change": -0.99
   },
   "vakbn": {
     "name": "Vakıfbank",
     "code": "VAKBN",
     "type": "stock",
-    "current": 31.42,
-    "selling": 31.42,
-    "buying": 31.42,
-    "change": 1.62
+    "current": 31.08,
+    "selling": 31.08,
+    "buying": 31.08,
+    "change": 0.52
   },
   "thyao": {
     "name": "Türk Hava Yolları",
     "code": "THYAO",
     "type": "stock",
-    "current": 310,
-    "selling": 310,
-    "buying": 310,
-    "change": 0.4
+    "current": 308.25,
+    "selling": 308.25,
+    "buying": 308.25,
+    "change": -0.16
   },
   "asels": {
     "name": "Aselsan",
     "code": "ASELS",
     "type": "stock",
-    "current": 386.25,
-    "selling": 386.25,
-    "buying": 386.25,
-    "change": 1.38
+    "current": 383.75,
+    "selling": 383.75,
+    "buying": 383.75,
+    "change": 0.72
   },
   "eregl": {
     "name": "Ereğli Demir Çelik",
     "code": "EREGL",
     "type": "stock",
-    "current": 38.1,
-    "selling": 38.1,
-    "buying": 38.1,
-    "change": 2.47
+    "current": 37.96,
+    "selling": 37.96,
+    "buying": 37.96,
+    "change": 2.1
   },
   "sise": {
     "name": "Şişecam",
     "code": "SISE",
     "type": "stock",
-    "current": 41.42,
-    "selling": 41.42,
-    "buying": 41.42,
-    "change": 1.12
+    "current": 41.12,
+    "selling": 41.12,
+    "buying": 41.12,
+    "change": 0.39
   },
   "kchol": {
     "name": "Koç Holding",
     "code": "KCHOL",
     "type": "stock",
-    "current": 208,
-    "selling": 208,
-    "buying": 208,
-    "change": 1.07
+    "current": 206.6,
+    "selling": 206.6,
+    "buying": 206.6,
+    "change": 0.39
   },
   "sahol": {
     "name": "Sabancı Holding",
     "code": "SAHOL",
     "type": "stock",
-    "current": 91.15,
-    "selling": 91.15,
-    "buying": 91.15,
-    "change": 3.29
+    "current": 90.4,
+    "selling": 90.4,
+    "buying": 90.4,
+    "change": 2.44
   },
   "tuprs": {
     "name": "Tüpraş",
     "code": "TUPRS",
     "type": "stock",
-    "current": 350.5,
-    "selling": 350.5,
-    "buying": 350.5,
-    "change": -0.21
+    "current": 349.75,
+    "selling": 349.75,
+    "buying": 349.75,
+    "change": -0.43
   },
   "toaso": {
     "name": "Tofaş",
     "code": "TOASO",
     "type": "stock",
-    "current": 274.25,
-    "selling": 274.25,
-    "buying": 274.25,
-    "change": 2.24
+    "current": 272.25,
+    "selling": 272.25,
+    "buying": 272.25,
+    "change": 1.49
   },
   "froto": {
     "name": "Ford Otosan",
     "code": "FROTO",
     "type": "stock",
-    "current": 80.1,
-    "selling": 80.1,
-    "buying": 80.1,
-    "change": 0.44
+    "current": 79.55,
+    "selling": 79.55,
+    "buying": 79.55,
+    "change": -0.25
   },
   "otkar": {
     "name": "Otokar",
     "code": "OTKAR",
     "type": "stock",
-    "current": 322.75,
-    "selling": 322.75,
-    "buying": 322.75,
-    "change": 0.78
+    "current": 321.25,
+    "selling": 321.25,
+    "buying": 321.25,
+    "change": 0.31
   },
   "tcell": {
     "name": "Turkcell",
     "code": "TCELL",
     "type": "stock",
-    "current": 105.2,
-    "selling": 105.2,
-    "buying": 105.2,
-    "change": 1.06
+    "current": 104.8,
+    "selling": 104.8,
+    "buying": 104.8,
+    "change": 0.67
   },
   "ttkom": {
     "name": "Türk Telekom",
     "code": "TTKOM",
     "type": "stock",
-    "current": 56.05,
-    "selling": 56.05,
-    "buying": 56.05,
-    "change": -0.53
+    "current": 55.75,
+    "selling": 55.75,
+    "buying": 55.75,
+    "change": -1.06
   },
   "logo": {
     "name": "Logo Yazılım",
     "code": "LOGO",
     "type": "stock",
-    "current": 135,
-    "selling": 135,
-    "buying": 135,
-    "change": 1.35
+    "current": 134.6,
+    "selling": 134.6,
+    "buying": 134.6,
+    "change": 1.05
   },
   "enkai": {
     "name": "Enka İnşaat",
     "code": "ENKAI",
     "type": "stock",
-    "current": 86.75,
-    "selling": 86.75,
-    "buying": 86.75,
-    "change": 0.12
+    "current": 86,
+    "selling": 86,
+    "buying": 86,
+    "change": -0.75
   },
   "bimas": {
     "name": "BİM Mağazalar",
     "code": "BIMAS",
     "type": "stock",
-    "current": 379,
-    "selling": 379,
-    "buying": 379,
-    "change": -1.3
+    "current": 377.25,
+    "selling": 377.25,
+    "buying": 377.25,
+    "change": -1.76
   },
   "mgros": {
     "name": "Migros",
     "code": "MGROS",
     "type": "stock",
-    "current": 555.5,
-    "selling": 555.5,
-    "buying": 555.5,
-    "change": -2.88
+    "current": 556,
+    "selling": 556,
+    "buying": 556,
+    "change": -2.8
   },
   "pgsus": {
     "name": "Pegasus",
     "code": "PGSUS",
     "type": "stock",
-    "current": 151.7,
-    "selling": 151.7,
-    "buying": 151.7,
-    "change": -0.13
+    "current": 151,
+    "selling": 151,
+    "buying": 151,
+    "change": -0.59
   },
   "ulker": {
     "name": "Ülker",
     "code": "ULKER",
     "type": "stock",
-    "current": 88,
-    "selling": 88,
-    "buying": 88,
-    "change": 0.63
+    "current": 87.65,
+    "selling": 87.65,
+    "buying": 87.65,
+    "change": 0.23
   },
   "_daily_open": {
     "date": "2026-08-13",
@@ -1264,110 +1264,110 @@
     "name": "Gremse Altın",
     "code": "GREMSE",
     "type": "gold",
-    "current": 109726.6309,
-    "selling": 109726.6309,
-    "buying": 107672.506,
-    "change": -0.9,
-    "open": 110723.14
+    "current": 109654.2251,
+    "selling": 109654.2251,
+    "buying": 107610.2317,
+    "change": -0.96,
+    "open": 110717.11
   },
   "albrk": {
     "name": "Albaraka Türk",
     "code": "ALBRK",
     "type": "stock",
-    "current": 8.4,
-    "selling": 8.4,
-    "buying": 8.4,
-    "change": 0.72
+    "current": 8.34,
+    "selling": 8.34,
+    "buying": 8.34,
+    "change": 0
   },
   "skbnk": {
     "name": "Şekerbank",
     "code": "SKBNK",
     "type": "stock",
-    "current": 6.01,
-    "selling": 6.01,
-    "buying": 6.01,
-    "change": -0.83
+    "current": 6,
+    "selling": 6,
+    "buying": 6,
+    "change": -0.99
   },
   "tskb": {
     "name": "TSKB",
     "code": "TSKB",
     "type": "stock",
-    "current": 11.16,
-    "selling": 11.16,
-    "buying": 11.16,
-    "change": 1
+    "current": 11.08,
+    "selling": 11.08,
+    "buying": 11.08,
+    "change": 0.27
   },
   "ansgr": {
     "name": "Anadolu Sigorta",
     "code": "ANSGR",
     "type": "stock",
-    "current": 29.12,
-    "selling": 29.12,
-    "buying": 29.12,
-    "change": 0.62
+    "current": 28.94,
+    "selling": 28.94,
+    "buying": 28.94,
+    "change": 0
   },
   "akgrt": {
     "name": "Aksigorta",
     "code": "AKGRT",
     "type": "stock",
-    "current": 6.3,
-    "selling": 6.3,
-    "buying": 6.3,
-    "change": 0.48
+    "current": 6.28,
+    "selling": 6.28,
+    "buying": 6.28,
+    "change": 0.16
   },
   "tursg": {
     "name": "Türkiye Sigorta",
     "code": "TURSG",
     "type": "stock",
-    "current": 6.32,
-    "selling": 6.32,
-    "buying": 6.32,
-    "change": 0.16
+    "current": 6.27,
+    "selling": 6.27,
+    "buying": 6.27,
+    "change": -0.63
   },
   "aghol": {
     "name": "Anadolu Grubu Holding",
     "code": "AGHOL",
     "type": "stock",
-    "current": 33.18,
-    "selling": 33.18,
-    "buying": 33.18,
-    "change": 0.06
+    "current": 33.12,
+    "selling": 33.12,
+    "buying": 33.12,
+    "change": -0.12
   },
   "dohol": {
     "name": "Doğan Holding",
     "code": "DOHOL",
     "type": "stock",
-    "current": 21.68,
-    "selling": 21.68,
-    "buying": 21.68,
-    "change": 0.56
+    "current": 21.64,
+    "selling": 21.64,
+    "buying": 21.64,
+    "change": 0.37
   },
   "nthol": {
     "name": "Net Holding",
     "code": "NTHOL",
     "type": "stock",
-    "current": 44.7,
-    "selling": 44.7,
-    "buying": 44.7,
-    "change": 0.04
+    "current": 44.56,
+    "selling": 44.56,
+    "buying": 44.56,
+    "change": -0.27
   },
   "glyho": {
     "name": "Global Yatırım Holding",
     "code": "GLYHO",
     "type": "stock",
-    "current": 17.5,
-    "selling": 17.5,
-    "buying": 17.5,
-    "change": 0.34
+    "current": 17.4,
+    "selling": 17.4,
+    "buying": 17.4,
+    "change": -0.23
   },
   "alark": {
     "name": "Alarko Holding",
     "code": "ALARK",
     "type": "stock",
-    "current": 102.1,
-    "selling": 102.1,
-    "buying": 102.1,
-    "change": 0.59
+    "current": 101.6,
+    "selling": 101.6,
+    "buying": 101.6,
+    "change": 0.1
   },
   "iheva": {
     "name": "İhlas Ev Aletleri",
@@ -1391,55 +1391,55 @@
     "name": "GSD Holding",
     "code": "GSDHO",
     "type": "stock",
-    "current": 4.74,
-    "selling": 4.74,
-    "buying": 4.74,
-    "change": 0.85
+    "current": 4.73,
+    "selling": 4.73,
+    "buying": 4.73,
+    "change": 0.64
   },
   "bryat": {
     "name": "Borusan Yatırım",
     "code": "BRYAT",
     "type": "stock",
-    "current": 1745,
-    "selling": 1745,
-    "buying": 1745,
-    "change": 0.23
+    "current": 1743,
+    "selling": 1743,
+    "buying": 1743,
+    "change": 0.11
   },
   "bera": {
     "name": "Bera Holding",
     "code": "BERA",
     "type": "stock",
-    "current": 13.12,
-    "selling": 13.12,
-    "buying": 13.12,
-    "change": 0.92
+    "current": 13.07,
+    "selling": 13.07,
+    "buying": 13.07,
+    "change": 0.54
   },
   "tkfen": {
     "name": "Tekfen Holding",
     "code": "TKFEN",
     "type": "stock",
-    "current": 237.5,
-    "selling": 237.5,
-    "buying": 237.5,
-    "change": -2.26
+    "current": 232.3,
+    "selling": 232.3,
+    "buying": 232.3,
+    "change": -4.4
   },
   "quagr": {
     "name": "Quagen",
     "code": "QUAGR",
     "type": "stock",
-    "current": 3.26,
-    "selling": 3.26,
-    "buying": 3.26,
-    "change": 1.24
+    "current": 3.25,
+    "selling": 3.25,
+    "buying": 3.25,
+    "change": 0.93
   },
   "tavhl": {
     "name": "TAV Havalimanları",
     "code": "TAVHL",
     "type": "stock",
-    "current": 281.25,
-    "selling": 281.25,
-    "buying": 281.25,
-    "change": 0.81
+    "current": 278.75,
+    "selling": 278.75,
+    "buying": 278.75,
+    "change": -0.09
   },
   "kords": {
     "name": "Kordsa",
@@ -1454,37 +1454,37 @@
     "name": "Ege Endüstri",
     "code": "EGEEN",
     "type": "stock",
-    "current": 5262.5,
-    "selling": 5262.5,
-    "buying": 5262.5,
-    "change": 0.29
+    "current": 5247.5,
+    "selling": 5247.5,
+    "buying": 5247.5,
+    "change": 0
   },
   "krdmd": {
     "name": "Kardemir D",
     "code": "KRDMD",
     "type": "stock",
-    "current": 41.96,
-    "selling": 41.96,
-    "buying": 41.96,
-    "change": 2.49
+    "current": 41.6,
+    "selling": 41.6,
+    "buying": 41.6,
+    "change": 1.61
   },
   "krdma": {
     "name": "Kardemir A",
     "code": "KRDMA",
     "type": "stock",
-    "current": 41.64,
-    "selling": 41.64,
-    "buying": 41.64,
-    "change": 1.76
+    "current": 41.3,
+    "selling": 41.3,
+    "buying": 41.3,
+    "change": 0.93
   },
   "izmdc": {
     "name": "İzmir Demir Çelik",
     "code": "IZMDC",
     "type": "stock",
-    "current": 13.94,
-    "selling": 13.94,
-    "buying": 13.94,
-    "change": 2.12
+    "current": 13.87,
+    "selling": 13.87,
+    "buying": 13.87,
+    "change": 1.61
   },
   "brsan": {
     "name": "Borusan Mannesmann",
@@ -1499,82 +1499,82 @@
     "name": "Parsan Makina",
     "code": "PARSN",
     "type": "stock",
-    "current": 71.55,
-    "selling": 71.55,
-    "buying": 71.55,
-    "change": 1.06
+    "current": 71.25,
+    "selling": 71.25,
+    "buying": 71.25,
+    "change": 0.64
   },
   "doas": {
     "name": "Doğuş Otomotiv",
     "code": "DOAS",
     "type": "stock",
-    "current": 176.8,
-    "selling": 176.8,
-    "buying": 176.8,
-    "change": -9.05
+    "current": 176.1,
+    "selling": 176.1,
+    "buying": 176.1,
+    "change": -9.41
   },
   "karel": {
     "name": "Karel",
     "code": "KAREL",
     "type": "stock",
-    "current": 9.52,
-    "selling": 9.52,
-    "buying": 9.52,
-    "change": -0.83
+    "current": 9.5,
+    "selling": 9.5,
+    "buying": 9.5,
+    "change": -1.04
   },
   "netas": {
     "name": "Netaş Telekom",
     "code": "NETAS",
     "type": "stock",
-    "current": 62.45,
-    "selling": 62.45,
-    "buying": 62.45,
-    "change": 1.13
+    "current": 62.15,
+    "selling": 62.15,
+    "buying": 62.15,
+    "change": 0.65
   },
   "alctl": {
     "name": "Alcatel Lucent",
     "code": "ALCTL",
     "type": "stock",
-    "current": 140.3,
-    "selling": 140.3,
-    "buying": 140.3,
-    "change": 1.01
+    "current": 139.6,
+    "selling": 139.6,
+    "buying": 139.6,
+    "change": 0.5
   },
   "indes": {
     "name": "İndeks Bilgisayar",
     "code": "INDES",
     "type": "stock",
-    "current": 10.24,
-    "selling": 10.24,
-    "buying": 10.24,
-    "change": 0.99
+    "current": 10.15,
+    "selling": 10.15,
+    "buying": 10.15,
+    "change": 0.1
   },
   "despc": {
     "name": "Despec Bilgisayar",
     "code": "DESPC",
     "type": "stock",
-    "current": 39.84,
-    "selling": 39.84,
-    "buying": 39.84,
-    "change": 0.45
+    "current": 39.76,
+    "selling": 39.76,
+    "buying": 39.76,
+    "change": 0.25
   },
   "aksen": {
     "name": "Aksa Enerji",
     "code": "AKSEN",
     "type": "stock",
-    "current": 83.15,
-    "selling": 83.15,
-    "buying": 83.15,
-    "change": 1.03
+    "current": 82.6,
+    "selling": 82.6,
+    "buying": 82.6,
+    "change": 0.36
   },
   "enjsa": {
     "name": "Enerjisa",
     "code": "ENJSA",
     "type": "stock",
-    "current": 108.5,
-    "selling": 108.5,
-    "buying": 108.5,
-    "change": 1.4
+    "current": 108,
+    "selling": 108,
+    "buying": 108,
+    "change": 0.93
   },
   "zoren": {
     "name": "Zorlu Enerji",
@@ -1598,46 +1598,46 @@
     "name": "Odaş Elektrik",
     "code": "ODAS",
     "type": "stock",
-    "current": 7.33,
-    "selling": 7.33,
-    "buying": 7.33,
-    "change": 0.27
+    "current": 7.28,
+    "selling": 7.28,
+    "buying": 7.28,
+    "change": -0.41
   },
   "bioen": {
     "name": "Biotrend Enerji",
     "code": "BIOEN",
     "type": "stock",
-    "current": 17.16,
-    "selling": 17.16,
-    "buying": 17.16,
-    "change": 0.88
+    "current": 17.12,
+    "selling": 17.12,
+    "buying": 17.12,
+    "change": 0.65
   },
   "smrtg": {
     "name": "Smart Güneş Enerjisi",
     "code": "SMRTG",
     "type": "stock",
-    "current": 10.44,
-    "selling": 10.44,
-    "buying": 10.44,
-    "change": 1.26
+    "current": 10.4,
+    "selling": 10.4,
+    "buying": 10.4,
+    "change": 0.87
   },
   "cwene": {
     "name": "CW Enerji",
     "code": "CWENE",
     "type": "stock",
-    "current": 39.02,
-    "selling": 39.02,
-    "buying": 39.02,
-    "change": -2.21
+    "current": 38.96,
+    "selling": 38.96,
+    "buying": 38.96,
+    "change": -2.36
   },
   "gesan": {
     "name": "Girişim Elektrik",
     "code": "GESAN",
     "type": "stock",
-    "current": 82.85,
-    "selling": 82.85,
-    "buying": 82.85,
-    "change": 1.28
+    "current": 82.65,
+    "selling": 82.65,
+    "buying": 82.65,
+    "change": 1.04
   },
   "kontr": {
     "name": "Kontrolmatik",
@@ -1652,127 +1652,127 @@
     "name": "Margün Enerji",
     "code": "MAGEN",
     "type": "stock",
-    "current": 32.2,
-    "selling": 32.2,
-    "buying": 32.2,
-    "change": 0.5
+    "current": 32.1,
+    "selling": 32.1,
+    "buying": 32.1,
+    "change": 0.19
   },
   "petkm": {
     "name": "Petkim",
     "code": "PETKM",
     "type": "stock",
-    "current": 18.6,
-    "selling": 18.6,
-    "buying": 18.6,
-    "change": -0.05
+    "current": 18.58,
+    "selling": 18.58,
+    "buying": 18.58,
+    "change": -0.16
   },
   "sasa": {
     "name": "Sasa Polyester",
     "code": "SASA",
     "type": "stock",
-    "current": 2.5,
-    "selling": 2.5,
-    "buying": 2.5,
-    "change": 0.4
+    "current": 2.47,
+    "selling": 2.47,
+    "buying": 2.47,
+    "change": -0.8
   },
   "deva": {
     "name": "Deva Holding",
     "code": "DEVA",
     "type": "stock",
-    "current": 72.75,
-    "selling": 72.75,
-    "buying": 72.75,
-    "change": -0.07
+    "current": 72.45,
+    "selling": 72.45,
+    "buying": 72.45,
+    "change": -0.48
   },
   "hekts": {
     "name": "Hektaş",
     "code": "HEKTS",
     "type": "stock",
-    "current": 2.85,
-    "selling": 2.85,
-    "buying": 2.85,
-    "change": 0
+    "current": 2.84,
+    "selling": 2.84,
+    "buying": 2.84,
+    "change": -0.35
   },
   "gubrf": {
     "name": "Gübre Fabrikaları",
     "code": "GUBRF",
     "type": "stock",
-    "current": 428.5,
-    "selling": 428.5,
-    "buying": 428.5,
-    "change": 0.35
+    "current": 422.5,
+    "selling": 422.5,
+    "buying": 422.5,
+    "change": -1.05
   },
   "bagfs": {
     "name": "Bagfaş",
     "code": "BAGFS",
     "type": "stock",
-    "current": 24.04,
-    "selling": 24.04,
-    "buying": 24.04,
-    "change": 0.84
+    "current": 23.96,
+    "selling": 23.96,
+    "buying": 23.96,
+    "change": 0.5
   },
   "aksa": {
     "name": "Aksa Akrilik",
     "code": "AKSA",
     "type": "stock",
-    "current": 12.09,
-    "selling": 12.09,
-    "buying": 12.09,
-    "change": 1.09
+    "current": 12.03,
+    "selling": 12.03,
+    "buying": 12.03,
+    "change": 0.59
   },
   "polho": {
     "name": "Polisan Holding",
     "code": "POLHO",
     "type": "stock",
-    "current": 22.32,
-    "selling": 22.32,
-    "buying": 22.32,
-    "change": 0.54
+    "current": 22.4,
+    "selling": 22.4,
+    "buying": 22.4,
+    "change": 0.9
   },
   "akcns": {
     "name": "Akçansa",
     "code": "AKCNS",
     "type": "stock",
-    "current": 247.5,
-    "selling": 247.5,
-    "buying": 247.5,
-    "change": 0.28
+    "current": 247.4,
+    "selling": 247.4,
+    "buying": 247.4,
+    "change": 0.24
   },
   "cimsa": {
     "name": "Çimsa",
     "code": "CIMSA",
     "type": "stock",
-    "current": 45.78,
-    "selling": 45.78,
-    "buying": 45.78,
-    "change": 0.79
+    "current": 45.44,
+    "selling": 45.44,
+    "buying": 45.44,
+    "change": 0.04
   },
   "bucim": {
     "name": "Bursa Çimento",
     "code": "BUCIM",
     "type": "stock",
-    "current": 4.99,
-    "selling": 4.99,
-    "buying": 4.99,
-    "change": 0.4
+    "current": 4.97,
+    "selling": 4.97,
+    "buying": 4.97,
+    "change": 0
   },
   "arclk": {
     "name": "Arçelik",
     "code": "ARCLK",
     "type": "stock",
-    "current": 95.6,
-    "selling": 95.6,
-    "buying": 95.6,
-    "change": -1.6
+    "current": 95.35,
+    "selling": 95.35,
+    "buying": 95.35,
+    "change": -1.85
   },
   "vestl": {
     "name": "Vestel",
     "code": "VESTL",
     "type": "stock",
-    "current": 22.18,
-    "selling": 22.18,
-    "buying": 22.18,
-    "change": 0.54
+    "current": 22.12,
+    "selling": 22.12,
+    "buying": 22.12,
+    "change": 0.27
   },
   "vesbe": {
     "name": "Vestel Beyaz Eşya",
@@ -1787,37 +1787,37 @@
     "name": "Yataş",
     "code": "YATAS",
     "type": "stock",
-    "current": 32.94,
-    "selling": 32.94,
-    "buying": 32.94,
-    "change": -0.24
+    "current": 32.8,
+    "selling": 32.8,
+    "buying": 32.8,
+    "change": -0.67
   },
   "ccola": {
     "name": "Coca-Cola İçecek",
     "code": "CCOLA",
     "type": "stock",
-    "current": 84.7,
-    "selling": 84.7,
-    "buying": 84.7,
-    "change": 1.74
+    "current": 84.35,
+    "selling": 84.35,
+    "buying": 84.35,
+    "change": 1.32
   },
   "aefes": {
     "name": "Anadolu Efes",
     "code": "AEFES",
     "type": "stock",
-    "current": 19.09,
-    "selling": 19.09,
-    "buying": 19.09,
-    "change": -2.2
+    "current": 19.03,
+    "selling": 19.03,
+    "buying": 19.03,
+    "change": -2.51
   },
   "banvt": {
     "name": "Banvit",
     "code": "BANVT",
     "type": "stock",
-    "current": 156.4,
-    "selling": 156.4,
-    "buying": 156.4,
-    "change": 0.06
+    "current": 155.7,
+    "selling": 155.7,
+    "buying": 155.7,
+    "change": -0.38
   },
   "kent": {
     "name": "Kent Gıda",
@@ -1832,100 +1832,100 @@
     "name": "Tukaş",
     "code": "TUKAS",
     "type": "stock",
-    "current": 2.01,
-    "selling": 2.01,
-    "buying": 2.01,
-    "change": 0.5
+    "current": 2,
+    "selling": 2,
+    "buying": 2,
+    "change": 0
   },
   "tatgd": {
     "name": "Tat Gıda",
     "code": "TATGD",
     "type": "stock",
-    "current": 18,
-    "selling": 18,
-    "buying": 18,
-    "change": 0.78
+    "current": 17.89,
+    "selling": 17.89,
+    "buying": 17.89,
+    "change": 0.17
   },
   "petun": {
     "name": "Pınar Et",
     "code": "PETUN",
     "type": "stock",
-    "current": 10.93,
-    "selling": 10.93,
-    "buying": 10.93,
-    "change": -0.18
+    "current": 10.86,
+    "selling": 10.86,
+    "buying": 10.86,
+    "change": -0.82
   },
   "sokm": {
     "name": "Şok Marketler",
     "code": "SOKM",
     "type": "stock",
-    "current": 52.7,
-    "selling": 52.7,
-    "buying": 52.7,
-    "change": 0.96
+    "current": 52.5,
+    "selling": 52.5,
+    "buying": 52.5,
+    "change": 0.57
   },
   "mavi": {
     "name": "Mavi Giyim",
     "code": "MAVI",
     "type": "stock",
-    "current": 39.16,
-    "selling": 39.16,
-    "buying": 39.16,
-    "change": 0.41
+    "current": 39,
+    "selling": 39,
+    "buying": 39,
+    "change": 0
   },
   "ekgyo": {
     "name": "Emlak Konut GYO",
     "code": "EKGYO",
     "type": "stock",
-    "current": 18.75,
-    "selling": 18.75,
-    "buying": 18.75,
-    "change": 1.3
+    "current": 18.49,
+    "selling": 18.49,
+    "buying": 18.49,
+    "change": -0.11
   },
   "trgyo": {
     "name": "Torunlar GYO",
     "code": "TRGYO",
     "type": "stock",
-    "current": 92.75,
-    "selling": 92.75,
-    "buying": 92.75,
-    "change": 0.38
+    "current": 92.15,
+    "selling": 92.15,
+    "buying": 92.15,
+    "change": -0.27
   },
   "isgyo": {
     "name": "İş GYO",
     "code": "ISGYO",
     "type": "stock",
-    "current": 28.2,
-    "selling": 28.2,
-    "buying": 28.2,
-    "change": -0.56
+    "current": 27.94,
+    "selling": 27.94,
+    "buying": 27.94,
+    "change": -1.48
   },
   "akfye": {
     "name": "Akfen Holding",
     "code": "AKFYE",
     "type": "stock",
-    "current": 23.48,
-    "selling": 23.48,
-    "buying": 23.48,
-    "change": 1.21
+    "current": 23.42,
+    "selling": 23.42,
+    "buying": 23.42,
+    "change": 0.95
   },
   "mpark": {
     "name": "MLP Sağlık",
     "code": "MPARK",
     "type": "stock",
-    "current": 435,
-    "selling": 435,
-    "buying": 435,
-    "change": 0.64
+    "current": 432.75,
+    "selling": 432.75,
+    "buying": 432.75,
+    "change": 0.12
   },
   "selec": {
     "name": "Selçuk Ecza",
     "code": "SELEC",
     "type": "stock",
-    "current": 245.9,
-    "selling": 245.9,
-    "buying": 245.9,
-    "change": 3.76
+    "current": 246.5,
+    "selling": 246.5,
+    "buying": 246.5,
+    "change": 4.01
   },
   "VND": {
     "name": "VND",
