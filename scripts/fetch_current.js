@@ -535,6 +535,13 @@ async function run() {
     let current = {};
     try { current = JSON.parse(fs.readFileSync(OUTPUT_FILE, 'utf8')); } catch {}
 
+    // Varlık başına tazelik damgası. Bir kaynak çökerse o varlıklar önceki
+    // run'dan korunur ve ts'leri eskir; sağlıklı yazılanlarınki tazelenir.
+    // Yazım anında damgalanır (fiyat değişiminde değil): piyasa kapalıyken
+    // fiyat sabit kalsa da kaynak veri yazdığı sürece ts taze olur, böylece
+    // hafta sonu yanlış "bayat" uyarısı üretilmez.
+    const NOW = new Date().toISOString();
+
     // Istanbul günlük açılış takibi (UTC+3): her altın türü kendi değişimini hesaplar.
     // Yeni gün → açılış fiyatları sıfırlanır; aynı gün → depolanmış açılıştan hesap yapılır.
     const nowTR   = new Date(Date.now() + 3 * 60 * 60 * 1000);
@@ -576,6 +583,7 @@ async function run() {
                 ? parseFloat((satis / (1 + realChg / 100)).toFixed(2))
                 : satis;
             current[tKey] = {
+                ts: NOW,
                 name: meta.name, code: meta.code, type: meta.type,
                 current: satis, selling: satis,
                 buying:  !isNaN(alis) && alis > 0 ? alis : parseFloat((satis * 0.995).toFixed(2)),
@@ -594,6 +602,7 @@ async function run() {
             if (isNaN(satis) || satis <= 0) return;
             if (CURRENCY_BLACKLIST.has(sym)) return;
             current[sym] = {
+                ts: NOW,
                 name: CURRENCY_NAMES[sym] || sym, code: sym, type: 'currency',
                 current: satis, selling: satis,
                 buying:  !isNaN(alis) && alis > 0 ? alis : parseFloat((satis * 0.995).toFixed(2)),
@@ -623,6 +632,7 @@ async function run() {
                 // USD/TRY Truncgil'den gelemediyse usdTry değişkenini de güncelle (emtia/kripto için kritik)
                 if (sym === 'USD') usdTry = r.selling;
                 current[sym] = {
+                    ts: NOW,
                     name: CURRENCY_NAMES[sym] || sym, code: sym, type: 'currency',
                     current: r.selling, selling: r.selling, buying: r.buying,
                     // TCMB intraday change vermiyor; önceki run'daki gerçek değeri koru (yoksa 0)
@@ -646,6 +656,7 @@ async function run() {
             if (!rate) continue;
             if (sym === 'USD' && rate > 0) usdTry = rate;
             current[sym] = {
+                ts: NOW,
                 name: CURRENCY_NAMES[sym] || sym, code: sym, type: 'currency',
                 current: rate, selling: rate,
                 buying:  parseFloat((rate * 0.998).toFixed(4)),
@@ -675,6 +686,7 @@ async function run() {
             ? parseFloat((data.satis / (1 + realChg / 100)).toFixed(2))
             : data.satis;
         current[item.key] = {
+            ts: NOW,
             name: meta.name, code: meta.code, type: meta.type,
             current: data.satis,
             selling: data.satis,
@@ -707,6 +719,7 @@ async function run() {
             const prevUSD  = prev ? (isUSX ? prev / 100 : prev) : null;
             const chg      = prevUSD ? parseFloat(((price - prevUSD) / prevUSD * 100).toFixed(2)) : 0;
             current[emtia.key] = {
+                ts: NOW,
                 name: emtia.name, code: emtia.code, type: 'commodity',
                 current: priceTRY, selling: priceTRY,
                 buying:  parseFloat((priceTRY * 0.998).toFixed(2)),
@@ -757,6 +770,7 @@ async function run() {
             if (!price || price <= 0) continue;
             const chg = prev ? parseFloat(((price - prev) / prev * 100).toFixed(2)) : 0;
             current[stock.key] = {
+                ts: NOW,
                 name: stock.name, code: stock.code, type: 'stock',
                 current: parseFloat(price.toFixed(2)),
                 selling: parseFloat(price.toFixed(2)),
@@ -783,6 +797,7 @@ async function run() {
         const decimals = raw >= 1 ? 2 : raw >= 0.01 ? 4 : raw >= 0.0001 ? 6 : 8;
         const priceTRY = parseFloat(raw.toFixed(decimals));
         current[meta.key] = {
+            ts: NOW,
             name: meta.name, code: meta.code, type: 'crypto',
             current: priceTRY, selling: priceTRY, buying: priceTRY,
             change: chg, priceUSD: parseFloat(priceUSD.toFixed(8))
@@ -962,10 +977,27 @@ async function run() {
         .filter(([, n]) => n === 0)
         .map(([k]) => `${k}: bu run'da hiç veri yazılmadı — değerler önceki run'dan geliyor`);
 
+    // Bu run'da yazılamayan (ts'i eskimiş) varlıklar. Kategori sayacı sıfır
+    // olmasa bile tek tek varlıklar geride kalmış olabilir.
+    // ts hiç yoksa da bayattır: o varlık bu run'da (ve ts özelliği eklendiğinden
+    // beri hiçbir run'da) yazılmamış demektir.
+    const STALE_MS = 2 * 60 * 60 * 1000;
+    const staleAssets = Object.entries(current)
+        .filter(([k, v]) => {
+            if (k.startsWith('_') || !v || typeof v !== 'object') return false;
+            if (!v.ts) return true;
+            return (Date.parse(NOW) - Date.parse(v.ts)) > STALE_MS;
+        })
+        .map(([k]) => k);
+    if (staleAssets.length) {
+        warnings.push(`${staleAssets.length} varlık 2 saatten uzun süredir güncellenmedi`);
+    }
+
     current['_meta'] = {
         updated_at: new Date().toISOString(),
         source: 'canlidoviz (altın) | Truncgil V3 (ons+platin+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)',
         counts,
+        stale_assets: staleAssets.length,
         ...(warnings.length ? { warnings } : {}),
     };
 
