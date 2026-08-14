@@ -19,6 +19,16 @@ const HISTORY_DIR  = path.join(__dirname, '..', 'data', 'history');
 const HISTORY_FILE = path.join(__dirname, '..', 'data', 'history.json');
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 
+// ── Alış/satış makası (spread) ────────────────────────────────────────────────
+// Bazı kaynaklar yalnızca tek fiyat veriyor (Yahoo futures, fawazahmed0, CoinGecko)
+// ya da alış alanı boş geliyor. Bu durumda alış fiyatı satıştan tahmin edilir.
+// Değerler piyasa gözlemine dayalı YAKLAŞIKTIR, kaynaktan gelen gerçek alış
+// fiyatı varsa DAİMA o kullanılır — bu çarpanlar yalnızca son çare.
+//   %0.2 → likit, dar makaslı enstrümanlar (döviz, emtia futures)
+//   %0.5 → kuyumcu/serbest piyasa kalemleri (daha geniş makas)
+const SPREAD_TIGHT = 0.998; // %0.2
+const SPREAD_WIDE  = 0.995; // %0.5
+
 // ── Kaynak URL'leri ───────────────────────────────────────────────────────────
 const TRUNCGIL_URL    = 'https://finans.truncgil.com/v3/today.json';
 // canlidoviz.com: TÜM altın türleri için baz veri kaynağı.
@@ -194,7 +204,7 @@ async function fetchTcmbRates() {
             rates[code] = {
                 selling: parseFloat((sel / unit).toFixed(4)),
                 buying:  buy > 0 ? parseFloat((buy / unit).toFixed(4))
-                                 : parseFloat((sel * 0.998 / unit).toFixed(4)),
+                                 : parseFloat((sel * SPREAD_TIGHT / unit).toFixed(4)),
             };
         }
     }
@@ -586,7 +596,7 @@ async function run() {
                 ts: NOW,
                 name: meta.name, code: meta.code, type: meta.type,
                 current: satis, selling: satis,
-                buying:  !isNaN(alis) && alis > 0 ? alis : parseFloat((satis * 0.995).toFixed(2)),
+                buying:  !isNaN(alis) && alis > 0 ? alis : parseFloat((satis * SPREAD_WIDE).toFixed(2)),
                 change:  realChg,
                 open:    computedOpen,
             };
@@ -605,8 +615,13 @@ async function run() {
                 ts: NOW,
                 name: CURRENCY_NAMES[sym] || sym, code: sym, type: 'currency',
                 current: satis, selling: satis,
-                buying:  !isNaN(alis) && alis > 0 ? alis : parseFloat((satis * 0.995).toFixed(2)),
-                change:  !isNaN(chg) ? chg : 0
+                buying:  !isNaN(alis) && alis > 0 ? alis : parseFloat((satis * SPREAD_WIDE).toFixed(2)),
+                change:  !isNaN(chg) ? chg : 0,
+                // Değişim yüzdesinden türetilir; app mutlak fiyat farkını
+                // ancak open > 0 iken gösterebiliyor.
+                open:    !isNaN(chg) && chg !== -100
+                    ? parseFloat((satis / (1 + chg / 100)).toFixed(4))
+                    : satis
             };
             writtenCurrencies.add(sym);
         });
@@ -631,12 +646,18 @@ async function run() {
                 if (!r) continue;
                 // USD/TRY Truncgil'den gelemediyse usdTry değişkenini de güncelle (emtia/kripto için kritik)
                 if (sym === 'USD') usdTry = r.selling;
+                // TCMB intraday change vermiyor; önceki run'daki gerçek değeri koru (yoksa 0).
+                // open bu değişimden türetilir — böylece app'te gösterilen mutlak fark
+                // ile yüzde birbiriyle tutarlı olur.
+                const carriedChg = current[sym]?.change ?? 0;
                 current[sym] = {
                     ts: NOW,
                     name: CURRENCY_NAMES[sym] || sym, code: sym, type: 'currency',
                     current: r.selling, selling: r.selling, buying: r.buying,
-                    // TCMB intraday change vermiyor; önceki run'daki gerçek değeri koru (yoksa 0)
-                    change: current[sym]?.change ?? 0,
+                    change: carriedChg,
+                    open:   carriedChg !== -100
+                        ? parseFloat((r.selling / (1 + carriedChg / 100)).toFixed(4))
+                        : r.selling,
                 };
                 writtenCurrencies.add(sym);
                 tcmbCount++;
@@ -655,13 +676,18 @@ async function run() {
             const rate = await fetchFawazRate(sym);
             if (!rate) continue;
             if (sym === 'USD' && rate > 0) usdTry = rate;
+            // fawazahmed0 intraday change vermiyor; önceki run'daki gerçek değeri koru (yoksa 0).
+            // open bundan türetilir ki gösterilen mutlak fark ile yüzde tutarlı olsun.
+            const carriedChg = current[sym]?.change ?? 0;
             current[sym] = {
                 ts: NOW,
                 name: CURRENCY_NAMES[sym] || sym, code: sym, type: 'currency',
                 current: rate, selling: rate,
-                buying:  parseFloat((rate * 0.998).toFixed(4)),
-                // fawazahmed0 intraday change vermiyor; önceki run'daki gerçek değeri koru (yoksa 0)
-                change:  current[sym]?.change ?? 0,
+                buying:  parseFloat((rate * SPREAD_TIGHT).toFixed(4)),
+                change:  carriedChg,
+                open:    carriedChg !== -100
+                    ? parseFloat((rate / (1 + carriedChg / 100)).toFixed(4))
+                    : rate,
             };
             writtenCurrencies.add(sym);
             fawazCount++;
@@ -722,8 +748,11 @@ async function run() {
                 ts: NOW,
                 name: emtia.name, code: emtia.code, type: 'commodity',
                 current: priceTRY, selling: priceTRY,
-                buying:  parseFloat((priceTRY * 0.998).toFixed(2)),
+                buying:  parseFloat((priceTRY * SPREAD_TIGHT).toFixed(2)),
                 change:  chg,
+                // Önceki kapanış TRY cinsinden — app mutlak fiyat farkını
+                // ancak open > 0 ise gösterebiliyor.
+                open:    prevUSD ? parseFloat((prevUSD * usdTry).toFixed(2)) : 0,
                 priceUSD
             };
             emtiaCount++;
@@ -775,7 +804,8 @@ async function run() {
                 current: parseFloat(price.toFixed(2)),
                 selling: parseFloat(price.toFixed(2)),
                 buying:  parseFloat(price.toFixed(2)),
-                change:  chg
+                change:  chg,
+                open:    prev ? parseFloat(prev.toFixed(2)) : 0
             };
             stockCount++;
         } catch { /* veri yoksa atla */ }
@@ -796,11 +826,16 @@ async function run() {
         // Çok küçük fiyatlar (SHIB gibi) için anlamlı basamak sayısı koru
         const decimals = raw >= 1 ? 2 : raw >= 0.01 ? 4 : raw >= 0.0001 ? 6 : 8;
         const priceTRY = parseFloat(raw.toFixed(decimals));
+        // Kripto 24/7 işlem gördüğü için "seans açılışı" yok; referans 24 saat
+        // önceki fiyat (change ile aynı temel) ve değişimden türetiliyor.
+        const openTRY = chg > -100
+            ? parseFloat((raw / (1 + chg / 100)).toFixed(decimals))
+            : 0;
         current[meta.key] = {
             ts: NOW,
             name: meta.name, code: meta.code, type: 'crypto',
             current: priceTRY, selling: priceTRY, buying: priceTRY,
-            change: chg, priceUSD: parseFloat(priceUSD.toFixed(8))
+            change: chg, open: openTRY, priceUSD: parseFloat(priceUSD.toFixed(8))
         };
         return true;
     };
