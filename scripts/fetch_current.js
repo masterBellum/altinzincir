@@ -785,6 +785,54 @@ async function run() {
             : satis;
     }
 
+    // ── Yahoo fallback: gram-platin ve ons ───────────────────────────────────
+    // Yukarıdaki senkron blokları yalnızca varlık zaten yazılmışsa mutasyon
+    // yapıyor. Truncgil çökerse bu ikisi hiç yazılmıyor ve önceki run'ın
+    // değerleriyle sessizce bayat kalıyorlardı.
+    const TROY_OZ_GRAMS = 31.1035;
+
+    // gram-platin ← PL=F (XPTUSD zaten emtia adımında çekildi), USD/ons → gram TRY
+    if (current['gram-platin']?.ts !== NOW && current['XPTUSD']?.priceUSD > 0) {
+        const gramTRY = current['XPTUSD'].priceUSD / TROY_OZ_GRAMS * usdTry;
+        const chg     = current['XPTUSD'].change ?? 0;
+        current['gram-platin'] = {
+            ts: NOW,
+            name: 'Gram Platin', code: 'PLATIN', type: 'commodity',
+            current: parseFloat(gramTRY.toFixed(2)),
+            selling: parseFloat(gramTRY.toFixed(2)),
+            buying:  parseFloat((gramTRY * SPREAD_WIDE).toFixed(2)),
+            change:  chg,
+            open:    chg !== -100 ? parseFloat((gramTRY / (1 + chg / 100)).toFixed(2)) : parseFloat(gramTRY.toFixed(2)),
+        };
+        console.log('  ↩️  gram-platin Yahoo (PL=F) fallback ile yazıldı');
+    }
+
+    // ons ← GC=F (altın futures, USD/ons) → TRY/ons
+    if (current['ons']?.ts !== NOW) {
+        const gcData = await fetchJson(
+            `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent('GC=F')}?interval=1d&range=2d`
+        );
+        try {
+            const meta  = gcData.chart.result[0].meta;
+            const price = meta.regularMarketPrice;
+            const prev  = meta.chartPreviousClose || meta.previousClose;
+            if (price > 0) {
+                const onsTRY = price * usdTry;
+                const chg    = prev ? parseFloat(((price - prev) / prev * 100).toFixed(2)) : 0;
+                current['ons'] = {
+                    ts: NOW,
+                    name: 'Ons Altın', code: 'ONS', type: 'gold',
+                    current: parseFloat(onsTRY.toFixed(2)),
+                    selling: parseFloat(onsTRY.toFixed(2)),
+                    buying:  parseFloat((onsTRY * SPREAD_WIDE).toFixed(2)),
+                    change:  chg,
+                    open:    prev ? parseFloat((prev * usdTry).toFixed(2)) : 0,
+                };
+                console.log('  ↩️  ons Yahoo (GC=F) fallback ile yazıldı');
+            }
+        } catch { /* GC=F de alınamadı — önceki değer korunur */ }
+    }
+
     // ── 4. Yahoo Finance (BIST Hisse) ────────────────────────────────────────
     console.log('⬇️  Yahoo Finance BIST hisseler çekiliyor...');
     let stockCount = 0;
