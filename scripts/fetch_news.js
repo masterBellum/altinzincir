@@ -17,11 +17,14 @@ const OUTPUT_FILE  = path.join(__dirname, '..', 'data', 'news.json');
 const NEWSAPI_KEY  = process.env.NEWSAPI_KEY || '';
 
 // ── Google News RSS sorguları ─────────────────────────────────────────────────
+// Her sorgu kendi kategorisini taşır. Eskiden yalnızca sorgu metni tutuluyor,
+// kategori hiç atanmıyordu; sonuçta tüm haberler 'general' olarak yazılıyor ve
+// kategori alanı işlevsiz kalıyordu.
 const RSS_QUERIES = [
-    'altın fiyat',
-    'dolar kur',
-    'ekonomi faiz enflasyon',
-    'kripto bitcoin',
+    { q: 'altın fiyat',            category: 'gold'    },
+    { q: 'dolar kur',              category: 'forex'   },
+    { q: 'ekonomi faiz enflasyon', category: 'economy' },
+    { q: 'kripto bitcoin',         category: 'crypto'  },
 ];
 
 // ── Yardımcı: HTTP GET ────────────────────────────────────────────────────────
@@ -76,10 +79,10 @@ async function fetchGoogleNews() {
     const allItems = [];
     const seen = new Set();
 
-    for (const query of RSS_QUERIES) {
-        const encoded = encodeURIComponent(query);
+    for (const { q, category } of RSS_QUERIES) {
+        const encoded = encodeURIComponent(q);
         const url = `https://news.google.com/rss/search?q=${encoded}&hl=tr&gl=TR&ceid=TR:tr`;
-        console.log(`  📰 RSS: "${query}"`);
+        console.log(`  📰 RSS: "${q}" (${category})`);
         const res = await fetchRaw(url);
         if (!res || res.status !== 200) { console.warn(`    ⚠️  Boş yanıt`); continue; }
 
@@ -87,7 +90,8 @@ async function fetchGoogleNews() {
         for (const item of items) {
             if (!seen.has(item.url)) {
                 seen.add(item.url);
-                allItems.push(item);
+                // Haber hangi sorgudan geldiyse o kategoriyi alır
+                allItems.push({ ...item, category });
             }
         }
         console.log(`    ✅ ${items.length} haber`);
@@ -136,9 +140,32 @@ async function run() {
         console.log(`✅ NewsAPI fallback: +${fallback.length} haber`);
     }
 
-    // Tarihe göre sırala (en yeni önce), max 50 tut
+    // Tarihe göre sırala (en yeni önce)
     items.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
-    items = items.slice(0, 50);
+
+    // Kategori başına kota ile seç. Düz "ilk 50" almak, o an yoğun yayın yapan
+    // kategorinin (ör. kripto) listeyi tamamen doldurmasına yol açıyor ve
+    // döviz/ekonomi haberleri hiç görünmüyordu.
+    const TOTAL      = 50;
+    const categories = [...new Set(items.map(i => i.category))];
+    const perCat     = Math.max(1, Math.floor(TOTAL / Math.max(1, categories.length)));
+    const picked     = [];
+    const pickedUrls = new Set();
+
+    for (const cat of categories) {
+        for (const item of items.filter(i => i.category === cat).slice(0, perCat)) {
+            picked.push(item);
+            pickedUrls.add(item.url);
+        }
+    }
+    // Kota sonrası boşluk kalırsa en yeni haberlerle tamamla
+    for (const item of items) {
+        if (picked.length >= TOTAL) break;
+        if (!pickedUrls.has(item.url)) { picked.push(item); pickedUrls.add(item.url); }
+    }
+
+    picked.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+    items = picked.slice(0, TOTAL);
 
     const output = {
         _meta: {
