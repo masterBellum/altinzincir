@@ -1,0 +1,83 @@
+name: Ekonomik Takvim (6 saat)
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # Her 6 saatte bir
+  repository_dispatch:
+    types: [fetch-calendar]
+  workflow_dispatch:        # Manuel tetikleme
+
+# Sadece kendi kendine üst üste binmeyi engeller; çapraz push çakışması
+# commit adımındaki pull --rebase + retry döngüsüyle çözülüyor.
+concurrency:
+  group: data-push-calendar
+  cancel-in-progress: false
+
+jobs:
+  fetch-calendar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      issues: write   # arıza durumunda Issue açmak için
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Ekonomik Takvimi Çek
+        run: node scripts/fetch_calendar.js
+
+      - name: Değişikliği Commit & Push Et
+        run: |
+          git config --global user.name  "AltinZincir-Bot"
+          git config --global user.email "bot@altinzincir.app"
+          git add data/economic-calendar.json
+          if git diff --cached --quiet; then
+            echo "Takvim değişikliği yok"
+            exit 0
+          fi
+          git commit -m "takvim: $(date -u '+%Y-%m-%d %H:%M UTC')"
+          for i in 1 2 3 4 5; do
+            if git pull --rebase --autostash origin main && git push; then
+              echo "✅ Push başarılı (deneme $i)"
+              exit 0
+            fi
+            # Rebase çakışmada yarım kalırsa repo "unmerged files" durumunda
+            # kilitleniyor ve sonraki denemeler de aynı hatayla düşüyor.
+            # Temiz duruma dön ki retry gerçekten yeniden deneyebilsin.
+            git rebase --abort 2>/dev/null || true
+            echo "⚠️  Push denemesi $i başarısız — yeniden deneniyor"
+            sleep $((i * 5))
+          done
+          echo "❌ Push 5 denemede de başarısız oldu"
+          exit 1
+
+      - name: Arıza Bildir
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🔴 Takvim pipeline arızası';
+            const body  = `\`${context.workflow}\` başarısız oldu.\n\n`
+              + `- Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n`
+              + `- Tetikleyici: \`${context.eventName}\`\n`
+              + `- Zaman: ${new Date().toISOString()}\n`;
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'pipeline-failure',
+            });
+            if (existing.data.length) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.data[0].number, body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: ['pipeline-failure'],
+              });
+            }

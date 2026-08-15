@@ -1,0 +1,757 @@
+{
+  "_meta": {
+    "updated_at": "2026-08-15T21:01:27.628Z",
+    "source": "ForexFactory (nfs.faireconomy.media)",
+    "count": 74,
+    "range_from": "2026-08-09 23:50:00",
+    "range_to": "2026-08-14 19:00:00",
+    "by_impact": {
+      "low": 54,
+      "holiday": 1,
+      "high": 11,
+      "medium": 8
+    }
+  },
+  "economicCalendar": [
+    {
+      "country": "JPY",
+      "event": "Bank Lending y/y",
+      "impact": "low",
+      "time": "2026-08-09 23:50:00",
+      "actual": null,
+      "estimate": 5.7,
+      "prev": 5.7,
+      "unit": "%"
+    },
+    {
+      "country": "JPY",
+      "event": "BOJ Summary of Opinions",
+      "impact": "low",
+      "time": "2026-08-09 23:50:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    },
+    {
+      "country": "JPY",
+      "event": "Current Account",
+      "impact": "low",
+      "time": "2026-08-09 23:50:00",
+      "actual": null,
+      "estimate": 2.5,
+      "prev": 3.06,
+      "unit": "T"
+    },
+    {
+      "country": "JPY",
+      "event": "Economy Watchers Sentiment",
+      "impact": "low",
+      "time": "2026-08-10 05:00:00",
+      "actual": null,
+      "estimate": 44.6,
+      "prev": 44,
+      "unit": ""
+    },
+    {
+      "country": "EUR",
+      "event": "Sentix Investor Confidence",
+      "impact": "low",
+      "time": "2026-08-10 08:30:00",
+      "actual": null,
+      "estimate": -0.7,
+      "prev": -3.1,
+      "unit": ""
+    },
+    {
+      "country": "USD",
+      "event": "Cleveland Fed Inflation Expectations",
+      "impact": "low",
+      "time": "2026-08-10 13:45:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 3.7,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "FOMC Member Hammack Speaks",
+      "impact": "low",
+      "time": "2026-08-10 19:00:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    },
+    {
+      "country": "JPY",
+      "event": "Bank Holiday",
+      "impact": "holiday",
+      "time": "2026-08-10 23:00:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    },
+    {
+      "country": "GBP",
+      "event": "BRC Retail Sales Monitor y/y",
+      "impact": "low",
+      "time": "2026-08-10 23:01:00",
+      "actual": null,
+      "estimate": 1.6,
+      "prev": 1.7,
+      "unit": "%"
+    },
+    {
+      "country": "AUD",
+      "event": "NAB Business Confidence",
+      "impact": "low",
+      "time": "2026-08-11 01:30:00",
+      "actual": null,
+      "estimate": null,
+      "prev": -5,
+      "unit": ""
+    },
+    {
+      "country": "AUD",
+      "event": "Cash Rate",
+      "impact": "high",
+      "time": "2026-08-11 04:30:00",
+      "actual": null,
+      "estimate": 4.35,
+      "prev": 4.35,
+      "unit": "%"
+    },
+    {
+      "country": "AUD",
+      "event": "RBA Monetary Policy Statement",
+      "impact": "high",
+      "time": "2026-08-11 04:30:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    },
+    {
+      "country": "AUD",
+      "event": "RBA Rate Statement",
+      "impact": "high",
+      "time": "2026-08-11 04:30:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    },
+    {
+      "country": "AUD",
+      "event": "RBA Press Conference",
+      "impact": "high",
+      "time": "2026-08-11 05:30:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    },
+    {
+      "country": "EUR",
+      "event": "Italian Trade Balance",
+      "impact": "low",
+      "time": "2026-08-11 08:00:00",
+      "actual": null,
+      "estimate": 4.74,
+      "prev": 4.79,
+      "unit": "B"
+    },
+    {
+      "country": "USD",
+      "event": "NFIB Small Business Index",
+      "impact": "low",
+      "time": "2026-08-11 10:00:00",
+      "actual": null,
+      "estimate": 97.5,
+      "prev": 97.4,
+      "unit": ""
+    },
+    {
+      "country": "USD",
+      "event": "ADP Weekly Employment Change",
+      "impact": "low",
+      "time": "2026-08-11 12:14:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 15,
+      "unit": "K"
+    },
+    {
+      "country": "USD",
+      "event": "ADP Weekly Employment Change",
+      "impact": "low",
+      "time": "2026-08-11 12:15:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 11,
+      "unit": "K"
+    },
+    {
+      "country": "USD",
+      "event": "Existing Home Sales",
+      "impact": "low",
+      "time": "2026-08-11 14:00:00",
+      "actual": null,
+      "estimate": 4.05,
+      "prev": 4.09,
+      "unit": "M"
+    },
+    {
+      "country": "USD",
+      "event": "API Weekly Statistical Bulletin",
+      "impact": "low",
+      "time": "2026-08-11 20:30:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    },
+    {
+      "country": "JPY",
+      "event": "M2 Money Stock y/y",
+      "impact": "low",
+      "time": "2026-08-11 23:50:00",
+      "actual": null,
+      "estimate": 2.1,
+      "prev": 2.2,
+      "unit": "%"
+    },
+    {
+      "country": "EUR",
+      "event": "German Final CPI m/m",
+      "impact": "low",
+      "time": "2026-08-12 06:00:00",
+      "actual": null,
+      "estimate": 0.8,
+      "prev": 0.8,
+      "unit": "%"
+    },
+    {
+      "country": "JPY",
+      "event": "Prelim Machine Tool Orders y/y",
+      "impact": "low",
+      "time": "2026-08-12 06:00:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 52.8,
+      "unit": "%"
+    },
+    {
+      "country": "EUR",
+      "event": "German 30-y Bond Auction",
+      "impact": "low",
+      "time": "2026-08-12 09:33:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 3.64,
+      "unit": "|2.9"
+    },
+    {
+      "country": "CAD",
+      "event": "Building Permits m/m",
+      "impact": "low",
+      "time": "2026-08-12 12:30:00",
+      "actual": null,
+      "estimate": 0.8,
+      "prev": -1.7,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "Core CPI m/m",
+      "impact": "high",
+      "time": "2026-08-12 12:30:00",
+      "actual": null,
+      "estimate": 0.2,
+      "prev": 0,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "Core CPI y/y",
+      "impact": "high",
+      "time": "2026-08-12 12:30:00",
+      "actual": null,
+      "estimate": 2.5,
+      "prev": 2.6,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "CPI m/m",
+      "impact": "high",
+      "time": "2026-08-12 12:30:00",
+      "actual": null,
+      "estimate": 0.1,
+      "prev": -0.4,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "CPI y/y",
+      "impact": "high",
+      "time": "2026-08-12 12:30:00",
+      "actual": null,
+      "estimate": 3.4,
+      "prev": 3.5,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "Crude Oil Inventories",
+      "impact": "low",
+      "time": "2026-08-12 14:30:00",
+      "actual": null,
+      "estimate": -1.7,
+      "prev": 2.5,
+      "unit": "M"
+    },
+    {
+      "country": "USD",
+      "event": "10-y Bond Auction",
+      "impact": "low",
+      "time": "2026-08-12 17:01:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 4.58,
+      "unit": "|2.6"
+    },
+    {
+      "country": "USD",
+      "event": "Federal Budget Balance",
+      "impact": "low",
+      "time": "2026-08-12 17:58:00",
+      "actual": null,
+      "estimate": -348.3,
+      "prev": -120.3,
+      "unit": "B"
+    },
+    {
+      "country": "GBP",
+      "event": "RICS House Price Balance",
+      "impact": "low",
+      "time": "2026-08-12 23:01:00",
+      "actual": null,
+      "estimate": -30,
+      "prev": -33,
+      "unit": "%"
+    },
+    {
+      "country": "JPY",
+      "event": "PPI y/y",
+      "impact": "low",
+      "time": "2026-08-12 23:50:00",
+      "actual": null,
+      "estimate": 7.4,
+      "prev": 7.1,
+      "unit": "%"
+    },
+    {
+      "country": "AUD",
+      "event": "RBA Assist Gov Kent Speaks",
+      "impact": "low",
+      "time": "2026-08-13 00:15:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    },
+    {
+      "country": "NZD",
+      "event": "Inflation Expectations q/q",
+      "impact": "medium",
+      "time": "2026-08-13 03:00:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 2.53,
+      "unit": "%"
+    },
+    {
+      "country": "GBP",
+      "event": "GDP m/m",
+      "impact": "high",
+      "time": "2026-08-13 06:00:00",
+      "actual": null,
+      "estimate": 0,
+      "prev": 0.1,
+      "unit": "%"
+    },
+    {
+      "country": "GBP",
+      "event": "Prelim GDP q/q",
+      "impact": "medium",
+      "time": "2026-08-13 06:00:00",
+      "actual": null,
+      "estimate": 0.4,
+      "prev": 0.6,
+      "unit": "%"
+    },
+    {
+      "country": "GBP",
+      "event": "Construction Output m/m",
+      "impact": "low",
+      "time": "2026-08-13 06:00:00",
+      "actual": null,
+      "estimate": -0.3,
+      "prev": -0.8,
+      "unit": "%"
+    },
+    {
+      "country": "GBP",
+      "event": "Goods Trade Balance",
+      "impact": "low",
+      "time": "2026-08-13 06:00:00",
+      "actual": null,
+      "estimate": -20.6,
+      "prev": -18.7,
+      "unit": "B"
+    },
+    {
+      "country": "GBP",
+      "event": "Index of Services 3m/3m",
+      "impact": "low",
+      "time": "2026-08-13 06:00:00",
+      "actual": null,
+      "estimate": 0.5,
+      "prev": 0.7,
+      "unit": "%"
+    },
+    {
+      "country": "GBP",
+      "event": "Industrial Production m/m",
+      "impact": "low",
+      "time": "2026-08-13 06:00:00",
+      "actual": null,
+      "estimate": 0.1,
+      "prev": -0.5,
+      "unit": "%"
+    },
+    {
+      "country": "GBP",
+      "event": "Manufacturing Production m/m",
+      "impact": "low",
+      "time": "2026-08-13 06:00:00",
+      "actual": null,
+      "estimate": -0.1,
+      "prev": 0.1,
+      "unit": "%"
+    },
+    {
+      "country": "GBP",
+      "event": "Prelim Business Investment q/q",
+      "impact": "low",
+      "time": "2026-08-13 06:00:00",
+      "actual": null,
+      "estimate": -0.3,
+      "prev": 0.7,
+      "unit": "%"
+    },
+    {
+      "country": "CHF",
+      "event": "PPI m/m",
+      "impact": "low",
+      "time": "2026-08-13 06:30:00",
+      "actual": null,
+      "estimate": -0.2,
+      "prev": -0.3,
+      "unit": "%"
+    },
+    {
+      "country": "EUR",
+      "event": "Industrial Production m/m",
+      "impact": "low",
+      "time": "2026-08-13 09:00:00",
+      "actual": null,
+      "estimate": -0.1,
+      "prev": -0.2,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "FOMC Member Hammack Speaks",
+      "impact": "low",
+      "time": "2026-08-13 12:15:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    },
+    {
+      "country": "USD",
+      "event": "Core PPI m/m",
+      "impact": "high",
+      "time": "2026-08-13 12:30:00",
+      "actual": null,
+      "estimate": 0.3,
+      "prev": 0.2,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "PPI m/m",
+      "impact": "high",
+      "time": "2026-08-13 12:30:00",
+      "actual": null,
+      "estimate": 0.2,
+      "prev": -0.3,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "Unemployment Claims",
+      "impact": "medium",
+      "time": "2026-08-13 12:30:00",
+      "actual": null,
+      "estimate": 202,
+      "prev": 199,
+      "unit": "K"
+    },
+    {
+      "country": "USD",
+      "event": "FOMC Member Barkin Speaks",
+      "impact": "low",
+      "time": "2026-08-13 12:40:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    },
+    {
+      "country": "GBP",
+      "event": "CB Leading Index m/m",
+      "impact": "low",
+      "time": "2026-08-13 13:30:00",
+      "actual": null,
+      "estimate": null,
+      "prev": -0.5,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "Mortgage Delinquencies",
+      "impact": "low",
+      "time": "2026-08-13 14:29:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 4.44,
+      "unit": "%"
+    },
+    {
+      "country": "AUD",
+      "event": "CB Leading Index m/m",
+      "impact": "low",
+      "time": "2026-08-13 14:30:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 0.2,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "Natural Gas Storage",
+      "impact": "low",
+      "time": "2026-08-13 14:30:00",
+      "actual": null,
+      "estimate": 31,
+      "prev": 33,
+      "unit": "B"
+    },
+    {
+      "country": "USD",
+      "event": "30-y Bond Auction",
+      "impact": "low",
+      "time": "2026-08-13 17:01:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 5.06,
+      "unit": "|2.4"
+    },
+    {
+      "country": "USD",
+      "event": "FOMC Member Goolsbee Speaks",
+      "impact": "low",
+      "time": "2026-08-13 22:00:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    },
+    {
+      "country": "NZD",
+      "event": "BusinessNZ Manufacturing Index",
+      "impact": "low",
+      "time": "2026-08-13 22:30:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 59.7,
+      "unit": ""
+    },
+    {
+      "country": "NZD",
+      "event": "Visitor Arrivals m/m",
+      "impact": "low",
+      "time": "2026-08-13 22:45:00",
+      "actual": null,
+      "estimate": null,
+      "prev": -2.4,
+      "unit": "%"
+    },
+    {
+      "country": "EUR",
+      "event": "German WPI m/m",
+      "impact": "low",
+      "time": "2026-08-14 06:00:00",
+      "actual": null,
+      "estimate": -0.2,
+      "prev": -0.7,
+      "unit": "%"
+    },
+    {
+      "country": "EUR",
+      "event": "French Final CPI m/m",
+      "impact": "low",
+      "time": "2026-08-14 06:45:00",
+      "actual": null,
+      "estimate": 0.6,
+      "prev": 0.6,
+      "unit": "%"
+    },
+    {
+      "country": "CNY",
+      "event": "M2 Money Supply y/y",
+      "impact": "low",
+      "time": "2026-08-14 08:01:00",
+      "actual": null,
+      "estimate": 7.9,
+      "prev": 8,
+      "unit": "%"
+    },
+    {
+      "country": "CNY",
+      "event": "New Loans",
+      "impact": "low",
+      "time": "2026-08-14 08:02:00",
+      "actual": null,
+      "estimate": -50,
+      "prev": 1610,
+      "unit": "B"
+    },
+    {
+      "country": "EUR",
+      "event": "Flash Employment Change q/q",
+      "impact": "low",
+      "time": "2026-08-14 09:00:00",
+      "actual": null,
+      "estimate": 0.1,
+      "prev": 0.1,
+      "unit": "%"
+    },
+    {
+      "country": "EUR",
+      "event": "Flash GDP q/q",
+      "impact": "low",
+      "time": "2026-08-14 09:00:00",
+      "actual": null,
+      "estimate": 0.4,
+      "prev": 0.4,
+      "unit": "%"
+    },
+    {
+      "country": "EUR",
+      "event": "Trade Balance",
+      "impact": "low",
+      "time": "2026-08-14 09:00:00",
+      "actual": null,
+      "estimate": -2.2,
+      "prev": -5,
+      "unit": "B"
+    },
+    {
+      "country": "CAD",
+      "event": "Manufacturing Sales m/m",
+      "impact": "low",
+      "time": "2026-08-14 12:30:00",
+      "actual": null,
+      "estimate": -0.1,
+      "prev": 1.3,
+      "unit": "%"
+    },
+    {
+      "country": "CAD",
+      "event": "Wholesale Sales m/m",
+      "impact": "low",
+      "time": "2026-08-14 12:30:00",
+      "actual": null,
+      "estimate": 2.7,
+      "prev": 0,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "Core Retail Sales m/m",
+      "impact": "medium",
+      "time": "2026-08-14 12:30:00",
+      "actual": null,
+      "estimate": 0.2,
+      "prev": -0.2,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "Retail Sales m/m",
+      "impact": "medium",
+      "time": "2026-08-14 12:30:00",
+      "actual": null,
+      "estimate": 0.1,
+      "prev": 0.2,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "Prelim UoM Consumer Sentiment",
+      "impact": "medium",
+      "time": "2026-08-14 14:00:00",
+      "actual": null,
+      "estimate": 54.7,
+      "prev": 54.4,
+      "unit": ""
+    },
+    {
+      "country": "USD",
+      "event": "Prelim UoM Inflation Expectations",
+      "impact": "medium",
+      "time": "2026-08-14 14:00:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 4.2,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "Business Inventories m/m",
+      "impact": "low",
+      "time": "2026-08-14 14:00:00",
+      "actual": null,
+      "estimate": 0.2,
+      "prev": 0.3,
+      "unit": "%"
+    },
+    {
+      "country": "USD",
+      "event": "President Trump Speaks",
+      "impact": "medium",
+      "time": "2026-08-14 19:00:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    }
+  ]
+}
