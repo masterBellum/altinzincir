@@ -46,11 +46,17 @@ jobs:
       - name: History Dosyalarını Üret
         run: node scripts/fetch_current.js
 
+      # data/current.json'ın tek sahibi prices workflow'u. Bu iş de dosyayı
+      # yeniden yazıyor ama COMMIT ETMEZ: iki workflow aynı dosyayı farklı
+      # zaman damgalarıyla yazdığında rebase çakışması kaçınılmaz oluyordu.
+      - name: Üretilen current.json'ı Geri Al
+        run: git checkout -- data/current.json
+
       - name: Değişikliği Commit & Push Et
         run: |
           git config --global user.name  "AltinZincir-Bot"
           git config --global user.email "bot@altinzincir.app"
-          git add data/history.json data/history/ data/current.json
+          git add data/history.json data/history/
           if git diff --cached --quiet; then
             echo "History değişikliği yok"
             exit 0
@@ -61,6 +67,10 @@ jobs:
               echo "✅ Push başarılı (deneme $i)"
               exit 0
             fi
+            # Rebase çakışmada yarım kalırsa repo "unmerged files" durumunda
+            # kilitleniyor ve sonraki denemeler de aynı hatayla düşüyor.
+            # Temiz duruma dön ki retry gerçekten yeniden deneyebilsin.
+            git rebase --abort 2>/dev/null || true
             echo "⚠️  Push denemesi $i başarısız — yeniden deneniyor"
             sleep $((i * 5))
           done
