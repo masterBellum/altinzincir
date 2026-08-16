@@ -12,15 +12,15 @@ jobs:
 
     steps:
       - name: Kodu Al
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
           ref: main
 
       - name: Node.js Kur
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Bootstrap Çalıştır
         run: node scripts/bootstrap_history.js
@@ -30,6 +30,21 @@ jobs:
           git config --global user.name  "AltinZincir-Bot"
           git config --global user.email "bot@altinzincir.app"
           git add data/history.json
-          git diff --cached --quiet && echo "Değişiklik yok" && exit 0
+          if git diff --cached --quiet; then
+            echo "Değişiklik yok"
+            exit 0
+          fi
           git commit -m "bootstrap: 5 yıllık tarihsel veri eklendi $(date -u '+%Y-%m-%d')"
-          git push
+          # history workflow'u da data/history.json'a yazıyor — çakışmaya karşı
+          # rebase + tekrar denemeli push (diğer workflow'larla aynı desen)
+          for i in 1 2 3 4 5; do
+            if git pull --rebase --autostash origin main && git push; then
+              echo "✅ Push başarılı (deneme $i)"
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            echo "⚠️  Push denemesi $i başarısız — yeniden deneniyor"
+            sleep $((i * 5))
+          done
+          echo "❌ Push 5 denemede de başarısız oldu"
+          exit 1
