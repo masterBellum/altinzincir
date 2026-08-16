@@ -135,6 +135,11 @@ history['_meta'] = {
 // ── Kaydet ────────────────────────────────────────────────────────────────────
 fs.mkdirSync(path.dirname(HISTORY_FILE), { recursive: true });
 const tmpHist = HISTORY_FILE + '.tmp';
-fs.writeFileSync(tmpHist, JSON.stringify(history, null, 2), 'utf8');
+// Minify: dosya ~174 bin sayıdan oluşuyor ve girintili yazıldığında her sayı
+// kendi satırında boşluklarla saklanıyordu — 2.74 MB'ın yarısı biçimlendirme.
+// Saatte bir yeniden yazıldığı için repo büyümesine doğrudan yansıyor.
+// Bu dosyayı hiçbir insan okumuyor (app varlık başına küçük dosyaları çekiyor,
+// fetch_current.js ise JSON.parse ediyor). bootstrap_history.js zaten minify yazıyor.
+fs.writeFileSync(tmpHist, JSON.stringify(history), 'utf8');
 fs.renameSync(tmpHist, HISTORY_FILE);
 console.log(`\n✅ data/history.json kaydedildi (${updatedCount} varlık güncellendi)`);
