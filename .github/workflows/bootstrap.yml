@@ -3,6 +3,12 @@ name: Bootstrap Tarihsel Veri (Tek Seferlik)
 on:
   workflow_dispatch: # Sadece manuel tetikleme
 
+# 30 dakika sürüyor ve data/history.json'ı baştan yazıyor — yanlışlıkla
+# iki kez tetiklenirse üst üste binmesin.
+concurrency:
+  group: data-push-bootstrap
+  cancel-in-progress: false
+
 jobs:
   bootstrap:
     runs-on: ubuntu-latest
