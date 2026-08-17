@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-08-17T00:53:58.855Z",
+    "updated_at": "2026-08-17T06:40:53.554Z",
     "source": "ForexFactory (nfs.faireconomy.media)",
     "count": 96,
     "range_from": "2026-08-16 22:30:00",
@@ -80,16 +80,6 @@
       "actual": null,
       "estimate": -0.9,
       "prev": 1.1,
-      "unit": "%"
-    },
-    {
-      "country": "CNY",
-      "event": "Foreign Direct Investment ytd/y",
-      "impact": "low",
-      "time": "2026-08-17 06:02:00",
-      "actual": null,
-      "estimate": null,
-      "prev": -5,
       "unit": "%"
     },
     {
@@ -280,6 +270,16 @@
       "actual": null,
       "estimate": 4.8,
       "prev": 4.9,
+      "unit": "%"
+    },
+    {
+      "country": "CNY",
+      "event": "Foreign Direct Investment ytd/y",
+      "impact": "low",
+      "time": "2026-08-18 06:02:00",
+      "actual": null,
+      "estimate": null,
+      "prev": -5,
       "unit": "%"
     },
     {
