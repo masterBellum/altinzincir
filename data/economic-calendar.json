@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-08-17T12:30:59.501Z",
+    "updated_at": "2026-08-17T18:29:18.070Z",
     "source": "ForexFactory (nfs.faireconomy.media)",
     "count": 96,
     "range_from": "2026-08-16 22:30:00",
@@ -184,16 +184,6 @@
     },
     {
       "country": "CAD",
-      "event": "Core CPI m/m",
-      "impact": "low",
-      "time": "2026-08-17 12:30:00",
-      "actual": null,
-      "estimate": null,
-      "prev": 0.1,
-      "unit": "%"
-    },
-    {
-      "country": "CAD",
       "event": "Foreign Securities Purchases",
       "impact": "low",
       "time": "2026-08-17 12:30:00",
@@ -211,6 +201,16 @@
       "estimate": 10.6,
       "prev": 15.6,
       "unit": ""
+    },
+    {
+      "country": "CAD",
+      "event": "Core CPI m/m",
+      "impact": "low",
+      "time": "2026-08-17 12:32:00",
+      "actual": null,
+      "estimate": null,
+      "prev": 0.1,
+      "unit": "%"
     },
     {
       "country": "USD",
