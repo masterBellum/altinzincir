@@ -1,14 +1,14 @@
 {
   "_meta": {
-    "updated_at": "2026-08-18T12:33:03.811Z",
+    "updated_at": "2026-08-18T18:28:10.773Z",
     "source": "ForexFactory (nfs.faireconomy.media)",
-    "count": 96,
+    "count": 97,
     "range_from": "2026-08-16 22:30:00",
     "range_to": "2026-08-21 14:00:00",
     "by_impact": {
       "low": 75,
       "high": 8,
-      "medium": 13
+      "medium": 14
     }
   },
   "economicCalendar": [
@@ -386,7 +386,7 @@
       "country": "NZD",
       "event": "GDT Price Index",
       "impact": "low",
-      "time": "2026-08-18 14:50:00",
+      "time": "2026-08-18 15:31:00",
       "actual": null,
       "estimate": null,
       "prev": 0.1,
@@ -561,6 +561,16 @@
       "estimate": null,
       "prev": 3.13,
       "unit": "|1.1"
+    },
+    {
+      "country": "EUR",
+      "event": "ECB President Lagarde Speaks",
+      "impact": "medium",
+      "time": "2026-08-19 10:15:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
     },
     {
       "country": "USD",
