@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-08-18T06:32:08.864Z",
+    "updated_at": "2026-08-18T12:33:03.811Z",
     "source": "ForexFactory (nfs.faireconomy.media)",
     "count": 96,
     "range_from": "2026-08-16 22:30:00",
@@ -273,16 +273,6 @@
       "unit": "%"
     },
     {
-      "country": "CNY",
-      "event": "Foreign Direct Investment ytd/y",
-      "impact": "low",
-      "time": "2026-08-18 06:02:00",
-      "actual": null,
-      "estimate": null,
-      "prev": -5,
-      "unit": "%"
-    },
-    {
       "country": "EUR",
       "event": "ZEW Economic Sentiment",
       "impact": "low",
@@ -306,7 +296,7 @@
       "country": "GBP",
       "event": "10-y Bond Auction",
       "impact": "low",
-      "time": "2026-08-18 09:33:00",
+      "time": "2026-08-18 09:02:00",
       "actual": null,
       "estimate": null,
       "prev": 5.04,
@@ -841,6 +831,16 @@
       "estimate": 0,
       "prev": 16,
       "unit": "B"
+    },
+    {
+      "country": "CNY",
+      "event": "Foreign Direct Investment ytd/y",
+      "impact": "low",
+      "time": "2026-08-21 06:02:00",
+      "actual": null,
+      "estimate": null,
+      "prev": -5,
+      "unit": "%"
     },
     {
       "country": "EUR",
