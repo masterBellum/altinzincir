@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated_at": "2026-08-18T18:28:10.773Z",
+    "updated_at": "2026-08-19T00:53:22.651Z",
     "source": "ForexFactory (nfs.faireconomy.media)",
     "count": 97,
     "range_from": "2026-08-16 22:30:00",
@@ -578,7 +578,7 @@
       "impact": "low",
       "time": "2026-08-19 14:30:00",
       "actual": null,
-      "estimate": null,
+      "estimate": 0.2,
       "prev": 17.4,
       "unit": "M"
     },
@@ -748,7 +748,7 @@
       "impact": "low",
       "time": "2026-08-20 14:30:00",
       "actual": null,
-      "estimate": null,
+      "estimate": 15,
       "prev": 36,
       "unit": "B"
     },
