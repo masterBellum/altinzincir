@@ -1,0 +1,18 @@
+# Geliştirme artıkları — depoya girmemeli
+node_modules/
+*.log
+.env
+.env.local
+
+# Geçici dosyalar (script'ler atomic write için .tmp kullanıyor)
+*.tmp
+
+# Ekran görüntüleri, yedek klasörleri, tek seferlik analiz script'leri.
+# 2026-08'de kökten temizlendi; tekrar birikmesin.
+*.png
+*.jpg
+*.jpeg
+*.url
+yedek_ui_*/
+analyze_data.js
+final_analysis.js
