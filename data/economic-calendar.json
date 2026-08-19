@@ -1,14 +1,14 @@
 {
   "_meta": {
-    "updated_at": "2026-08-19T00:53:22.651Z",
+    "updated_at": "2026-08-19T06:33:15.363Z",
     "source": "ForexFactory (nfs.faireconomy.media)",
-    "count": 97,
+    "count": 98,
     "range_from": "2026-08-16 22:30:00",
     "range_to": "2026-08-21 14:00:00",
     "by_impact": {
       "low": 75,
       "high": 8,
-      "medium": 14
+      "medium": 15
     }
   },
   "economicCalendar": [
@@ -587,6 +587,16 @@
       "event": "FOMC Meeting Minutes",
       "impact": "high",
       "time": "2026-08-19 18:00:00",
+      "actual": null,
+      "estimate": null,
+      "prev": null,
+      "unit": ""
+    },
+    {
+      "country": "USD",
+      "event": "President Trump Speaks",
+      "impact": "medium",
+      "time": "2026-08-19 18:30:00",
       "actual": null,
       "estimate": null,
       "prev": null,
