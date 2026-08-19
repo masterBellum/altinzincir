@@ -78,13 +78,30 @@ Object.entries(current).forEach(([key, asset]) => {
     }
     const h = history[key];
     if (!Array.isArray(h.hourly))  h.hourly  = [];
+    // hourlyTs: hourly[] ile AYNI uzunlukta, her fiyatın toplandığı an (epoch sn).
+    // Neden gerekli: hourly dizisi yalnızca sayı tutuyordu, zaman bilgisi yoktu.
+    // Uygulama bu yüzden noktaları "son 24 saate eşit dağılmış" varsayıyor ve
+    // grafik tooltip'inde YANLIŞ saat gösteriyordu (ilk nokta için 15 saate
+    // varan hata). Ayrıca cron gecikmeleri nedeniyle noktalar zaten eşit
+    // aralıklı değil.
+    if (!Array.isArray(h.hourlyTs)) h.hourlyTs = [];
     if (!Array.isArray(h.daily))   h.daily   = [];
     if (!Array.isArray(h.monthly)) h.monthly = [];
     if (!Array.isArray(h.yearly))  h.yearly  = [];
 
     // ── 1. Her saat: fiyatı hourly'e ekle (max 24) ───────────────────────────
     h.hourly.push(parseFloat(price.toFixed(2)));
+    h.hourlyTs.push(Math.floor(Date.now() / 1000));
     if (h.hourly.length > 24) h.hourly = h.hourly.slice(-24);
+    if (h.hourlyTs.length > 24) h.hourlyTs = h.hourlyTs.slice(-24);
+    // Eski kayıtlarda hourlyTs yok. Diziyi SIFIRLAMAK yerine hizalamayı koruyacak
+    // şekilde eşitle: bilinmeyen eski girişler için başa null koy, fazlaysa baştan
+    // kırp. (İlk sürümde sıfırlanıyordu; bu yüzden dizi hiçbir zaman birikemiyordu.)
+    // Yazıcı yalnızca TÜM damgalar geçerliyse times alanını üretir, dolayısıyla
+    // null'lar geçici olarak times yazılmamasına yol açar — eski girişler
+    // döngüden çıkınca kendiliğinden düzelir.
+    while (h.hourlyTs.length < h.hourly.length) h.hourlyTs.unshift(null);
+    if (h.hourlyTs.length > h.hourly.length) h.hourlyTs = h.hourlyTs.slice(-h.hourly.length);
 
     // ── 2. İlk kez oluşturuluyorsa daily'i şimdiki fiyatla seed'le ─────────────
     if (h.daily.length === 0) {
@@ -118,6 +135,7 @@ Object.entries(current).forEach(([key, asset]) => {
 
         // Hourly'i temizle (yeni güne sıfırla)
         h.hourly = [];
+        h.hourlyTs = [];
         console.log(`  🌅 [06:00] ${key}: ${dailyClose} → daily (${h.daily.length}/365)`);
     }
 

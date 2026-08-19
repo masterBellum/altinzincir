@@ -269,14 +269,28 @@ function isHistoryStale(symbol, rangeName, maxAgeMs) {
 // data/history.json içinde her varlık için hourly[]/daily[]/monthly[]/yearly[] var.
 // Bunları per-asset {key}-{range}.json formatına çevirir. Sentetik'in üstüne yazılır
 // (gerçek piyasa premium dalgalanması — ata/reşat/hamit gibi sikkeler için kritik).
-function writeRealHistoryFromAccumulator(key, rangeName, hSeries) {
+/**
+ * @param tsSeries Opsiyonel: hSeries ile ayni uzunlukta epoch-saniye dizisi.
+ *   Neden onemli: points yalnizca sayi dizisiydi, zaman bilgisi tasimiyordu.
+ *   Uygulama bu yuzden noktalari "araligin tamamina esit dagilmis" varsayip
+ *   grafik tooltip'inde YANLIS saat gosteriyordu. Ornek: hourly serisi 06:00
+ *   UTC'de sifirlanip saatlik birikiyor; oglen 9 nokta varken uygulama ilk
+ *   noktayi "24 saat once" sanıyordu — 15 saate varan hata. Ustelik cron
+ *   gecikmeleri yuzunden noktalar zaten esit arali degil.
+ *   times yazildiginda uygulama gercek zamani kullanir.
+ */
+function writeRealHistoryFromAccumulator(key, rangeName, hSeries, tsSeries) {
     if (!Array.isArray(hSeries) || hSeries.length < 2) return false;
-    const points = hSeries
-        .map(v => parseFloat(v))
-        .filter(v => Number.isFinite(v) && v > 0);
-    if (points.length < 2) return false;
+    // Fiyat ve zaman damgasini BIRLIKTE filtrele ki hizalama bozulmasin
+    const pairs = hSeries
+        .map((v, i) => ({ v: parseFloat(v), t: Array.isArray(tsSeries) ? tsSeries[i] : undefined }))
+        .filter(p => Number.isFinite(p.v) && p.v > 0);
+    if (pairs.length < 2) return false;
+    const points = pairs.map(p => p.v);
+    const times  = pairs.every(p => Number.isFinite(p.t)) ? pairs.map(p => p.t) : null;
     const histData = {
         points,
+        ...(times ? { times } : {}),
         open:  points[0],
         high:  Math.max(...points),
         low:   Math.min(...points),
@@ -887,7 +901,7 @@ async function run() {
             for (const [key, h] of Object.entries(accumulator)) {
                 if (key.startsWith('_') || !h || typeof h !== 'object') continue;
                 // gun: hourly (24'e kadar)  — en azından 2 nokta varsa
-                if (h.hourly  && h.hourly.length  >= 2 && writeRealHistoryFromAccumulator(key, 'gun',   h.hourly))  realHistoryWritten++;
+                if (h.hourly  && h.hourly.length  >= 2 && writeRealHistoryFromAccumulator(key, 'gun',   h.hourly, h.hourlyTs))  realHistoryWritten++;
                 // hafta: daily son 7-8 gün
                 if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'hafta', h.daily.slice(-8)))   realHistoryWritten++;
                 // ay: daily son 30 gün
