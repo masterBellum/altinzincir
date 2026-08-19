@@ -64,10 +64,48 @@ kullanmıyor, **yeniden dağıtıyoruz**. İncelenen sağlayıcıların tamamı 
 Finnhub, EODHD, Financial Modeling Prep ve Borsa İstanbul'un kendi veri sözleşmesi.
 
 Bu yüzden:
-- **97 BIST hissesi** → uygulamada TradingView gömülü widget'ına taşındı
-  (veri bizde saklanmaz, TradingView kendi lisansıyla gösterir)
-- **14 Yahoo emtiası** → uygulamadaki Emtia sekmesi kaldırıldı; gümüş ve gram platin
-  Altın sekmesine alındı (ikisi de Türk kaynağından, gram cinsinden)
+- **97 BIST hissesi** → önce TradingView gömülü widget'ına taşındı, **2026-08'de
+  uygulamadan tamamen kaldırıldı**. Widget veriyi yasal gösteriyordu ama favori ve
+  alarm kurulamıyordu; onun için kendi veri hattımız gerekir ve o hattı lisanslamak
+  ücretli (aşağıdaki tablo).
+- **14 Yahoo emtiası** → Emtia sekmesi kaldırıldı; gümüş ve gram platin Altın
+  sekmesine alındı (ikisi de Türk kaynağından, gram cinsinden)
+
+### Yabancı kaynak araştırması (2026-08) — neden hisse geri gelmedi
+
+ABD borsa verisi üç lisans katmanına ayrılıyor: gerçek zamanlı (SIP, ayda beş
+haneli), 15 dk gecikmeli (~250 USD/ay UTP) ve **geçmiş / gün sonu — borsa lisansı
+gerektirmez, ücretsiz**. Yani borsa tarafı gün sonu veride serbest; duvar
+*sağlayıcı sözleşmesi* tarafında:
+
+| Sağlayıcı | Yeniden dağıtım | Not |
+|---|---|---|
+| Finnhub | Yasak | "…3rd party without written approval"; tüm planlar kişisel kullanım |
+| EODHD | Yasak | Profesyonel olmayan kullanıcıya "redistributing, displaying" yasak |
+| Alpha Vantage / Twelve Data / Polygon | Ücretli | Ayrı lisans ya da eklenti gerekiyor |
+| marketdata.app | Ücretli | Yalnızca "Commercial" planı izin veriyor, özel teklif |
+| IEX | Ücretli | Eskiden ücretsizdi; artık TOPS 500 + dağıtım 500 USD/ay |
+| **Databento US Equities Mini** | **Serbest** | Tek temiz seçenek: sıfır borsa lisans ücreti + serbest dağıtım, **~200 USD/ay** |
+
+Uygulama ücretsiz ve gelirsiz olduğu için hiçbiri uygun değil. Sonuç: hisse
+kategorisi uygulamadan tamamen çıkarıldı (Android tarafında `AssetCategory`).
+
+**Emtia için ise kamu malı kaynaklar var** — ileride gerekirse:
+
+| Kaynak | Lisans | Kapsam | Sıklık |
+|---|---|---|---|
+| EIA (ABD Enerji Bakanlığı) | Kamu malı, atıf şartlı | WTI, Brent, Henry Hub doğal gaz | **Günlük** |
+| Dünya Bankası Pink Sheet | CC BY 4.0 | Metal, tarım, değerli maden, gübre | Aylık |
+| USDA (AMS + NASS) | Kamu malı | Tarım nakit fiyatları | Günlük/haftalık |
+| IMF Primary Commodity Prices | Atıf şartlı | Genel emtia | Aylık |
+
+- **FRED kullanma:** şartları "yalnızca kişisel, ticari olmayan kullanım" diyor.
+  Aynı seriyi doğrudan EIA veya Dünya Bankası'ndan al.
+- Metal ve tarımın **günlük vadeli** fiyatları (bakır, kahve, buğday…) hiçbir açık
+  kaynakta yok — hepsi CME/ICE/LME borsa verisi, her zaman lisanslı.
+
+Karar: kapsam dar (yalnızca enerji günlük) olduğu için Emtia sekmesi geri
+açılmadı; uygulama altın + döviz + kripto olarak sadeleştirildi.
 
 **Tek istisna:** `PL=F` hâlâ Yahoo'dan çekiliyor ama **dosyaya yazılmıyor** —
 yalnızca `gram-platin`'in yüzde değişimini hesaplamakta kullanılıyor, çünkü
