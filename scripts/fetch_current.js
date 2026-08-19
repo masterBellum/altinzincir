@@ -9,6 +9,40 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
+/*
+ * ─────────────────────────────────────────────────────────────────────────────
+ * KAPSAM KARARI — 2026-08 (neden bazı veriler artık burada YOK)
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Bu script'in ürettiği data/current.json GitHub Pages üzerinden HERKESE AÇIK
+ * bir adreste yayınlanıyor. Yani veriyi sadece kullanmıyor, YENİDEN DAĞITIYORUZ.
+ *
+ * Yeniden dağıtım, incelenen ticari sağlayıcıların tamamının kullanım
+ * şartlarında açıkça yasak: Yahoo Finance (resmî olmayan endpoint, "kişisel
+ * kullanım"), Twelve Data, Finnhub, EODHD, Financial Modeling Prep ve Borsa
+ * İstanbul'un kendi veri sözleşmesi. Bu yüzden şunlar KALDIRILDI:
+ *
+ *   • 97 BIST hissesi  → uygulamada TradingView gömülü widget'ına taşındı.
+ *                        Widget'ta veri bizim tarafımızda hiç saklanmaz;
+ *                        TradingView kendi lisansıyla doğrudan gösterir.
+ *   • 14 Yahoo emtiası → uygulamadaki Emtia sekmesi tamamen kaldırıldı
+ *                        (petrol, buğday, bakır, kahve, pamuk...).
+ *
+ * KORUNANLAR ve neden korunabildikleri:
+ *   • Altın (canlidoviz + Truncgil) — robots.txt izin veriyor, halka açık API
+ *   • Döviz (Truncgil → TCMB → fawazahmed0) — TCMB resmî kamu verisi,
+ *     Frankfurter/fawazahmed0 açıkça serbest
+ *   • Kripto (CoinGecko) — ücretsiz katman atıf şartıyla uygun; uygulamanın
+ *     Ayarlar > Veri Kaynakları ekranında atıf veriliyor
+ *   • gumus / gram-platin — Türk kuyumcu piyasasından, gram cinsinden.
+ *     Uygulamada artık Altın sekmesinde gösteriliyorlar.
+ *
+ * TEK İSTİSNA: PL=F (platin futures) hâlâ Yahoo'dan çekiliyor — AMA dosyaya
+ * YAZILMIYOR. Yalnızca gram-platin'in yüzde değişimini hesaplamakta
+ * kullanılıyor, çünkü Truncgil'in Change alanı hafta sonu/tatilde bayat
+ * kalıyor. Veri yayınlanmadığı için yeniden dağıtım söz konusu değil.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
 const fs            = require('fs');
 const https         = require('https');
 const path          = require('path');
@@ -57,24 +91,6 @@ const GOLD_SLUGS = [
 
 // canlidoviz'de mevcut olmayan, sadece Truncgil V3'ten alınacak altın türleri
 const TRUNCGIL_ONLY_GOLD_KEYS = ['gram-platin', 'ons'];
-
-// Yahoo Finance futures: GenelPara tüm sunucu IP'lerini bloke ediyor (403)
-const EMTIA_MAP = [
-    { yahoo: 'SI=F',  key: 'XAGUSD',  name: 'Gümüş',           code: 'XAG'    },
-    { yahoo: 'PL=F',  key: 'XPTUSD',  name: 'Platin',           code: 'XPT'    },
-    { yahoo: 'PA=F',  key: 'XPDUSD',  name: 'Paladyum',         code: 'XPD'    },
-    { yahoo: 'BZ=F',  key: 'XBRUSD',  name: 'Brent Ham Petrol', code: 'BRENT'  },
-    { yahoo: 'CL=F',  key: 'COIL',    name: 'Ham Petrol (WTI)', code: 'WTI'    },
-    { yahoo: 'HG=F',  key: 'COPPER',  name: 'Bakır',            code: 'COPPER' },
-    { yahoo: 'NG=F',  key: 'NGAS',    name: 'Doğal Gaz',        code: 'NGAS'   },
-    { yahoo: 'ZW=F',  key: 'WHEAT',   name: 'Buğday',           code: 'WHEAT'  },
-    { yahoo: 'ZC=F',  key: 'CORN',    name: 'Mısır',            code: 'CORN'   },
-    { yahoo: 'KC=F',  key: 'COFFEE',  name: 'Kahve',            code: 'COFFEE' },
-    { yahoo: 'SB=F',  key: 'SUGAR',   name: 'Şeker',            code: 'SUGAR'  },
-    { yahoo: 'CC=F',  key: 'COCOA',   name: 'Kakao',            code: 'COCOA'  },
-    { yahoo: 'ZS=F',  key: 'SOYBEAN', name: 'Soya Fasulyesi',   code: 'SOYBEAN'},
-    { yahoo: 'CT=F',  key: 'COTTON',  name: 'Pamuk',            code: 'COTTON' },
-];
 
 function coinGeckoUrl(ids) {
     return `https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=usd&include_24hr_change=true`;
@@ -383,122 +399,6 @@ const CURRENCY_NAMES = {
 const CURRENCY_BLACKLIST = new Set(['BAM', 'GEL', 'SYP']);
 
 // ── BIST hisse tablosu (Yahoo Finance .IS) — 97 likit hisse ───────────────────
-// Yahoo'da test edildi (KOZAA/KOZAL/IPEKE delisted, listede yok).
-const BIST_STOCKS = [
-    // Bankacılık
-    { yahoo: 'GARAN.IS', key: 'garan', name: 'Garanti BBVA',                code: 'GARAN' },
-    { yahoo: 'AKBNK.IS', key: 'akbnk', name: 'Akbank',                      code: 'AKBNK' },
-    { yahoo: 'YKBNK.IS', key: 'ykbnk', name: 'Yapı Kredi',                  code: 'YKBNK' },
-    { yahoo: 'ISCTR.IS', key: 'isctr', name: 'İş Bankası (C)',              code: 'ISCTR' },
-    { yahoo: 'HALKB.IS', key: 'halkb', name: 'Halkbank',                    code: 'HALKB' },
-    { yahoo: 'VAKBN.IS', key: 'vakbn', name: 'Vakıfbank',                   code: 'VAKBN' },
-    { yahoo: 'ALBRK.IS', key: 'albrk', name: 'Albaraka Türk',               code: 'ALBRK' },
-    { yahoo: 'SKBNK.IS', key: 'skbnk', name: 'Şekerbank',                   code: 'SKBNK' },
-    { yahoo: 'TSKB.IS',  key: 'tskb',  name: 'TSKB',                         code: 'TSKB'  },
-    // Sigorta
-    { yahoo: 'ANSGR.IS', key: 'ansgr', name: 'Anadolu Sigorta',             code: 'ANSGR' },
-    { yahoo: 'AKGRT.IS', key: 'akgrt', name: 'Aksigorta',                   code: 'AKGRT' },
-    { yahoo: 'TURSG.IS', key: 'tursg', name: 'Türkiye Sigorta',             code: 'TURSG' },
-    // Holding
-    { yahoo: 'KCHOL.IS', key: 'kchol', name: 'Koç Holding',                 code: 'KCHOL' },
-    { yahoo: 'SAHOL.IS', key: 'sahol', name: 'Sabancı Holding',             code: 'SAHOL' },
-    { yahoo: 'AGHOL.IS', key: 'aghol', name: 'Anadolu Grubu Holding',       code: 'AGHOL' },
-    { yahoo: 'DOHOL.IS', key: 'dohol', name: 'Doğan Holding',               code: 'DOHOL' },
-    { yahoo: 'NTHOL.IS', key: 'nthol', name: 'Net Holding',                 code: 'NTHOL' },
-    { yahoo: 'GLYHO.IS', key: 'glyho', name: 'Global Yatırım Holding',      code: 'GLYHO' },
-    { yahoo: 'ALARK.IS', key: 'alark', name: 'Alarko Holding',              code: 'ALARK' },
-    { yahoo: 'IHEVA.IS', key: 'iheva', name: 'İhlas Ev Aletleri',           code: 'IHEVA' },
-    { yahoo: 'IHLAS.IS', key: 'ihlas', name: 'İhlas Holding',               code: 'IHLAS' },
-    { yahoo: 'GSDHO.IS', key: 'gsdho', name: 'GSD Holding',                 code: 'GSDHO' },
-    { yahoo: 'BRYAT.IS', key: 'bryat', name: 'Borusan Yatırım',             code: 'BRYAT' },
-    { yahoo: 'BERA.IS',  key: 'bera',  name: 'Bera Holding',                code: 'BERA'  },
-    // Sanayi / Üretim
-    { yahoo: 'THYAO.IS', key: 'thyao', name: 'Türk Hava Yolları',           code: 'THYAO' },
-    { yahoo: 'ASELS.IS', key: 'asels', name: 'Aselsan',                     code: 'ASELS' },
-    { yahoo: 'EREGL.IS', key: 'eregl', name: 'Ereğli Demir Çelik',          code: 'EREGL' },
-    { yahoo: 'SISE.IS',  key: 'sise',  name: 'Şişecam',                     code: 'SISE'  },
-    { yahoo: 'TUPRS.IS', key: 'tuprs', name: 'Tüpraş',                      code: 'TUPRS' },
-    { yahoo: 'ENKAI.IS', key: 'enkai', name: 'Enka İnşaat',                 code: 'ENKAI' },
-    { yahoo: 'TKFEN.IS', key: 'tkfen', name: 'Tekfen Holding',              code: 'TKFEN' },
-    { yahoo: 'QUAGR.IS', key: 'quagr', name: 'Quagen',                      code: 'QUAGR' },
-    { yahoo: 'TAVHL.IS', key: 'tavhl', name: 'TAV Havalimanları',           code: 'TAVHL' },
-    { yahoo: 'KORDS.IS', key: 'kords', name: 'Kordsa',                      code: 'KORDS' },
-    { yahoo: 'EGEEN.IS', key: 'egeen', name: 'Ege Endüstri',                code: 'EGEEN' },
-    { yahoo: 'KRDMD.IS', key: 'krdmd', name: 'Kardemir D',                  code: 'KRDMD' },
-    { yahoo: 'KRDMA.IS', key: 'krdma', name: 'Kardemir A',                  code: 'KRDMA' },
-    { yahoo: 'IZMDC.IS', key: 'izmdc', name: 'İzmir Demir Çelik',           code: 'IZMDC' },
-    { yahoo: 'BRSAN.IS', key: 'brsan', name: 'Borusan Mannesmann',          code: 'BRSAN' },
-    { yahoo: 'PARSN.IS', key: 'parsn', name: 'Parsan Makina',               code: 'PARSN' },
-    // Otomotiv
-    { yahoo: 'TOASO.IS', key: 'toaso', name: 'Tofaş',                       code: 'TOASO' },
-    { yahoo: 'FROTO.IS', key: 'froto', name: 'Ford Otosan',                 code: 'FROTO' },
-    { yahoo: 'OTKAR.IS', key: 'otkar', name: 'Otokar',                      code: 'OTKAR' },
-    { yahoo: 'DOAS.IS',  key: 'doas',  name: 'Doğuş Otomotiv',              code: 'DOAS'  },
-    // Telecom & Teknoloji
-    { yahoo: 'TCELL.IS', key: 'tcell', name: 'Turkcell',                    code: 'TCELL' },
-    { yahoo: 'TTKOM.IS', key: 'ttkom', name: 'Türk Telekom',                code: 'TTKOM' },
-    { yahoo: 'LOGO.IS',  key: 'logo',  name: 'Logo Yazılım',                code: 'LOGO'  },
-    { yahoo: 'KAREL.IS', key: 'karel', name: 'Karel',                       code: 'KAREL' },
-    { yahoo: 'NETAS.IS', key: 'netas', name: 'Netaş Telekom',               code: 'NETAS' },
-    { yahoo: 'ALCTL.IS', key: 'alctl', name: 'Alcatel Lucent',              code: 'ALCTL' },
-    { yahoo: 'INDES.IS', key: 'indes', name: 'İndeks Bilgisayar',           code: 'INDES' },
-    { yahoo: 'DESPC.IS', key: 'despc', name: 'Despec Bilgisayar',           code: 'DESPC' },
-    // Enerji
-    { yahoo: 'AKSEN.IS', key: 'aksen', name: 'Aksa Enerji',                 code: 'AKSEN' },
-    { yahoo: 'ENJSA.IS', key: 'enjsa', name: 'Enerjisa',                    code: 'ENJSA' },
-    { yahoo: 'ZOREN.IS', key: 'zoren', name: 'Zorlu Enerji',                code: 'ZOREN' },
-    { yahoo: 'AYDEM.IS', key: 'aydem', name: 'Aydem Enerji',                code: 'AYDEM' },
-    { yahoo: 'ODAS.IS',  key: 'odas',  name: 'Odaş Elektrik',               code: 'ODAS'  },
-    { yahoo: 'BIOEN.IS', key: 'bioen', name: 'Biotrend Enerji',             code: 'BIOEN' },
-    { yahoo: 'SMRTG.IS', key: 'smrtg', name: 'Smart Güneş Enerjisi',        code: 'SMRTG' },
-    { yahoo: 'CWENE.IS', key: 'cwene', name: 'CW Enerji',                   code: 'CWENE' },
-    { yahoo: 'GESAN.IS', key: 'gesan', name: 'Girişim Elektrik',            code: 'GESAN' },
-    { yahoo: 'KONTR.IS', key: 'kontr', name: 'Kontrolmatik',                code: 'KONTR' },
-    { yahoo: 'MAGEN.IS', key: 'magen', name: 'Margün Enerji',               code: 'MAGEN' },
-    // Petrol / Kimya
-    { yahoo: 'PETKM.IS', key: 'petkm', name: 'Petkim',                      code: 'PETKM' },
-    { yahoo: 'SASA.IS',  key: 'sasa',  name: 'Sasa Polyester',              code: 'SASA'  },
-    { yahoo: 'DEVA.IS',  key: 'deva',  name: 'Deva Holding',                code: 'DEVA'  },
-    { yahoo: 'HEKTS.IS', key: 'hekts', name: 'Hektaş',                      code: 'HEKTS' },
-    { yahoo: 'GUBRF.IS', key: 'gubrf', name: 'Gübre Fabrikaları',           code: 'GUBRF' },
-    { yahoo: 'BAGFS.IS', key: 'bagfs', name: 'Bagfaş',                      code: 'BAGFS' },
-    { yahoo: 'AKSA.IS',  key: 'aksa',  name: 'Aksa Akrilik',                code: 'AKSA'  },
-    { yahoo: 'POLHO.IS', key: 'polho', name: 'Polisan Holding',             code: 'POLHO' },
-    // Çimento
-    { yahoo: 'AKCNS.IS', key: 'akcns', name: 'Akçansa',                     code: 'AKCNS' },
-    { yahoo: 'CIMSA.IS', key: 'cimsa', name: 'Çimsa',                       code: 'CIMSA' },
-    { yahoo: 'BUCIM.IS', key: 'bucim', name: 'Bursa Çimento',               code: 'BUCIM' },
-    // Tüketim / Beyaz Eşya
-    { yahoo: 'ARCLK.IS', key: 'arclk', name: 'Arçelik',                     code: 'ARCLK' },
-    { yahoo: 'VESTL.IS', key: 'vestl', name: 'Vestel',                      code: 'VESTL' },
-    { yahoo: 'VESBE.IS', key: 'vesbe', name: 'Vestel Beyaz Eşya',           code: 'VESBE' },
-    { yahoo: 'YATAS.IS', key: 'yatas', name: 'Yataş',                       code: 'YATAS' },
-    // Gıda & İçecek
-    { yahoo: 'ULKER.IS', key: 'ulker', name: 'Ülker',                       code: 'ULKER' },
-    { yahoo: 'CCOLA.IS', key: 'ccola', name: 'Coca-Cola İçecek',            code: 'CCOLA' },
-    { yahoo: 'AEFES.IS', key: 'aefes', name: 'Anadolu Efes',                code: 'AEFES' },
-    { yahoo: 'BANVT.IS', key: 'banvt', name: 'Banvit',                      code: 'BANVT' },
-    { yahoo: 'KENT.IS',  key: 'kent',  name: 'Kent Gıda',                   code: 'KENT'  },
-    { yahoo: 'TUKAS.IS', key: 'tukas', name: 'Tukaş',                       code: 'TUKAS' },
-    { yahoo: 'TATGD.IS', key: 'tatgd', name: 'Tat Gıda',                    code: 'TATGD' },
-    { yahoo: 'PETUN.IS', key: 'petun', name: 'Pınar Et',                    code: 'PETUN' },
-    // Perakende
-    { yahoo: 'BIMAS.IS', key: 'bimas', name: 'BİM Mağazalar',               code: 'BIMAS' },
-    { yahoo: 'MGROS.IS', key: 'mgros', name: 'Migros',                      code: 'MGROS' },
-    { yahoo: 'SOKM.IS',  key: 'sokm',  name: 'Şok Marketler',               code: 'SOKM'  },
-    { yahoo: 'MAVI.IS',  key: 'mavi',  name: 'Mavi Giyim',                  code: 'MAVI'  },
-    // Havacılık & Ulaştırma
-    { yahoo: 'PGSUS.IS', key: 'pgsus', name: 'Pegasus',                     code: 'PGSUS' },
-    // GYO
-    { yahoo: 'EKGYO.IS', key: 'ekgyo', name: 'Emlak Konut GYO',             code: 'EKGYO' },
-    { yahoo: 'TRGYO.IS', key: 'trgyo', name: 'Torunlar GYO',                code: 'TRGYO' },
-    { yahoo: 'ISGYO.IS', key: 'isgyo', name: 'İş GYO',                      code: 'ISGYO' },
-    { yahoo: 'AKFYE.IS', key: 'akfye', name: 'Akfen Holding',               code: 'AKFYE' },
-    // Sağlık
-    { yahoo: 'MPARK.IS', key: 'mpark', name: 'MLP Sağlık',                  code: 'MPARK' },
-    { yahoo: 'SELEC.IS', key: 'selec', name: 'Selçuk Ecza',                 code: 'SELEC' },
-];
-
 // ── CoinGecko kripto tablosu ──────────────────────────────────────────────────
 // CoinGecko: API key gerektirmez, 30 istek/dk, GH Actions'dan kesinlikle çalışır
 const COINGECKO_CRYPTO = [
@@ -725,49 +625,34 @@ async function run() {
     }
     console.log(`  ${goldCount > 0 ? '✅' : '⚠️'} canlidoviz: ${goldCount}/${GOLD_SLUGS.length} altın işlendi`);
 
-    // ── 3. Yahoo Finance (Emtia) ────────────────────────────────────────────────
-    console.log('⬇️  Yahoo Finance emtia çekiliyor...');
-    let emtiaCount = 0;
-    for (const emtia of EMTIA_MAP) {
-        const url  = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(emtia.yahoo)}?interval=1d&range=2d`;
-        const data = await fetchJson(url);
-        try {
-            const r    = data.chart.result[0];
-            const meta = r.meta;
-            let price  = meta.regularMarketPrice;
-            const prev = meta.chartPreviousClose || meta.previousClose;
-            if (!price || price <= 0) continue;
-            // Tarım futures Yahoo'da USX (sent) döner — USD'ye çevir
-            const isUSX = meta.currency === 'USX';
-            if (isUSX) price = price / 100;
-            const priceUSD = parseFloat(price.toFixed(4));
-            const priceTRY = parseFloat((priceUSD * usdTry).toFixed(2));
-            const prevUSD  = prev ? (isUSX ? prev / 100 : prev) : null;
-            const chg      = prevUSD ? parseFloat(((price - prevUSD) / prevUSD * 100).toFixed(2)) : 0;
-            current[emtia.key] = {
-                ts: NOW,
-                name: emtia.name, code: emtia.code, type: 'commodity',
-                current: priceTRY, selling: priceTRY,
-                buying:  parseFloat((priceTRY * SPREAD_TIGHT).toFixed(2)),
-                change:  chg,
-                // Önceki kapanış TRY cinsinden — app mutlak fiyat farkını
-                // ancak open > 0 ise gösterebiliyor.
-                open:    prevUSD ? parseFloat((prevUSD * usdTry).toFixed(2)) : 0,
-                priceUSD
-            };
-            emtiaCount++;
-        } catch { /* veri yoksa atla */ }
-        await new Promise(r => setTimeout(r, 200));
-    }
-    console.log(`  ${emtiaCount > 0 ? '✅' : '⚠️'} Yahoo Finance emtia: ${emtiaCount}/14 işlendi`);
+    // ── 3. Platin referansı (PL=F) ──────────────────────────────────────────────
+    // Emtia varlıkları artık current.json'a YAZILMIYOR: app'te emtia sekmesi
+    // kaldırıldı ve bu veriyi herkese açık bir URL'de yeniden yayınlamak
+    // Yahoo'nun şartlarına aykırıydı. Yalnızca gram-platin'in yüzde değişimi
+    // için PL=F fiyatı çekiliyor — değer dosyaya yazılmıyor, sadece hesapta
+    // kullanılıyor, dolayısıyla yeniden dağıtım söz konusu değil.
+    let platinUSD = 0, platinChg = 0;
+    try {
+        const plData = await fetchJson(
+            `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent('PL=F')}?interval=1d&range=2d`
+        );
+        const meta = plData.chart.result[0].meta;
+        const px   = meta.regularMarketPrice;
+        const prev = meta.chartPreviousClose || meta.previousClose;
+        if (px > 0) {
+            platinUSD = px;
+            platinChg = prev ? parseFloat(((px - prev) / prev * 100).toFixed(2)) : 0;
+            console.log(`  ✅ Platin referansı (PL=F): ${px} USD, %${platinChg}`);
+        }
+    } catch { console.warn('  ⚠️ PL=F alınamadı — gram-platin kendi değişimini kullanacak'); }
 
     // ── Truncgil-only varlıklar için change% senkronizasyonu ─────────────────
     // Truncgil'in row.Change alanı hafta sonu/tatil günü stale (son işlem günü değeri)
     // döndürebilir; Yahoo Finance / canlidoviz market kapalıyken doğru 0.00% verir.
 
     // gram-platin: % değişim PL=F (XPTUSD) ile aynı → Yahoo'dan al
-    if (current['gram-platin'] && current['XPTUSD'] !== undefined) {
-        const chg   = current['XPTUSD'].change;
+    if (current['gram-platin'] && platinUSD > 0) {
+        const chg   = platinChg;
         const satis = current['gram-platin'].current;
         current['gram-platin'].change = chg;
         current['gram-platin'].open   = chg !== -100
@@ -792,9 +677,9 @@ async function run() {
     const TROY_OZ_GRAMS = 31.1035;
 
     // gram-platin ← PL=F (XPTUSD zaten emtia adımında çekildi), USD/ons → gram TRY
-    if (current['gram-platin']?.ts !== NOW && current['XPTUSD']?.priceUSD > 0) {
-        const gramTRY = current['XPTUSD'].priceUSD / TROY_OZ_GRAMS * usdTry;
-        const chg     = current['XPTUSD'].change ?? 0;
+    if (current['gram-platin']?.ts !== NOW && platinUSD > 0) {
+        const gramTRY = platinUSD / TROY_OZ_GRAMS * usdTry;
+        const chg     = platinChg;
         current['gram-platin'] = {
             ts: NOW,
             name: 'Gram Platin', code: 'PLATIN', type: 'commodity',
@@ -833,33 +718,10 @@ async function run() {
         } catch { /* GC=F de alınamadı — önceki değer korunur */ }
     }
 
-    // ── 4. Yahoo Finance (BIST Hisse) ────────────────────────────────────────
-    console.log('⬇️  Yahoo Finance BIST hisseler çekiliyor...');
-    let stockCount = 0;
-    for (const stock of BIST_STOCKS) {
-        const url  = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(stock.yahoo)}?interval=1d&range=2d`;
-        const data = await fetchJson(url);
-        try {
-            const r      = data.chart.result[0];
-            const meta   = r.meta;
-            const price  = meta.regularMarketPrice;
-            const prev   = meta.chartPreviousClose || meta.previousClose;
-            if (!price || price <= 0) continue;
-            const chg = prev ? parseFloat(((price - prev) / prev * 100).toFixed(2)) : 0;
-            current[stock.key] = {
-                ts: NOW,
-                name: stock.name, code: stock.code, type: 'stock',
-                current: parseFloat(price.toFixed(2)),
-                selling: parseFloat(price.toFixed(2)),
-                buying:  parseFloat(price.toFixed(2)),
-                change:  chg,
-                open:    prev ? parseFloat(prev.toFixed(2)) : 0
-            };
-            stockCount++;
-        } catch { /* veri yoksa atla */ }
-        await new Promise(r => setTimeout(r, 300));
-    }
-    console.log(`  ✅ Yahoo Finance: ${stockCount} hisse işlendi`);
+    // ── BIST hisseleri kaldırıldı ───────────────────────────────────────────────
+    // Hisse listesi artık uygulamada TradingView gömülü widget'ından gösteriliyor.
+    // Veriyi kendi sunucumuzda çekip yeniden yayınlamak, incelenen tüm
+    // sağlayıcıların (Yahoo dahil) şartlarına aykırıydı.
 
     // ── 4. CoinGecko (Kripto) — Yahoo Finance fallback'lı ───────────────────
     console.log('⬇️  CoinGecko kripto çekiliyor...');
@@ -946,9 +808,8 @@ async function run() {
     // Her varlığın GÜN/HAFTA/AY/YIL geçmişi data/history/{sembol}-{aralık}.json'a yazılır.
     // Android app önce buradan okur; Yahoo Finance sadece fallback olarak kullanılır.
     const ALL_YAHOO_SYMBOLS = [...new Set([
-        'GC=F', 'SI=F', 'PL=F',                       // Altın / kıymetli maden
-        ...EMTIA_MAP.map(e => e.yahoo),                 // Emtia
-        ...BIST_STOCKS.map(s => s.yahoo),               // BIST hisseler
+        'GC=F', 'SI=F', 'PL=F',                       // Altın / gümüş / platin (sentetik gram history için)
+        // Emtia ve BIST hisse sembolleri çıkarıldı: artık yayınlanmıyorlar.
         ...FOREX_YAHOO_SYMBOLS,                          // Döviz (TRY bazlı)
         ...CRYPTO_YAHOO_SYMBOLS,                         // Kripto (Yahoo)
     ])];
@@ -1045,14 +906,35 @@ async function run() {
 
     // ── Meta bilgisi ekle ve kaydet ───────────────────────────────────────────
     current['_daily_open'] = dailyOpen;
+    // ── Artık yayınlanmayan varlıkları dosyadan temizle ─────────────────────────
+    // current nesnesi önceki dosyadan yükleniyor; hisse ve Yahoo emtia kayıtları
+    // üretilmeyi bıraktıktan sonra da dosyada kalıyor, yani yeniden dağıtım
+    // sürüyor ve "bayat varlık" uyarısı üretiyorlardı. Açıkça siliyoruz.
+    // gumus ve gram-platin KALIR: onlar Truncgil/canlidoviz kaynaklı.
+    const KALDIRILACAK_EMTIA = [
+        'XAGUSD', 'XPTUSD', 'XPDUSD', 'XBRUSD', 'COIL', 'COPPER', 'NGAS',
+        'WHEAT', 'CORN', 'COFFEE', 'SUGAR', 'COCOA', 'SOYBEAN', 'COTTON',
+    ];
+    let temizlenen = 0;
+    for (const k of Object.keys(current)) {
+        if (k.startsWith('_')) continue;
+        const v = current[k];
+        if (!v || typeof v !== 'object') continue;
+        if (v.type === 'stock' || KALDIRILACAK_EMTIA.includes(k)) {
+            delete current[k];
+            temizlenen++;
+        }
+    }
+    if (temizlenen > 0) {
+        console.log(`  🧹 Yayından kaldırılan varlık temizlendi: ${temizlenen}`);
+    }
+
     // Kaynak sağlık raporu. Bir kaynak çökerse eski değerler korunuyor (kasıtlı),
     // ama updated_at yine de tazeleniyor — bu, donmuş fiyatları "az önce
     // güncellendi" gibi gösteriyordu. Sayaçlar hangi kaynağın bu run'da gerçekten
     // veri yazdığını söyler; 0 olan bir kategori sessiz bayatlama demektir.
     const counts = {
         gold:      goldCount,
-        commodity: emtiaCount,
-        stock:     stockCount,
         crypto:    cryptoCount + yahooCryptoCount,
         currency:  writtenCurrencies.size,
     };
