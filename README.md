@@ -107,8 +107,8 @@ doğrudan yansıyordu. 2.74 MB → 1.32 MB, kayıpsız.
 
 ## Kurulum
 
-**Secret'lar:** `NEWSAPI_KEY` (opsiyonel, `fetch_news.js` yedeği).
-NewsAPI ücretsiz katmanı **yalnızca geliştirme** içindir — üretimde kullanılmamalı.
+**Secret'lar:** Yok. (NEWSAPI_KEY kaldırıldı — ücretsiz katmanı yalnızca
+geliştirme içindir, üretimde kullanmak lisans ihlali.)
 
 **Harici cron (önerilen):** GitHub cron throttle'ı yüzünden 5 dakikalık kadans için
 harici bir zamanlayıcı gerekir:

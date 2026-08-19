@@ -2,8 +2,7 @@
  * fetch_news.js
  * ─────────────────────────────────────────────────────────────────────────────
  * Her 30 dakikada GitHub Actions tarafından çalıştırılır.
- * Birincil: Google News RSS (ücretsiz, Türkçe)
- * Yedek:    NewsAPI.org (NEWSAPI_KEY secret gerekir)
+ * Kaynak: Google News RSS (ücretsiz, Türkçe). Yedek YOK — bkz. aşağıdaki not.
  *
  * Çıktı: data/news.json
  * ─────────────────────────────────────────────────────────────────────────────
@@ -14,7 +13,6 @@ const https = require('https');
 const path  = require('path');
 
 const OUTPUT_FILE  = path.join(__dirname, '..', 'data', 'news.json');
-const NEWSAPI_KEY  = process.env.NEWSAPI_KEY || '';
 
 // ── Google News RSS sorguları ─────────────────────────────────────────────────
 // Her sorgu kendi kategorisini taşır. Eskiden yalnızca sorgu metni tutuluyor,
@@ -99,26 +97,12 @@ async function fetchGoogleNews() {
     return allItems;
 }
 
-// ── Yedek: NewsAPI ────────────────────────────────────────────────────────────
-async function fetchNewsAPI() {
-    if (!NEWSAPI_KEY) { console.log('  ⏭️  NewsAPI key yok, atlanıyor'); return []; }
-
-    const url = `https://newsapi.org/v2/everything?q=altın+dolar+ekonomi+kripto&language=tr&sortBy=publishedAt&pageSize=30&apiKey=${NEWSAPI_KEY}`;
-    const res = await fetchRaw(url);
-    if (!res || res.status !== 200) return [];
-
-    try {
-        const data = JSON.parse(res.body);
-        return (data.articles || []).map(a => ({
-            id:          Buffer.from(a.url || '').toString('base64').slice(0, 16),
-            title:       a.title || '',
-            source:      a.source?.name || 'NewsAPI',
-            url:         a.url || '',
-            publishedAt: a.publishedAt || new Date().toISOString(),
-            category:    'general'
-        })).filter(a => a.title && a.url);
-    } catch { return []; }
-}
+// NewsAPI yedegi KALDIRILDI (2026-08).
+// Neden: NewsAPI'nin ucretsiz katmani kullanim sartlarinda ACIKCA yalnizca
+// gelistirme/test icindir; uretimde kullanmak lisans ihlali. Ustelik cektigimiz
+// haberler data/news.json olarak herkese acik yayinlaniyor, bu da NewsAPI'nin
+// yeniden dagitim yasagina giriyor. Google News RSS tek kaynak olarak yeterli
+// (olculdu: 4 sorgudan 391 haber, kota sonrasi 50 yayinlaniyor).
 
 // ── Ana fonksiyon ─────────────────────────────────────────────────────────────
 async function run() {
@@ -128,16 +112,12 @@ async function run() {
     let items = await fetchGoogleNews();
     console.log(`✅ Google News: ${items.length} haber`);
 
-    // Yedek: NewsAPI (Google News 10'dan az döndürdüyse)
-    if (items.length < 10) {
-        console.log('⬇️  NewsAPI fallback devreye giriyor...');
-        const fallback = await fetchNewsAPI();
-        // Tekrar edenleri atla
-        const existingUrls = new Set(items.map(i => i.url));
-        for (const item of fallback) {
-            if (!existingUrls.has(item.url)) items.push(item);
-        }
-        console.log(`✅ NewsAPI fallback: +${fallback.length} haber`);
+    // Google News tek kaynak. Yedek yok: NewsAPI'nin ucretsiz katmani
+    // uretimde kullanilamiyor (bkz. yukaridaki not). Haber gelmezse onceki
+    // news.json korunur.
+    if (items.length === 0) {
+        console.error('❌ Google News RSS hiç haber döndürmedi — mevcut dosya korunuyor');
+        process.exit(1);
     }
 
     // Tarihe göre sırala (en yeni önce)
@@ -171,7 +151,7 @@ async function run() {
         _meta: {
             updated_at: new Date().toISOString(),
             count: items.length,
-            source: 'Google News RSS / NewsAPI fallback'
+            source: 'Google News RSS'
         },
         items
     };

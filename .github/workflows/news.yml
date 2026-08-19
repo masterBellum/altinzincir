@@ -27,9 +27,9 @@ jobs:
         with:
           node-version: '22'
 
+      # NEWSAPI_KEY kaldırıldı: ücretsiz katmanı yalnızca geliştirme içindir,
+      # üretimde kullanmak lisans ihlali. Google News RSS tek kaynak.
       - name: Fetch news
-        env:
-          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
         run: node scripts/fetch_news.js
 
       - name: Commit & push
