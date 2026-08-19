@@ -1,11 +1,16 @@
 # AltınZincir — Veri Deposu
 
 Bu depo, **AltınZincir** Android uygulamasının fiyat verisini üretir ve GitHub Pages
-üzerinden yayınlar. Ayrıca kökteki `index.html` bir web panosu olarak aynı veriyi kullanır.
+üzerinden yayınlar.
 
 ```
-GitHub Actions  →  scripts/*.js  →  data/*.json  →  GitHub Pages  →  Android app + web panosu
+GitHub Actions  →  scripts/*.js  →  data/*.json  →  GitHub Pages  →  Android uygulaması
 ```
+
+> Kökte eskiden bir `index.html` web panosu vardı. Uygulama yazılmadan önce
+> "kaynaklar GitHub üzerinden doğru çekiliyor mu" testi için kurulmuştu; işlevi
+> bitince 2026-08'de silindi. **Pages hâlâ açık** — sadece kök adres 404 verir,
+> `data/` altındaki dosyalar eskisi gibi sunulur (uygulamanın kullandığı yol budur).
 
 ---
 
@@ -17,10 +22,11 @@ GitHub Actions  →  scripts/*.js  →  data/*.json  →  GitHub Pages  →  And
 | `data/history.json` | Rollup biriktirici (hourly/daily/monthly/yearly) | `build_history.js` | 1 saat |
 | `data/history/*.json` | Varlık başına grafik serisi (`{key}-{gun\|hafta\|ay\|yil}.json`) | `fetch_current.js` | 1 saat |
 | `data/news.json` | 50 haber, kategori kotalı | `fetch_news.js` | 30 dk |
-| `data/economic-calendar.json` | Ekonomik takvim | `fetch_calendar.js` | 6 saat |
 
-> **Not:** Uygulamada takvim artık TradingView gömülü widget'ıyla gösteriliyor;
-> `economic-calendar.json` şu an uygulama tarafından kullanılmıyor.
+> **Ekonomik takvim burada üretilmiyor.** Uygulama TradingView gömülü widget'ını
+> kullanıyor (veri bizde saklanmaz). Eskiden `fetch_calendar.js` + `calendar.yml`
+> ikilisi `data/economic-calendar.json` üretiyordu; widget'a geçildikten sonra
+> dosyayı okuyan kimse kalmadığı için 2026-08'de üçü de silindi.
 
 ---
 
@@ -31,7 +37,6 @@ GitHub Actions  →  scripts/*.js  →  data/*.json  →  GitHub Pages  →  And
 | `prices.yml` | 5 dk cron (yedek) + `repository_dispatch: fetch-prices` | `data/current.json` |
 | `history.yml` | Saatlik + `build-history` | `data/history.json`, `data/history/` |
 | `news.yml` | 30 dk + `fetch-news` | `data/news.json` |
-| `calendar.yml` | 6 saat + `fetch-calendar` | `data/economic-calendar.json` |
 | `bootstrap.yml` | Yalnızca manuel | `data/history.json` (tek seferlik dolum) |
 
 **Cron gerçeği:** GitHub scheduled cron'u ağır throttle ediyor — `*/5` ayarlıyken
@@ -39,7 +44,7 @@ GitHub Actions  →  scripts/*.js  →  data/*.json  →  GitHub Pages  →  And
 servisinden `repository_dispatch` ile yapılmalı (test edildi: 20 saniyede tetikliyor).
 `schedule` yalnızca yedek olarak duruyor.
 
-**Push çakışması:** Beş workflow da aynı ref'e push ediyor. Her birinde
+**Push çakışması:** Dört workflow da aynı ref'e push ediyor. Her birinde
 `pull --rebase --autostash` + `git rebase --abort` + 5 denemeli backoff var.
 `rebase --abort` olmadan yarım kalan rebase repoyu kilitliyor ve tüm denemeler
 aynı hatayla düşüyordu.
@@ -54,7 +59,6 @@ aynı hatayla düşüyordu.
 | Truncgil → TCMB → fawazahmed0 | Döviz (61) | TCMB resmî kamu verisi; diğerleri serbest |
 | CoinGecko | Kripto (20) | Ücretsiz katman, **atıf şartlı** (uygulamada Ayarlar › Veri Kaynakları) |
 | Google News RSS | Haberler | Başlık + kaynağa link |
-| ForexFactory | Ekonomik takvim | Anahtarsız haftalık feed |
 
 ### Neden BIST hissesi ve emtia YOK
 
