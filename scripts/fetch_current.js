@@ -447,13 +447,6 @@ const FOREX_YAHOO_SYMBOLS = [
     'CZKTRY=X','HUFTRY=X','RONTRY=X','AZNTRY=X','QARTRY=X',
 ];
 
-const CRYPTO_YAHOO_SYMBOLS = [
-    'BTC-USD','ETH-USD','BNB-USD','SOL-USD','XRP-USD','DOGE-USD',
-    'LTC-USD','ADA-USD','AVAX-USD','DOT-USD','LINK-USD','ATOM-USD',
-    'TRX-USD','POL28321-USD','SHIB-USD','NEAR-USD','UNI7083-USD',
-    'ARB11841-USD','TON11419-USD','SUI20947-USD',
-];
-
 // ── Ana fonksiyon ─────────────────────────────────────────────────────────────
 async function run() {
     let current = {};
@@ -782,31 +775,18 @@ async function run() {
         if (cgData?.status) console.warn('  CoinGecko hata:', cgData.status.error_message);
     }
 
-    // Yahoo Finance fallback: CoinGecko fail olduysa tüm coinler, kısmi başarı varsa
-    // CoinGecko'nun atladığı coinler. Bu run'da CoinGecko'nun YAZDIĞI key'leri atla
-    // (eski current.json değerlerini değil).
-    let yahooCryptoCount = 0;
-    for (const meta of COINGECKO_CRYPTO) {
-        if (geckoKeysWritten.has(meta.key)) continue;
-        if (!meta.yahoo) continue;
-        const url  = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(meta.yahoo)}?interval=1d&range=2d`;
-        const data = await fetchJson(url);
-        try {
-            const r        = data.chart.result[0];
-            const m        = r.meta;
-            const priceUSD = m.regularMarketPrice;
-            const prev     = m.chartPreviousClose || m.previousClose;
-            const chg = (prev && priceUSD)
-                ? parseFloat(((priceUSD - prev) / prev * 100).toFixed(2))
-                : 0;
-            if (writeCrypto(meta, priceUSD, chg)) yahooCryptoCount++;
-        } catch { /* veri yoksa atla */ }
-        await new Promise(res => setTimeout(res, 200));
-    }
-    if (yahooCryptoCount > 0) {
-        console.log(`  ✅ Yahoo Finance fallback: ${yahooCryptoCount} kripto eklendi`);
-    } else if (!geckoOk) {
-        console.warn('  ⚠️ Yahoo Finance fallback da başarısız — eski değerler korunuyor');
+    // Yahoo fallback KALDIRILDI (2026-08).
+    // Neden: CoinGecko başarısız olduğunda Yahoo'dan çekilen kripto fiyatları da
+    // data/current.json'a yazılıyordu; bu dosya herkese açık yayınlandığı için
+    // Yahoo verisini YENİDEN DAĞITMIŞ oluyorduk — BIST hisse ve emtia için
+    // kaldırdığımız sorunun aynısı. CoinGecko sağlıklı çalıştığı için
+    // (ölçüldü: 3/3 HTTP 200, 20/20 coin dolu) fallback'e gerek yok.
+    //
+    // CoinGecko düşerse ne olur: kriptolar önceki run'ın değerleriyle kalır ve
+    // _meta.counts.crypto = 0 olur; bu da _meta.warnings'e düşüp uygulamada
+    // "veriler güncellenemedi" uyarısı gösterir. Yani sessiz bayatlama yok.
+    if (!geckoOk) {
+        console.warn("  ⚠️ CoinGecko alınamadı — kripto değerleri önceki run'dan korunuyor (fallback yok)");
     }
 
     // ── History üretimi (adım 5-6-7) ─────────────────────────────────────────
@@ -825,7 +805,10 @@ async function run() {
         'GC=F', 'SI=F', 'PL=F',                       // Altın / gümüş / platin (sentetik gram history için)
         // Emtia ve BIST hisse sembolleri çıkarıldı: artık yayınlanmıyorlar.
         ...FOREX_YAHOO_SYMBOLS,                          // Döviz (TRY bazlı)
-        ...CRYPTO_YAHOO_SYMBOLS,                         // Kripto (Yahoo)
+        // Kripto history'si de kaldırıldı: Yahoo'dan çekilip data/history/
+        // altında yayınlanıyordu — fiyat fallback'iyle aynı yeniden dağıtım
+        // sorunu. Uygulama kripto grafiği için Yahoo'ya doğrudan düşer
+        // (cihazdan tek kullanıcılık istek; yeniden yayın değil).
     ])];
 
     const HISTORY_RANGES = [
@@ -949,7 +932,7 @@ async function run() {
     // veri yazdığını söyler; 0 olan bir kategori sessiz bayatlama demektir.
     const counts = {
         gold:      goldCount,
-        crypto:    cryptoCount + yahooCryptoCount,
+        crypto:    cryptoCount,
         currency:  writtenCurrencies.size,
     };
     const warnings = Object.entries(counts)
