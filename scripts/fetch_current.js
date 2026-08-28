@@ -939,6 +939,25 @@ async function run() {
         .filter(([, n]) => n === 0)
         .map(([k]) => `${k}: bu run'da hiç veri yazılmadı — değerler önceki run'dan geliyor`);
 
+    // Desteklenmeyen dövizleri current.json'dan TEMİZLE.
+    //
+    // Truncgil V3 84 kalem döviz dönüyor; desteklediğimiz (CURRENCY_NAMES)
+    // 29 tanesi. Fazlası bir kez yazılıp dosyada kalıyor ve BİR DAHA HİÇ
+    // güncellenmiyordu: Truncgil CI'dan ara ara erişilemiyor, o durumda
+    // devreye giren TCMB/fawazahmed0 yedekleri yalnızca CURRENCY_NAMES'i
+    // kapsıyor.
+    //
+    // Sonuç kullanıcıya yansıyordu: bu ölü kayıtlar stale_assets sayacını
+    // sürekli şişiriyor, uygulama da uyarı bandını gösteriyordu — üstelik
+    // uygulamanın EKRANDA GÖSTERMEDİĞİ dövizler yüzünden. Ölçüldü: bayat
+    // 32 kaydın hiçbiri uygulamada listelenmiyor.
+    for (const k of Object.keys(current)) {
+        const v = current[k];
+        if (k.startsWith('_') || !v || typeof v !== 'object') continue;
+        if (v.type !== 'currency') continue;
+        if (!CURRENCY_NAMES[k]) delete current[k];
+    }
+
     // Bu run'da yazılamayan (ts'i eskimiş) varlıklar. Kategori sayacı sıfır
     // olmasa bile tek tek varlıklar geride kalmış olabilir.
     // ts hiç yoksa da bayattır: o varlık bu run'da (ve ts özelliği eklendiğinden

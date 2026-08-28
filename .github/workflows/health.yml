@@ -1,0 +1,114 @@
+name: Veri Sağlığı Bekçisi
+
+# NEDEN AYRI BIR WORKFLOW
+#
+# prices.yml içindeki "Arıza Bildir" adımı yalnızca if: failure() ile çalışıyor,
+# yani iş akışı ÇÖKERSE. Ama gerçek arıza bu değildi: iş akışı hiç çökmedi,
+# sadece yeterince sık ÇALIŞMADI. 27 Ağu 2026'da iki çalışma arası 588 dakikaya
+# çıktı ve kimse fark etmedi; kullanıcı uygulamada 4 saatlik fiyat gördü.
+#
+# Bir boru hattı kendi YOKLUĞUNU tespit edemez. Bu yüzden dışarıdan bakan,
+# yayınlanmış verinin YAŞINA bakan ayrı bir bekçi gerekiyor.
+#
+# Bilerek GitHub Pages adresini okuyor, depodaki dosyayı değil: kullanıcının
+# gerçekten aldığı şey bu. Pages dağıtımı takılırsa depo güncel olsa bile
+# uygulamaya eski veri gider — bekçi bunu da yakalar.
+
+on:
+  schedule:
+    # 30 dk isteniyor, GitHub throttle'ı yüzünden pratikte ~1 saat.
+    # Bekçi için yeterli: saatler mertebesinde bir bayatlığı arıyoruz.
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  saglik:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Yayınlanmış verinin yaşını ölç
+        id: olc
+        run: |
+          URL="https://masterbellum.github.io/altinzincir/data/current.json?t=$(date +%s)"
+          if ! curl -fsS --max-time 30 "$URL" -o current.json; then
+            echo "durum=erisilemedi" >> "$GITHUB_OUTPUT"
+            echo "yas_dk=-1" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          UP=$(node -e "console.log(JSON.parse(require('fs').readFileSync('current.json','utf8'))._meta.updated_at)")
+          YAS=$(node -e "console.log(Math.round((Date.now()-Date.parse('$UP'))/60000))")
+          echo "updated_at=$UP"  >> "$GITHUB_OUTPUT"
+          echo "yas_dk=$YAS"     >> "$GITHUB_OUTPUT"
+          # 90 dk: hedef kadans 5 dk. Tek bir kaçan çalışma alarm üretmesin
+          # diye bolca pay bırakıldı; 90 dk'yı geçmesi artık "bozuk" demektir.
+          if [ "$YAS" -gt 90 ]; then
+            echo "durum=bayat" >> "$GITHUB_OUTPUT"
+          else
+            echo "durum=saglikli" >> "$GITHUB_OUTPUT"
+          fi
+          echo "Veri yaşı: ${YAS} dk (updated_at: $UP)"
+
+      - name: Arızayı bildir / çözülünce kapat
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const durum = '${{ steps.olc.outputs.durum }}';
+            const yas   = '${{ steps.olc.outputs.yas_dk }}';
+            const up    = '${{ steps.olc.outputs.updated_at }}';
+            const ETIKET = 'veri-bayat';
+            const BASLIK = '🟠 Fiyat verisi güncellenmiyor';
+
+            const acik = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: ETIKET,
+            });
+
+            if (durum === 'saglikli') {
+              // Kendi kendini temizlesin: düzelince açık kalan uyarı,
+              // bir sonraki gerçek arızada gürültüye dönüşür.
+              for (const i of acik.data) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: i.number,
+                  body: `✅ Veri yeniden güncel (yaş: ${yas} dk). Otomatik kapatıldı.`,
+                });
+                await github.rest.issues.update({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: i.number, state: 'closed',
+                });
+              }
+              return;
+            }
+
+            const govde = durum === 'erisilemedi'
+              ? `GitHub Pages üzerindeki \`current.json\` **okunamadı**.\n\n`
+                + `Pages dağıtımı düşmüş ya da dosya yayınlanmamış olabilir. `
+                + `Uygulama bu adresi okuyor, yani kullanıcılar veri alamıyor.\n`
+              : `Yayınlanmış veri **${yas} dakikadır** güncellenmedi `
+                + `(hedef: 5 dk).\n\n`
+                + `- \`_meta.updated_at\`: ${up}\n\n`
+                + `Muhtemel sebep: \`repository_dispatch\` tetiklemesi gelmiyor. `
+                + `GitHub'ın kendi cron'u \`*/5\` isteğini saatlere kadar `
+                + `throttle'lıyor; asıl tetikleme harici cron servisinden `
+                + `gelmeli (bkz. README "Harici cron").\n`;
+
+            const body = govde
+              + `\n---\n_Bekçi: ${context.serverUrl}/${context.repo.owner}/`
+              + `${context.repo.repo}/actions/runs/${context.runId}_\n`;
+
+            if (acik.data.length) {
+              // Var olanı güncelle — her turda yeni Issue açmak posta kutusunu
+              // doldurur ve asıl sorunu gözden kaçırtır.
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: acik.data[0].number, body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title: BASLIK, body, labels: [ETIKET],
+              });
+            }
