@@ -1,0 +1,92 @@
+name: Canlı Fiyat Döngüsü (saatlik, içinde 5 dk)
+
+# NEDEN BU WORKFLOW VAR
+#
+# Hedef kadans 5 dakika. `cron: '*/5'` bunu VERMİYOR — GitHub yüksek frekanslı
+# zamanlamaları ağır throttle'lıyor ve çoğunu hiç çalıştırmıyor. Ölçülen
+# gerçek aralıklar (28 Ağu 2026): 741, 466, 607, 588 dakika. Yani hedef 5 dk
+# iken kullanıcı yarım günlük fiyat görüyordu.
+#
+# README harici bir cron servisinden `repository_dispatch` önermişti; o kurulum
+# hiç yapılmadı (son 12 çalışmanın 12'si de `schedule`).
+#
+# BU ÇÖZÜM harici servise ve token'a gerek duymuyor:
+#   - Zamanlama SAATLİK (`0 * * * *`). Düşük frekanslı cron'lar çok daha
+#     güvenilir teslim ediliyor; `*/5`in aksine genelde kaçmıyor.
+#   - Tek çalışma İÇİNDE 5 dakikada bir döngüyle veri çekiliyor. Yani saatlik
+#     tetikleme, 5 dakikalık kadans üretiyor.
+#
+# MALİYET: depo PUBLIC, public depolarda GitHub Actions dakikaları ücretsiz ve
+# sınırsız. Özel depoya çevrilirse bu workflow ayda ~40 saat yakar ve ücretli
+# kotayı doldurur — o durumda önce burayı kapat.
+#
+# Bu, harici cron'un yerine geçen PRATİK çözüm. Harici cron hâlâ daha temiz
+# (runner'ı meşgul etmez); kurulursa bu workflow kapatılabilir.
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+# Kendi grubunda ve yeni çalışma eskisini İPTAL EDER: bir döngü takılıp kalırsa
+# bir sonraki saat temiz başlasın. prices.yml'in grubundan ayrı, çünkü orası
+# cancel-in-progress: false kullanıyor ve 55 dakikalık bir işin arkasında
+# kuyruğa girmesi istenmez.
+concurrency:
+  group: data-push-prices-loop
+  cancel-in-progress: true
+
+jobs:
+  dongu:
+    runs-on: ubuntu-latest
+    # 55 dk döngü + kurulum payı. GitHub'ın üst sınırı 6 saat.
+    timeout-minutes: 58
+    permissions:
+      contents: write
+
+    steps:
+      - name: Kodu Al
+        uses: actions/checkout@v5
+
+      - name: Node.js Kur
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: 5 dakikada bir çek ve yayınla
+        env:
+          # history üretimi atlanıyor: ~962 dosya değiştirip depoyu şişiriyor.
+          # data/history/ üretimini saatlik history workflow'u yapıyor.
+          SKIP_HISTORY: '1'
+          ARALIK_SN: '300'
+          # 55 dk. Bir sonraki saatlik tetikleme gelmeden bitmeli, yoksa
+          # cancel-in-progress iptal eder ve yarım kalan push'lar oluşur.
+          SURE_SN: '3300'
+        run: |
+          set -uo pipefail
+          chmod +x scripts/push_data.sh
+          BASLANGIC=$(date +%s)
+          TUR=0
+          while :; do
+              TUR=$((TUR + 1))
+              GECEN=$(( $(date +%s) - BASLANGIC ))
+              echo "──── tur $TUR (geçen: $((GECEN / 60)) dk) ────"
+
+              # Tek turun hatası döngüyü DÜŞÜRMEMELİ: kaynaklardan biri geçici
+              # olarak erişilemez olabilir, bir sonraki tur düzelir.
+              if node scripts/fetch_current.js; then
+                  bash scripts/push_data.sh || echo "⚠️  push bu turda başarısız"
+              else
+                  echo "⚠️  fetch bu turda başarısız — sonraki tur denenecek"
+              fi
+
+              GECEN=$(( $(date +%s) - BASLANGIC ))
+              KALAN=$(( SURE_SN - GECEN ))
+              # Bir tur daha sığmıyorsa bitir; yarım uykuda iptal edilmektense
+              # temiz çık.
+              if [ "$KALAN" -lt "$ARALIK_SN" ]; then
+                  echo "Süre doldu ($((GECEN / 60)) dk, $TUR tur). Çıkılıyor."
+                  break
+              fi
+              sleep "$ARALIK_SN"
+          done
