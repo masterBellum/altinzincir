@@ -630,6 +630,51 @@ async function run() {
         goldCount++;
         await new Promise(r => setTimeout(r, 100));
     }
+
+    // ── Sikke altinlarinin degisim yuzdesini gram altindan turet ─────────────
+    //
+    // OLCULEN ARIZA (29 Agu 2026): current.json'daki 14 altin varliginin
+    // 12'si kalici olarak change: 0 tasiyordu. Yalnizca gram-altin (-0.06) ve
+    // ons (-0.06) gercek deger gosteriyordu.
+    //
+    // SEBEP bizde degil, kaynakta. canlidoviz sikke sayfalarinda hero
+    // etiketinin "onceki kapanis" alani guncellenmiyor:
+    //   gram-altin   -> cp="6913.12"    fiyat 6908.74   => -0.06%  (dogru)
+    //   ceyrek-altin -> cp="11368.83"   fiyat 11368.83  =>  0.00%  (yanlis)
+    // cp fiyatin aynisi oldugu icin scraper matematiksel olarak 0 buluyor.
+    // Scraper dogru calisiyor; besledigi veri hatali.
+    //
+    // COZUM: asagidaki turler fiziksel olarak gram altinin katidir (agirlik x
+    // milyem). Gunluk yuzde degisimleri tanim geregi gram altinla AYNIDIR;
+    // aralarindaki tek fark sabit bayi makasi, o da yuzdeyi degistirmez.
+    // Dolayisiyla gram altin kimildarken tam olarak 0 raporlayan bir turevin
+    // degeri veri eksikligidir, gercek bir duraganlik degil.
+    //
+    // Yalnizca (a) gram altin gercekten hareket etmisse ve (b) turev TAM OLARAK
+    // 0 ise devreye giriyor. Boylece piyasa gercekten sabitken (hafta sonu,
+    // tatil) yanlis hareket uydurmuyoruz.
+    //
+    // gumus GOLD_SLUGS icinde ama bu listede YOK ve olmamali: gumus ayri bir
+    // emtia, gram altinla ayni yonde hareket etmek zorunda degil.
+    const GRAM_TUREVLERI = [
+        'ceyrek-altin', 'yarim-altin', 'tam-altin', 'cumhuriyet-altini',
+        'gremse-altin', 'ata-altin', 'resat-altin', 'hamit-altin',
+        'gram-has-altin', '14-ayar-altin', '18-ayar-altin', '22-ayar-bilezik',
+    ];
+    const gramChg = current['gram-altin']?.change;
+    if (typeof gramChg === 'number' && gramChg !== 0) {
+        let turetilen = 0;
+        for (const key of GRAM_TUREVLERI) {
+            const v = current[key];
+            if (!v || v.change !== 0 || !(v.current > 0)) continue;
+            v.change = gramChg;
+            v.open   = parseFloat((v.current / (1 + gramChg / 100)).toFixed(2));
+            turetilen++;
+        }
+        if (turetilen > 0) {
+            console.log(`  ↻ ${turetilen} sikke altininin degisimi gram altindan turetildi (%${gramChg})`);
+        }
+    }
     console.log(`  ${goldCount > 0 ? '✅' : '⚠️'} canlidoviz: ${goldCount}/${GOLD_SLUGS.length} altın işlendi`);
 
     // ── 3. Platin referansı (PL=F) ──────────────────────────────────────────────
