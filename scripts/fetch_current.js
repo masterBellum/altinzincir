@@ -931,14 +931,23 @@ async function run() {
                 // gun: hourly (24'e kadar)  — en azından 2 nokta varsa
                 if (h.hourly  && h.hourly.length  >= 2 && writeRealHistoryFromAccumulator(key, 'gun',   h.hourly, h.hourlyTs))  realHistoryWritten++;
                 // hafta: daily son 7-8 gün
-                if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'hafta', h.daily.slice(-8)))   realHistoryWritten++;
+                if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'hafta', h.daily.slice(-8), h.dailyTs?.slice(-8)))   realHistoryWritten++;
                 // ay: daily son 30 gün
-                if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'ay',    h.daily.slice(-31)))  realHistoryWritten++;
+                if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'ay',    h.daily.slice(-31), h.dailyTs?.slice(-31)))  realHistoryWritten++;
                 // yil: monthly son 12 ay (yoksa daily son 365 günden örnekle)
-                const yearlySeries = (h.monthly && h.monthly.length >= 2)
+                // Damgalar fiyatlarla AYNI sekilde secilmeli; yoksa hizalama
+                // bozulur ve yazici zaten times uretmez ama sessizce yanlis
+                // saat yazma riski dogar.
+                const aylikVar = h.monthly && h.monthly.length >= 2;
+                const yearlySeries = aylikVar
                     ? h.monthly.slice(-12)
                     : (h.daily && h.daily.length > 30 ? h.daily.filter((_, i, a) => i % 7 === 0 || i === a.length - 1).slice(-60) : null);
-                if (yearlySeries && writeRealHistoryFromAccumulator(key, 'yil', yearlySeries)) realHistoryWritten++;
+                const yearlyTs = aylikVar
+                    ? h.monthlyTs?.slice(-12)
+                    : (h.dailyTs && h.daily && h.daily.length > 30
+                        ? h.dailyTs.filter((_, i, a) => i % 7 === 0 || i === a.length - 1).slice(-60)
+                        : undefined);
+                if (yearlySeries && writeRealHistoryFromAccumulator(key, 'yil', yearlySeries, yearlyTs)) realHistoryWritten++;
             }
             console.log(`  ✅ Gerçek piyasa history overlay: ${realHistoryWritten} dosya yazıldı`);
         } catch (e) {

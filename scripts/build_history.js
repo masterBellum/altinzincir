@@ -88,6 +88,13 @@ Object.entries(current).forEach(([key, asset]) => {
     if (!Array.isArray(h.daily))   h.daily   = [];
     if (!Array.isArray(h.monthly)) h.monthly = [];
     if (!Array.isArray(h.yearly))  h.yearly  = [];
+    // hourlyTs ile ayni gerekce, uzun araliklar icin: HAFTA/AY/YIL grafikleri de
+    // noktalarin "esit dagilmis" oldugunu varsayamaz. Gun atlandiginda (cron
+    // gecikmesi, is akisi hatasi) turetilen tarih sessizce kayar; gercek damga
+    // kayarsa bile dogru kalir.
+    if (!Array.isArray(h.dailyTs))   h.dailyTs   = [];
+    if (!Array.isArray(h.monthlyTs)) h.monthlyTs = [];
+    if (!Array.isArray(h.yearlyTs))  h.yearlyTs  = [];
 
     // ── 1. Her saat: fiyatı hourly'e ekle (max 24) ───────────────────────────
     h.hourly.push(parseFloat(price.toFixed(2)));
@@ -106,6 +113,7 @@ Object.entries(current).forEach(([key, asset]) => {
     // ── 2. İlk kez oluşturuluyorsa daily'i şimdiki fiyatla seed'le ─────────────
     if (h.daily.length === 0) {
         h.daily.push(parseFloat(price.toFixed(2)));
+        h.dailyTs.push(Math.floor(Date.now() / 1000));
     }
 
     // ── 3. Gece yarısı: günün kapanışını daily'e ekle ────────────────────────
@@ -118,25 +126,41 @@ Object.entries(current).forEach(([key, asset]) => {
         // Ay sonu mu? → monthly'e al
         if (isMonthEnd) {
             h.monthly.push(dailyClose);
+            h.monthlyTs.push(Math.floor(Date.now() / 1000));
             if (h.monthly.length > 60) h.monthly = h.monthly.slice(-60);
+            if (h.monthlyTs.length > 60) h.monthlyTs = h.monthlyTs.slice(-60);
             console.log(`  📅 [AY SONU] ${key}: ${dailyClose} → monthly`);
 
             // Yıl sonu mu? → yearly'e al
             if (isYearEnd) {
                 h.yearly.push(dailyClose);
+                h.yearlyTs.push(Math.floor(Date.now() / 1000));
                 if (h.yearly.length > 5) h.yearly = h.yearly.slice(-5);
+                if (h.yearlyTs.length > 5) h.yearlyTs = h.yearlyTs.slice(-5);
                 console.log(`  🗓️  [YIL SONU] ${key}: ${dailyClose} → yearly`);
             }
         }
 
         // Her gün (ay sonu da dahil) daily'e ekle — son 1825 gün tut (5 yıl)
         h.daily.push(dailyClose);
+        h.dailyTs.push(Math.floor(Date.now() / 1000));
         if (h.daily.length > 1825) h.daily = h.daily.slice(-1825);
+        if (h.dailyTs.length > 1825) h.dailyTs = h.dailyTs.slice(-1825);
 
         // Hourly'i temizle (yeni güne sıfırla)
         h.hourly = [];
         h.hourlyTs = [];
         console.log(`  🌅 [06:00] ${key}: ${dailyClose} → daily (${h.daily.length}/365)`);
+    }
+
+    // Eski kayitlarda damga dizileri yok. hourlyTs'de oldugu gibi SIFIRLAMA
+    // yerine hizalamayi koru: bilinmeyen eski girisler icin basa null koy,
+    // fazlaysa bastan kirp. Yazici tum damgalar gecerli degilse times
+    // uretmiyor, yani null'lar dizi dolana kadar times'i geciktirir — dogru
+    // olan da bu, uydurmak degil.
+    for (const [seri, damga] of [['daily', 'dailyTs'], ['monthly', 'monthlyTs'], ['yearly', 'yearlyTs']]) {
+        while (h[damga].length < h[seri].length) h[damga].unshift(null);
+        if (h[damga].length > h[seri].length) h[damga] = h[damga].slice(-h[seri].length);
     }
 
     updatedCount++;
