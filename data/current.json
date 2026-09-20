@@ -1,129 +1,126 @@
 {
   "_meta": {
-    "updated_at": "2026-09-20T21:32:02.332Z",
+    "updated_at": "2026-09-20T21:36:53.286Z",
     "source": "canlidoviz (altın) | Truncgil V3 (ons+platin+döviz) | Yahoo Finance (emtia+hisse) | CoinGecko (kripto)",
     "counts": {
       "gold": 14,
-      "crypto": 0,
+      "crypto": 20,
       "currency": 61
     },
-    "stale_assets": 0,
-    "warnings": [
-      "crypto: bu run'da hiç veri yazılmadı — değerler önceki run'dan geliyor"
-    ]
+    "stale_assets": 0
   },
   "gram-altin": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Gram Altın",
     "code": "GRAM",
     "type": "gold",
-    "current": 6865.8,
-    "selling": 6865.8,
-    "buying": 6864.97,
-    "change": 0,
-    "open": 6865.8
+    "current": 6864.66,
+    "selling": 6864.66,
+    "buying": 6863.83,
+    "change": -0.02,
+    "open": 6866.03
   },
   "ons": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Ons Altın",
     "code": "ONS",
     "type": "gold",
     "current": 213744.29,
     "selling": 213744.29,
     "buying": 213718.42,
-    "change": 0,
-    "open": 213744.29
+    "change": -0.02,
+    "open": 213787.05
   },
   "ceyrek-altin": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Çeyrek Altın",
     "code": "CEYREK",
     "type": "gold",
-    "current": 11306.03,
-    "selling": 11306.03,
-    "buying": 11110.08,
-    "change": 0.07,
-    "open": 11298.12
+    "current": 11306.84,
+    "selling": 11306.84,
+    "buying": 11105.15,
+    "change": 0.08,
+    "open": 11297.8
   },
   "yarim-altin": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Yarım Altın",
     "code": "YARIM",
     "type": "gold",
-    "current": 22646.43,
-    "selling": 22646.43,
-    "buying": 22220.16,
+    "current": 22647.91,
+    "selling": 22647.91,
+    "buying": 22211.63,
     "change": 0.07,
-    "open": 22630.59
+    "open": 22632.07
   },
   "tam-altin": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Tam Altın",
     "code": "TAM",
     "type": "gold",
-    "current": 45086.67,
-    "selling": 45086.67,
-    "buying": 44303.16,
+    "current": 45089.62,
+    "selling": 45089.62,
+    "buying": 44286.15,
     "change": 0.07,
-    "open": 45055.13
+    "open": 45058.08
   },
   "cumhuriyet-altini": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Cumhuriyet Altını",
     "code": "CUMHUR",
     "type": "gold",
-    "current": 46186.342,
-    "selling": 46186.342,
-    "buying": 45331.8672,
+    "current": 46189.3693,
+    "selling": 46189.3693,
+    "buying": 45314.4683,
     "change": 0.07,
-    "open": 46154.03
+    "open": 46157.06
   },
   "ata-altin": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Ata Altın",
     "code": "ATAALT",
     "type": "gold",
-    "current": 46187.0988,
-    "selling": 46187.0988,
-    "buying": 45329.3551,
-    "change": 0.07,
-    "open": 46154.79
+    "current": 46189.6531,
+    "selling": 46189.6531,
+    "buying": 45311.77,
+    "change": 0.08,
+    "open": 46152.73
   },
   "resat-altin": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Reşat Altın",
     "code": "RESAT",
     "type": "gold",
-    "current": 46386.2594,
-    "selling": 46386.2594,
-    "buying": 45622.1031,
-    "change": 0.05,
-    "open": 46363.08
+    "current": 46394.0514,
+    "selling": 46394.0514,
+    "buying": 45599.9186,
+    "change": 0.07,
+    "open": 46361.6
   },
   "hamit-altin": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Hamit Altın",
     "code": "HAMIT",
     "type": "gold",
-    "current": 46729.8613,
-    "selling": 46729.8613,
-    "buying": 45279.0798,
-    "change": 0.05,
-    "open": 46706.51
+    "current": 46737.7111,
+    "selling": 46737.7111,
+    "buying": 45257.062,
+    "change": 0.07,
+    "open": 46705.02
   },
   "gram-has-altin": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Gram Has Altın",
     "code": "HAS",
     "type": "gold",
-    "current": 6866.34,
-    "selling": 6866.34,
-    "buying": 6865.51,
-    "change": 0,
-    "open": 6866.34
+    "current": 6864.66,
+    "selling": 6864.66,
+    "buying": 6863.83,
+    "change": -0.02,
+    "open": 6866.03
   },
   "14-ayar-altin": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "14 Ayar Altın",
     "code": "14AYAR",
     "type": "gold",
@@ -134,7 +131,7 @@
     "open": 3875.28
   },
   "18-ayar-altin": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "18 Ayar Altın",
     "code": "18AYAR",
     "type": "gold",
@@ -145,29 +142,29 @@
     "open": 4963.07
   },
   "22-ayar-bilezik": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "22 Ayar Bilezik",
     "code": "22AYAR",
     "type": "gold",
-    "current": 6460.5895,
-    "selling": 6460.5895,
-    "buying": 6240.8471,
-    "change": 0.07,
-    "open": 6456.07
+    "current": 6461.0527,
+    "selling": 6461.0527,
+    "buying": 6238.0803,
+    "change": 0.08,
+    "open": 6455.89
   },
   "gumus": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Gümüş",
     "code": "GUMUS",
     "type": "commodity",
-    "current": 103.9329,
-    "selling": 103.9329,
-    "buying": 103.8859,
-    "change": 0.01,
-    "open": 103.92
+    "current": 103.91,
+    "selling": 103.91,
+    "buying": 103.86,
+    "change": -0.02,
+    "open": 103.93
   },
   "gram-platin": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Gram Platin",
     "code": "PLATIN",
     "type": "commodity",
@@ -178,7 +175,7 @@
     "open": 2827.79
   },
   "USD": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "ABD Doları",
     "code": "USD",
     "type": "currency",
@@ -189,7 +186,7 @@
     "open": 48.8101
   },
   "EUR": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Euro",
     "code": "EUR",
     "type": "currency",
@@ -200,7 +197,7 @@
     "open": 56.15
   },
   "GBP": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "İngiliz Sterlini",
     "code": "GBP",
     "type": "currency",
@@ -211,7 +208,7 @@
     "open": 65.3541
   },
   "CHF": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "İsviçre Frangı",
     "code": "CHF",
     "type": "currency",
@@ -222,7 +219,7 @@
     "open": 59.437
   },
   "CAD": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Kanada Doları",
     "code": "CAD",
     "type": "currency",
@@ -233,7 +230,7 @@
     "open": 34.9172
   },
   "RUB": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Rus Rublesi",
     "code": "RUB",
     "type": "currency",
@@ -244,7 +241,7 @@
     "open": 0.5763
   },
   "AED": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "BAE Dirhemi",
     "code": "AED",
     "type": "currency",
@@ -255,7 +252,7 @@
     "open": 13.293
   },
   "AUD": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Avustralya Doları",
     "code": "AUD",
     "type": "currency",
@@ -266,7 +263,7 @@
     "open": 34.7897
   },
   "DKK": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Danimarka Kronası",
     "code": "DKK",
     "type": "currency",
@@ -277,7 +274,7 @@
     "open": 7.503
   },
   "SEK": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "İsveç Kronası",
     "code": "SEK",
     "type": "currency",
@@ -288,7 +285,7 @@
     "open": 4.9788
   },
   "NOK": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Norveç Kronası",
     "code": "NOK",
     "type": "currency",
@@ -299,7 +296,7 @@
     "open": 5.2025
   },
   "JPY": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Japon Yeni",
     "code": "JPY",
     "type": "currency",
@@ -310,7 +307,7 @@
     "open": 0.3153
   },
   "KWD": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Kuveyt Dinarı",
     "code": "KWD",
     "type": "currency",
@@ -321,7 +318,7 @@
     "open": 158.0448
   },
   "ZAR": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Güney Afrika Randı",
     "code": "ZAR",
     "type": "currency",
@@ -332,7 +329,7 @@
     "open": 3.0097
   },
   "SAR": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Suudi Riyali",
     "code": "SAR",
     "type": "currency",
@@ -343,7 +340,7 @@
     "open": 13.0018
   },
   "ILS": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "İsrail Şekeli",
     "code": "ILS",
     "type": "currency",
@@ -354,7 +351,7 @@
     "open": 16.1062
   },
   "INR": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Hindistan Rupisi",
     "code": "INR",
     "type": "currency",
@@ -365,7 +362,7 @@
     "open": 0.5092
   },
   "MXN": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Meksika Pesosu",
     "code": "MXN",
     "type": "currency",
@@ -376,7 +373,7 @@
     "open": 2.8329
   },
   "HUF": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Macar Forinti",
     "code": "HUF",
     "type": "currency",
@@ -387,7 +384,7 @@
     "open": 0.1544
   },
   "NZD": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Yeni Zelanda Doları",
     "code": "NZD",
     "type": "currency",
@@ -398,7 +395,7 @@
     "open": 27.9302
   },
   "BRL": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Brezilya Reali",
     "code": "BRL",
     "type": "currency",
@@ -409,7 +406,7 @@
     "open": 9.4951
   },
   "CZK": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Çek Korunası",
     "code": "CZK",
     "type": "currency",
@@ -420,7 +417,7 @@
     "open": 2.3029
   },
   "PLN": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Polonya Zlotısı",
     "code": "PLN",
     "type": "currency",
@@ -431,7 +428,7 @@
     "open": 12.8542
   },
   "RON": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Rumen Leyi",
     "code": "RON",
     "type": "currency",
@@ -442,7 +439,7 @@
     "open": 10.6565
   },
   "CNY": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Çin Yuanı",
     "code": "CNY",
     "type": "currency",
@@ -453,7 +450,7 @@
     "open": 7.2926
   },
   "AZN": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Azerbaycan Manatı",
     "code": "AZN",
     "type": "currency",
@@ -464,7 +461,7 @@
     "open": 28.7118
   },
   "HKD": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Hong Kong Doları",
     "code": "HKD",
     "type": "currency",
@@ -475,7 +472,7 @@
     "open": 6.2218
   },
   "QAR": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Katar Riyali",
     "code": "QAR",
     "type": "currency",
@@ -486,7 +483,7 @@
     "open": 13.843
   },
   "SGD": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Singapur Doları",
     "code": "SGD",
     "type": "currency",
@@ -497,163 +494,163 @@
     "open": 38.2481
   },
   "btc": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Bitcoin",
     "code": "BTC",
     "type": "crypto",
-    "current": 3945298.5,
-    "selling": 3945298.5,
-    "buying": 3945298.5,
-    "change": -0.23,
-    "open": 3954393.6,
-    "priceUSD": 80789
+    "current": 3948742.98,
+    "selling": 3948742.98,
+    "buying": 3948742.98,
+    "change": -0.09,
+    "open": 3952300.05,
+    "priceUSD": 80892
   },
   "eth": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Ethereum",
     "code": "ETH",
     "type": "crypto",
-    "current": 127895.38,
-    "selling": 127895.38,
-    "buying": 127895.38,
-    "change": -0.18,
-    "open": 128126,
-    "priceUSD": 2618.95
+    "current": 128131.56,
+    "selling": 128131.56,
+    "buying": 128131.56,
+    "change": 0.04,
+    "open": 128080.33,
+    "priceUSD": 2624.84
   },
   "bnb": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "BNB",
     "code": "BNB",
     "type": "crypto",
-    "current": 37346.26,
-    "selling": 37346.26,
-    "buying": 37346.26,
-    "change": 0.8,
-    "open": 37049.86,
-    "priceUSD": 764.75
+    "current": 37383.02,
+    "selling": 37383.02,
+    "buying": 37383.02,
+    "change": 0.97,
+    "open": 37023.88,
+    "priceUSD": 765.81
   },
   "sol": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Solana",
     "code": "SOL",
     "type": "crypto",
-    "current": 5358.13,
-    "selling": 5358.13,
-    "buying": 5358.13,
-    "change": -0.91,
-    "open": 5407.34,
-    "priceUSD": 109.72
+    "current": 5368.19,
+    "selling": 5368.19,
+    "buying": 5368.19,
+    "change": -0.4,
+    "open": 5389.74,
+    "priceUSD": 109.97
   },
   "xrp": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "XRP",
     "code": "XRP",
     "type": "crypto",
-    "current": 68.37,
-    "selling": 68.37,
-    "buying": 68.37,
-    "change": -1.22,
-    "open": 69.21,
+    "current": 68.34,
+    "selling": 68.34,
+    "buying": 68.34,
+    "change": -0.59,
+    "open": 68.75,
     "priceUSD": 1.4
   },
   "doge": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Dogecoin",
     "code": "DOGE",
     "type": "crypto",
     "current": 4.23,
     "selling": 4.23,
     "buying": 4.23,
-    "change": -1.38,
-    "open": 4.29,
-    "priceUSD": 0.086559
+    "change": -0.67,
+    "open": 4.26,
+    "priceUSD": 0.086693
   },
   "ltc": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Litecoin",
     "code": "LTC",
     "type": "crypto",
-    "current": 2850.96,
-    "selling": 2850.96,
-    "buying": 2850.96,
-    "change": 1.85,
-    "open": 2799.18,
-    "priceUSD": 58.38
+    "current": 2860.07,
+    "selling": 2860.07,
+    "buying": 2860.07,
+    "change": 2.71,
+    "open": 2784.61,
+    "priceUSD": 58.59
   },
   "ada": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Cardano",
     "code": "ADA",
     "type": "crypto",
-    "current": 11,
-    "selling": 11,
-    "buying": 11,
-    "change": -0.86,
-    "open": 11.1,
-    "priceUSD": 0.22527
+    "current": 11.05,
+    "selling": 11.05,
+    "buying": 11.05,
+    "change": -0.26,
+    "open": 11.08,
+    "priceUSD": 0.226326
   },
   "avax": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Avalanche",
     "code": "AVAX",
     "type": "crypto",
-    "current": 541.58,
-    "selling": 541.58,
-    "buying": 541.58,
-    "change": 14.33,
-    "open": 473.7,
-    "priceUSD": 11.09
+    "current": 547.7,
+    "selling": 547.7,
+    "buying": 547.7,
+    "change": 16.39,
+    "open": 470.58,
+    "priceUSD": 11.22
   },
   "dot": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Polkadot",
     "code": "DOT",
     "type": "crypto",
-    "current": 55.18,
-    "selling": 55.18,
-    "buying": 55.18,
-    "change": 2.62,
-    "open": 53.77,
-    "priceUSD": 1.13
+    "current": 55.65,
+    "selling": 55.65,
+    "buying": 55.65,
+    "change": 3.74,
+    "open": 53.64,
+    "priceUSD": 1.14
   },
   "link": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Chainlink",
     "code": "LINK",
     "type": "crypto",
-    "current": 605.55,
-    "selling": 605.55,
-    "buying": 605.55,
-    "change": 0.14,
-    "open": 604.7,
-    "priceUSD": 12.4
+    "current": 607.26,
+    "selling": 607.26,
+    "buying": 607.26,
+    "change": 0.85,
+    "open": 602.14,
+    "priceUSD": 12.44
   },
   "atom": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Cosmos",
     "code": "ATOM",
     "type": "crypto",
-    "current": 85.95,
-    "selling": 85.95,
-    "buying": 85.95,
-    "change": 2.57,
-    "open": 83.8,
-    "priceUSD": 1.76
+    "current": 86.4,
+    "selling": 86.4,
+    "buying": 86.4,
+    "change": 2.34,
+    "open": 84.43,
+    "priceUSD": 1.77
   },
   "trx": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "TRON",
     "code": "TRX",
     "type": "crypto",
-    "current": 16.74,
-    "selling": 16.74,
-    "buying": 16.74,
-    "change": 1.02,
-    "open": 16.57,
-    "priceUSD": 0.342783
+    "current": 16.72,
+    "selling": 16.72,
+    "buying": 16.72,
+    "change": 1,
+    "open": 16.56,
+    "priceUSD": 0.342603
   },
   "matic": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Polygon",
     "code": "POL",
     "type": "crypto",
@@ -665,90 +662,90 @@
     "priceUSD": 0.126156
   },
   "shib": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Shiba Inu",
     "code": "SHIB",
     "type": "crypto",
-    "current": 0.000267,
-    "selling": 0.000267,
-    "buying": 0.000267,
-    "change": -0.51,
-    "open": 0.000268,
-    "priceUSD": 0.00000546
+    "current": 0.000268,
+    "selling": 0.000268,
+    "buying": 0.000268,
+    "change": 0.59,
+    "open": 0.000266,
+    "priceUSD": 0.00000548
   },
   "near": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "NEAR Protocol",
     "code": "NEAR",
     "type": "crypto",
-    "current": 201.69,
-    "selling": 201.69,
-    "buying": 201.69,
-    "change": 16.84,
-    "open": 172.62,
-    "priceUSD": 4.13
+    "current": 205.02,
+    "selling": 205.02,
+    "buying": 205.02,
+    "change": 18.53,
+    "open": 172.97,
+    "priceUSD": 4.2
   },
   "uni": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Uniswap",
     "code": "UNI",
     "type": "crypto",
-    "current": 424.86,
-    "selling": 424.86,
-    "buying": 424.86,
-    "change": 2.02,
-    "open": 416.45,
-    "priceUSD": 8.7
+    "current": 427.62,
+    "selling": 427.62,
+    "buying": 427.62,
+    "change": 2.71,
+    "open": 416.34,
+    "priceUSD": 8.76
   },
   "arb": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Arbitrum",
     "code": "ARB",
     "type": "crypto",
-    "current": 10.37,
-    "selling": 10.37,
-    "buying": 10.37,
-    "change": 4.02,
-    "open": 9.97,
-    "priceUSD": 0.2123
+    "current": 10.49,
+    "selling": 10.49,
+    "buying": 10.49,
+    "change": 5.73,
+    "open": 9.92,
+    "priceUSD": 0.214875
   },
   "ton": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Toncoin",
     "code": "TON",
     "type": "crypto",
-    "current": 66.9,
-    "selling": 66.9,
-    "buying": 66.9,
-    "change": -0.74,
-    "open": 67.4,
-    "priceUSD": 1.37
+    "current": 67.36,
+    "selling": 67.36,
+    "buying": 67.36,
+    "change": -0.08,
+    "open": 67.42,
+    "priceUSD": 1.38
   },
   "sui": {
-    "ts": "2026-09-20T21:26:17.161Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Sui",
     "code": "SUI",
     "type": "crypto",
-    "current": 42.82,
-    "selling": 42.82,
-    "buying": 42.82,
-    "change": 2.41,
-    "open": 41.81,
-    "priceUSD": 0.876891
+    "current": 43.23,
+    "selling": 43.23,
+    "buying": 43.23,
+    "change": 3.73,
+    "open": 41.68,
+    "priceUSD": 0.885601
   },
   "_daily_open": {
     "date": "2026-09-21",
     "prices": {}
   },
   "gremse-altin": {
-    "ts": "2026-09-20T21:31:35.845Z",
+    "ts": "2026-09-20T21:36:36.497Z",
     "name": "Gremse Altın",
     "code": "GREMSE",
     "type": "gold",
-    "current": 112373.0196,
-    "selling": 112373.0196,
-    "buying": 110072.083,
+    "current": 112380.3851,
+    "selling": 112380.3851,
+    "buying": 110029.8359,
     "change": 0.07,
-    "open": 112294.41
+    "open": 112301.77
   }
 }
