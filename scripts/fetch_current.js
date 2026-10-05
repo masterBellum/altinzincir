@@ -141,23 +141,23 @@ async function fetchSikkeFiyati(slug) {
         // Sayfanın asıl varlığının değişimi `class="currency-change-text-lg"` hero
         // etiketinde. Yedek: itemprop=price'ın hemen yakınındaki `cp` (önceki kapanış)
         // ile current price farkını hesapla.
-        const satisM = html.match(/itemprop="price"[^>]*>\s*([\d]+(?:\.\d+)?)/);
-        const alisM  = html.match(/dt="bA"[^>]*>\s*([\d]+(?:\.\d+)?)/);
+        const satisM = html.match(/itemprop="price"[^>]*>\s*([\d.,]+)/);
+        const alisM  = html.match(/dt="bA"[^>]*>\s*([\d.,]+)/);
         // Hero badge: class="currency-change-text-lg" ... dt="change" ... > %X.YZ
-        let chgM = html.match(/class="currency-change-text-lg"[^>]*dt="change"[^>]*>\s*%(-?\d+(?:\.\d+)?)/);
+        let chgM = html.match(/class="currency-change-text-lg"[^>]*dt="change"[^>]*>\s*%(-?[\d.,]+)/);
         // Alternatif sıra: dt="change" ... class="currency-change-text-lg"
-        if (!chgM) chgM = html.match(/dt="change"[^>]*class="currency-change-text-lg"[^>]*>\s*%(-?\d+(?:\.\d+)?)/);
+        if (!chgM) chgM = html.match(/dt="change"[^>]*class="currency-change-text-lg"[^>]*>\s*%(-?[\d.,]+)/);
         // Son çare: hero `dt="amount"` etiketindeki cp (prev close) ile satış farkı
         let chgFromCp = null;
-        const cpM = html.match(/itemprop="price"[\s\S]{0,300}cp="([\d.]+)"/);
+        const cpM = html.match(/itemprop="price"[\s\S]{0,1000}?cp="([\d.,]+)"/);
         if (cpM && satisM) {
-            const cp = parseFloat(cpM[1]);
-            const px = parseFloat(satisM[1]);
+            const cp = sayiCanlidoviz(cpM[1]);
+            const px = sayiCanlidoviz(satisM[1]);
             if (cp > 0 && px > 0) chgFromCp = parseFloat(((px - cp) / cp * 100).toFixed(2));
         }
-        const satis  = satisM ? parseFloat(satisM[1]) : NaN;
-        const alis   = alisM  ? parseFloat(alisM[1])  : NaN;
-        const change = chgM   ? parseFloat(chgM[1])   : (chgFromCp != null ? chgFromCp : NaN);
+        const satis  = satisM ? sayiCanlidoviz(satisM[1]) : NaN;
+        const alis   = alisM  ? sayiCanlidoviz(alisM[1])  : NaN;
+        const change = chgM   ? sayiCanlidoviz(chgM[1])   : (chgFromCp != null ? chgFromCp : NaN);
         if (isNaN(satis) || satis <= 0) return null;
         return {
             alis: isNaN(alis) || alis <= 0 ? parseFloat((satis * 0.986).toFixed(4)) : alis,
@@ -235,6 +235,23 @@ async function fetchFawazRate(currencyCode) {
     if (!data || !data[base]) return null;
     const rate = data[base]['try'];
     return (rate && rate > 0) ? parseFloat(rate.toFixed(4)) : null;
+}
+
+// canlidoviz sayfasindaki sayi. Ekim 2026 basinda site Turkce bicime gecti:
+// "6.588,77" (nokta binlik, virgul ondalik); oncesinde "6588.77" yaziyordu.
+// Eski desen yalnizca "6.588"i yakaliyor ve ondalik saniyordu: gram altin
+// 6,588 TL, butun altin turleri 1000 kat kucuk yayinlandi; "%0,70" da "0"
+// okundugu icin degisimler hep %0 cikti. Iki bicimi de cozer.
+function sayiCanlidoviz(val) {
+    if (val == null) return NaN;
+    const s = String(val).trim();
+    if (!s) return NaN;
+    const virgul = s.lastIndexOf(','), nokta = s.lastIndexOf('.');
+    if (virgul > nokta) return parseFloat(s.replace(/\./g, '').replace(',', '.'));
+    if (nokta > virgul && virgul >= 0) return parseFloat(s.replace(/,/g, ''));
+    // Virgulsuz "6.588": kurussuz Turkce binlik. "6588.77": eski bicim.
+    if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) return parseFloat(s.replace(/\./g, ''));
+    return parseFloat(s);
 }
 
 function parseTR(val) {
@@ -610,9 +627,29 @@ async function run() {
     // canlidoviz tek kaynak → gram düşerken çeyrek/yarım/tam da yakın yüzdede düşer.
     console.log('⬇️  canlidoviz altın fiyatları çekiliyor...');
     let goldCount = 0;
+    const altinlar = [];
     for (const item of GOLD_SLUGS) {
         const data = await fetchSikkeFiyati(item.slug);
-        if (!data) continue;
+        if (data) altinlar.push({ item, data });
+        await new Promise(r => setTimeout(r, 100));
+    }
+    // Akil kontrolu: sayfa bicimi bir daha degisirse yanlis fiyati YAYINLAMA.
+    // Gram altin, ons altinin (Truncgil, bu run) gram karsiligina kuyumcu
+    // makasi kadar yakin olmali. Ekim 2026'daki bicim degisikliginde oran
+    // 0,001'di ve dort gun boyunca kimse fark etmedi. Kontrol tutmazsa altinlar
+    // onceki degerlerinde kalir; ts eskir, 2 saat sonra bayat uyarisi ve veri
+    // sagligi bekcisi devreye girer.
+    const onsGram = (current['ons']?.ts === NOW && current['ons'].current > 0)
+        ? current['ons'].current / 31.1035 : null;
+    const gramVeri = altinlar.find(a => a.item.key === 'gram-altin')?.data;
+    if (onsGram && gramVeri) {
+        const oran = gramVeri.satis / onsGram;
+        if (oran < 0.8 || oran > 1.25) {
+            console.error(`  ❌ canlidoviz gram altin ${gramVeri.satis} TL, ons karsiligi ${onsGram.toFixed(2)} TL (oran ${oran.toFixed(4)}) — altinlar YAZILMADI, sayfa bicimi degismis olabilir`);
+            altinlar.length = 0;
+        }
+    }
+    for (const { item, data } of altinlar) {
         const meta = GOLD_MAP[item.key] || { name: item.key, code: item.key.toUpperCase(), type: 'gold' };
         const realChg = data.change !== null ? data.change : 0;
         const computedOpen = realChg !== -100
@@ -628,7 +665,6 @@ async function run() {
             open:    computedOpen,
         };
         goldCount++;
-        await new Promise(r => setTimeout(r, 100));
     }
 
     // ── Sikke altinlarinin degisim yuzdesini gram altindan turet ─────────────
