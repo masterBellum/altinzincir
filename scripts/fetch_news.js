@@ -120,6 +120,15 @@ async function run() {
         process.exit(1);
     }
 
+    // Yabanci piyasa haberleri. Google News'in TR baskisi Vietnam.vn'in
+    // Turkceye makine cevirisi altin haberlerini de donduruyor (VND fiyatlari,
+    // SJC altini): 2026-10-18'de yayinlanan 50 haberin 9'u. Turk kullanici
+    // icin anlamsiz ve "altin dustu" basliklariyla yaniltici.
+    const YABANCI = /vietnam|VND|SJC/i;
+    const once = items.length;
+    items = items.filter(i => !YABANCI.test(i.title || '') && !YABANCI.test(String(i.source || '')));
+    if (once !== items.length) console.log(`🚫 Yabanci piyasa haberi elendi: ${once - items.length}`);
+
     // Tarihe göre sırala (en yeni önce)
     items.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
