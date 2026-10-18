@@ -6,7 +6,7 @@
  *
  * Rollup mantığı (foto 2):
  *   1 saat    → hourly[]  : son 24 giriş tutulur (intraday grafik)
- *   Gece 00:00 → daily[]  : son saatin fiyatı günün kapanışı olur, hourly temizlenir
+ *   Gece 00:00 → daily[]  : son saatin fiyatı günün kapanışı olur, hourly korunur (kayan 24)
  *   7 gün dolunca          : 8. gün silinir (rolling 7-day pencere)
  *   Ay sonu    → monthly[]: o günün fiyatı aylık kapanış olur, daily'den çıkarılır
  *   12 ay dolunca          : 13. ay silinir
@@ -166,9 +166,11 @@ Object.entries(current).forEach(([key, asset]) => {
         if (h.daily.length > 1825) h.daily = h.daily.slice(-1825);
         if (h.dailyTs.length > 1825) h.dailyTs = h.dailyTs.slice(-1825);
 
-        // Hourly'i temizle (yeni güne sıfırla)
-        h.hourly = [];
-        h.hourlyTs = [];
+        // hourly BILEREK temizlenmiyor; zaten son 24 kayitla sinirli (kayan pencere).
+        // Eskiden burada sifirlaniyordu: gun siniri sonrasi seri 2 noktanin altina
+        // dusunce fetch_current.js "gun" dosyasini Yahoo'nun 5 dk verisiyle
+        // dolduruyordu. Hafta sonu bu, CUMANIN egrisinin "bugun" diye gosterilmesi
+        // demekti (olculen: 2026-10-18 pazar 07:37 UTC, gram altin GUN grafigi).
         console.log(`  🌅 [GUN] ${key}: ${dailyClose} → daily (${h.daily.length})`);
     }
 
