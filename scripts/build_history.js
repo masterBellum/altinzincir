@@ -115,7 +115,7 @@ Object.entries(current).forEach(([key, asset]) => {
     if (!Array.isArray(h.monthlyTs)) h.monthlyTs = [];
     if (!Array.isArray(h.yearlyTs))  h.yearlyTs  = [];
 
-    // ── 1. Her saat: fiyatı hourly'e ekle (max 24) ───────────────────────────
+    // ── 1. Her saat: fiyatı hourly'e ekle (max 24, son 24 saat) ───────────────────────────
     h.hourly.push(yuvarla(price));
     h.hourlyTs.push(nowSn);
     if (h.hourly.length > 24) h.hourly = h.hourly.slice(-24);
@@ -128,6 +128,16 @@ Object.entries(current).forEach(([key, asset]) => {
     // döngüden çıkınca kendiliğinden düzelir.
     while (h.hourlyTs.length < h.hourly.length) h.hourlyTs.unshift(null);
     if (h.hourlyTs.length > h.hourly.length) h.hourlyTs = h.hourlyTs.slice(-h.hourly.length);
+
+    // "Son 24 KAYIT" "son 24 SAAT" demek degil: GitHub zamanlayicisi bu isi
+    // saatte bir degil 3-6 saatte bir calistiriyor, 24 kayit 2 gunu asiyordu
+    // ve GUN grafigi 18-20 Ekim'i gosteriyordu (2026-10-20). Damgasi olan
+    // girislerde 24 saatten eskileri at; grafik cizilebilsin diye en az 2 kalsin.
+    const sinir = nowSn - 24 * 3600;
+    let ilk = h.hourlyTs.findIndex(t => t !== null && t >= sinir);
+    if (ilk === -1) ilk = h.hourlyTs.length;
+    ilk = Math.min(ilk, Math.max(0, h.hourly.length - 2));
+    if (ilk > 0) { h.hourly = h.hourly.slice(ilk); h.hourlyTs = h.hourlyTs.slice(ilk); }
 
     // ── 2. İlk kez oluşturuluyorsa daily'i şimdiki fiyatla seed'le ─────────────
     if (h.daily.length === 0) {
