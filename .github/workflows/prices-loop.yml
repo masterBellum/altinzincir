@@ -104,8 +104,15 @@ jobs:
       # Döngü başarıyla bittiyse bir sonraki çalışmayı başlat. İptal edilen
       # (yeni bir çalışmanın ezdiği) ya da düşen çalışma zinciri sürdürmez;
       # o durumda saatlik cron yeniden başlatır.
+      #
+      # Aynı anda saatlik geçmiş işini de tetikler: history.yml'in kendi
+      # cron'u da 3-6 saatte bir geliyordu ve GÜN grafiği 24 saatte 5-6
+      # nokta alıyordu. Döngü ~55 dk sürdüğü için bu yaklaşık saatlik kadans
+      # verir. ÖNCE döngü tetiklenir; geçmiş tetiklemesi düşerse zincir kopmaz.
       - name: Zinciri sürdür
         if: success()
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run prices-loop.yml --ref main -R "${{ github.repository }}"
+        run: |
+          gh workflow run prices-loop.yml --ref main -R "${{ github.repository }}"
+          gh workflow run history.yml --ref main -R "${{ github.repository }}"             || echo "⚠️  history tetiklenemedi (zincir sürüyor)"
