@@ -1,11 +1,10 @@
 name: Canlı Fiyat Güncellemesi (5 dk)
 
+# Zamanlama KALDIRILDI (2026-10-24). Fiyatları artık kendini zincirleyen
+# prices-loop.yml yazıyor; bu işin cron'u ayrı concurrency grubunda aynı
+# data/current.json'u yazıp push yarışına giriyordu (eski görüntünün yenisini
+# ezme olasılığı, Codex incelemesi 10-18 P1). Elle ve harici tetikleme kaldı.
 on:
-  schedule:
-    # YEDEK tetikleyici. GitHub scheduled cron'u ağır throttle'lıyor —
-    # ölçülen gerçek aralık ~57 dk. Asıl tetikleme repository_dispatch ile
-    # harici cron servisinden (cron-job.org) geliyor.
-    - cron: '*/5 * * * *'
   repository_dispatch:
     types: [fetch-prices]
   workflow_dispatch: # Manuel tetikleme butonu

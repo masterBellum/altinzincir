@@ -22,19 +22,28 @@ name: Canlı Fiyat Döngüsü (saatlik, içinde 5 dk)
 #
 # Bu, harici cron'un yerine geçen PRATİK çözüm. Harici cron hâlâ daha temiz
 # (runner'ı meşgul etmez); kurulursa bu workflow kapatılabilir.
+#
+# ZİNCİR (2026-10-24): saatlik cron da düzenli gelmiyor — 17-24 Ekim'de
+# çalışmalar 3-6 saat arayla başladı, her biri 54 dk sürdü; günün ~%25'inde
+# taze fiyat vardı. Artık döngü bitince kendini workflow_dispatch ile yeniden
+# başlatıyor. GITHUB_TOKEN workflow_dispatch tetikleyebilir (diğer olayları
+# tetikleyemez), yani token/harici servis gerekmiyor. Zincir koparsa (tur
+# hatası, iptal) saatlik cron yedek olarak yeniden başlatır. İki zincir
+# oluşmaz: aynı concurrency grubunda yeni çalışma eskisini iptal eder.
 
 on:
   schedule:
     - cron: '0 * * * *'
   workflow_dispatch:
 
-# Kendi grubunda ve yeni çalışma eskisini İPTAL EDER: bir döngü takılıp kalırsa
-# bir sonraki saat temiz başlasın. prices.yml'in grubundan ayrı, çünkü orası
-# cancel-in-progress: false kullanıyor ve 55 dakikalık bir işin arkasında
-# kuyruğa girmesi istenmez.
+# Yeni çalışma eskisini İPTAL ETMEZ, sırada bekler (2026-10-24'e kadar
+# ediyordu). Zincir sürekli çalıştığı için saatlik cron her geldiğinde koşan
+# döngüyü yarıda, bazen push ortasında öldürürdü. Sırada en fazla bir bekleyen
+# kalır (GitHub daha eski bekleyeni düşürür), yani zincir + cron iki paralel
+# döngü üretmez. Takılan döngüyü timeout-minutes: 58 bitirir.
 concurrency:
   group: data-push-prices-loop
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   dongu:
@@ -43,6 +52,7 @@ jobs:
     timeout-minutes: 58
     permissions:
       contents: write
+      actions: write   # zincir: kendini yeniden tetiklemek için
 
     steps:
       - name: Kodu Al
@@ -90,3 +100,12 @@ jobs:
               fi
               sleep "$ARALIK_SN"
           done
+
+      # Döngü başarıyla bittiyse bir sonraki çalışmayı başlat. İptal edilen
+      # (yeni bir çalışmanın ezdiği) ya da düşen çalışma zinciri sürdürmez;
+      # o durumda saatlik cron yeniden başlatır.
+      - name: Zinciri sürdür
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run prices-loop.yml --ref main -R "${{ github.repository }}"
