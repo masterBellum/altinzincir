@@ -115,6 +115,44 @@ Object.entries(current).forEach(([key, asset]) => {
     if (!Array.isArray(h.monthlyTs)) h.monthlyTs = [];
     if (!Array.isArray(h.yearlyTs))  h.yearlyTs  = [];
 
+    // ── 0. Biten islem gununun kapanisi (fiyat eklenmeden ONCE) ──────────────
+    // Eskiden kapanis "son hourly" idi; ama 1. adim su anki fiyati (YENI gunun
+    // fiyatini) once ekliyordu, yani "dunun kapanisi" bugunun ilk fiyati ve
+    // damgasiyla yaziliyordu. Ay/yil kapanisi da ayni degeri aliyordu: 1 Ekim
+    // 07:14 UTC fiyati "Eylul kapanisi" diye YIL grafigine giriyordu (Codex
+    // 10-18 P2). Artik biten gune ait SON olcum ve onun damgasi kullaniliyor;
+    // o gune ait olcum hic yoksa (cron boslugu) eskisi gibi su anki fiyat.
+    let kapanis = null, kapanisTs = null;
+    if (isMidnight) {
+        const kayma = h.hourly.length - h.hourlyTs.length; // eski kayitlarda Ts kisa olabilir
+        for (let i = h.hourly.length - 1; i >= 0; i--) {
+            const t = h.hourlyTs[i - kayma];
+            if (t == null) continue;
+            if (islemGunu(new Date(t * 1000)) < bugun) { kapanis = h.hourly[i]; kapanisTs = t; break; }
+        }
+    }
+    // Secilen olcum zaten kayitliysa (damgasi son kaydin damgasindan yeni
+    // degilse) kullanma: eski kodun "kapanis" diye yazdigi son nokta aslinda
+    // yeni gunun ilk olcumuydu; ayni olcum ikinci kez, ayni damgayla girerdi
+    // (canli veri, 2026-10-24 06:43). O durumda eski davranis: su anki fiyat.
+    const sonGunlukTs = h.dailyTs.length ? h.dailyTs[h.dailyTs.length - 1] : null;
+    if (kapanisTs != null && sonGunlukTs != null && kapanisTs <= sonGunlukTs) { kapanis = null; kapanisTs = null; }
+    // Ay/yil kapanisi icin ek kosul: olcum Turkiye saatiyle (UTC+3, yaz saati
+    // yok) YENI AY baslamadan once olmali. Islem gunu kapanisi 1 Ekim 04:00 UTC
+    // olabilir (06:00 sinirindan once) ama uygulama onu "Eki" diye etiketler.
+    let ayKapanis = null, ayKapanisTs = null;
+    if (isMonthEnd) {
+        const [y, m] = bugun.slice(0, 7).split('-').map(Number);
+        const ayBasi = Date.UTC(y, m - 1, 1) / 1000 - 3 * 3600; // TR 00:00
+        const kayma = h.hourly.length - h.hourlyTs.length;
+        for (let i = h.hourly.length - 1; i >= 0; i--) {
+            const t = h.hourlyTs[i - kayma];
+            if (t != null && t < ayBasi) { ayKapanis = h.hourly[i]; ayKapanisTs = t; break; }
+        }
+        const sonAylikTs = h.monthlyTs.length ? h.monthlyTs[h.monthlyTs.length - 1] : null;
+        if (ayKapanisTs != null && sonAylikTs != null && ayKapanisTs <= sonAylikTs) { ayKapanis = null; ayKapanisTs = null; }
+    }
+
     // ── 1. Her saat: fiyatı hourly'e ekle (max 24, son 24 saat) ───────────────────────────
     h.hourly.push(yuvarla(price));
     h.hourlyTs.push(nowSn);
@@ -147,32 +185,33 @@ Object.entries(current).forEach(([key, asset]) => {
 
     // ── 3. Gece yarısı: günün kapanışını daily'e ekle ────────────────────────
     if (isMidnight) {
-        // Son hourly fiyatı = günün kapanışı
-        const dailyClose = h.hourly.length > 0
-            ? h.hourly[h.hourly.length - 1]
-            : yuvarla(price);
+        // Biten gunun son olcumu (bkz. 0. adim); yoksa su anki fiyat.
+        const dailyClose = kapanis ?? yuvarla(price);
+        const kapanisAni = kapanisTs ?? nowSn;
 
         // Ay sonu mu? → monthly'e al
         if (isMonthEnd) {
-            h.monthly.push(dailyClose);
-            h.monthlyTs.push(nowSn);
+            const ayDeger = ayKapanis ?? dailyClose;
+            const ayAni   = ayKapanisTs ?? kapanisAni;
+            h.monthly.push(ayDeger);
+            h.monthlyTs.push(ayAni);
             if (h.monthly.length > 60) h.monthly = h.monthly.slice(-60);
             if (h.monthlyTs.length > 60) h.monthlyTs = h.monthlyTs.slice(-60);
-            console.log(`  📅 [AY SONU] ${key}: ${dailyClose} → monthly`);
+            console.log(`  📅 [AY SONU] ${key}: ${ayDeger} → monthly`);
 
             // Yıl sonu mu? → yearly'e al
             if (isYearEnd) {
-                h.yearly.push(dailyClose);
-                h.yearlyTs.push(nowSn);
+                h.yearly.push(ayDeger);
+                h.yearlyTs.push(ayAni);
                 if (h.yearly.length > 5) h.yearly = h.yearly.slice(-5);
                 if (h.yearlyTs.length > 5) h.yearlyTs = h.yearlyTs.slice(-5);
-                console.log(`  🗓️  [YIL SONU] ${key}: ${dailyClose} → yearly`);
+                console.log(`  🗓️  [YIL SONU] ${key}: ${ayDeger} → yearly`);
             }
         }
 
         // Her gün (ay sonu da dahil) daily'e ekle — son 1825 gün tut (5 yıl)
         h.daily.push(dailyClose);
-        h.dailyTs.push(nowSn);
+        h.dailyTs.push(kapanisAni);
         if (h.daily.length > 1825) h.daily = h.daily.slice(-1825);
         if (h.dailyTs.length > 1825) h.dailyTs = h.dailyTs.slice(-1825);
 
