@@ -60,7 +60,10 @@ function parseRSS(xml) {
         const source  = block.match(/<source[^>]*>([^<]*)<\/source>/)?.[1]?.trim() || 'Google News';
         if (title && link) {
             items.push({
-                id:       Buffer.from(link).toString('base64').slice(0, 16),
+                // Kimlik baglantinin OZETI. Eskiden base64'un ilk 16 karakteriydi;
+                // butun Google News baglantilari ayni onekle basladigi icin 50
+                // haberin 50'si ayni kimligi aliyordu ("https://news").
+                id:       require('crypto').createHash('sha1').update(link).digest('hex').slice(0, 16),
                 title,
                 source,
                 url:      link,
@@ -128,6 +131,15 @@ async function run() {
     const once = items.length;
     items = items.filter(i => !YABANCI.test(i.title || '') && !YABANCI.test(String(i.source || '')));
     if (once !== items.length) console.log(`🚫 Yabanci piyasa haberi elendi: ${once - items.length}`);
+
+    // Turkiye'den erisilemeyen kaynaklar. Traders Union (tradersunion.com)
+    // erisim engelli: DNS engel sayfasina (213.14.227.50) cozuluyor,
+    // haber Chrome'da ERR_CONNECTION_TIMED_OUT veriyor. 2026-10-25'te
+    // 50 haberin 5'i bu kaynaktandi ve hicbiri acilmiyordu.
+    const ERISILEMEZ = /traders ?union/i;
+    const once2 = items.length;
+    items = items.filter(i => !ERISILEMEZ.test(String(i.source || '')));
+    if (once2 !== items.length) console.log(`🚫 Erisilemeyen kaynak elendi: ${once2 - items.length}`);
 
     // Tarihe göre sırala (en yeni önce)
     items.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
