@@ -58,6 +58,9 @@ function parseRSS(xml) {
         const link    = get('link');
         const pubDate = get('pubDate');
         const source  = block.match(/<source[^>]*>([^<]*)<\/source>/)?.[1]?.trim() || 'Google News';
+        const kaynakUrl = block.match(/<source url="([^"]+)"/)?.[1] || '';
+        let kaynakAlan = '';
+        try { kaynakAlan = new URL(kaynakUrl).hostname.replace(/^www\./, ''); } catch (_) {}
         if (title && link) {
             items.push({
                 // Kimlik baglantinin OZETI. Eskiden base64'un ilk 16 karakteriydi;
@@ -67,6 +70,7 @@ function parseRSS(xml) {
                 title,
                 source,
                 url:      link,
+                kaynakAlan,
                 publishedAt: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
                 category: 'general'
             });
@@ -132,13 +136,19 @@ async function run() {
     items = items.filter(i => !YABANCI.test(i.title || '') && !YABANCI.test(String(i.source || '')));
     if (once !== items.length) console.log(`🚫 Yabanci piyasa haberi elendi: ${once - items.length}`);
 
-    // Turkiye'den erisilemeyen kaynaklar. Traders Union (tradersunion.com)
-    // erisim engelli: DNS engel sayfasina (213.14.227.50) cozuluyor,
-    // haber Chrome'da ERR_CONNECTION_TIMED_OUT veriyor. 2026-10-25'te
-    // 50 haberin 5'i bu kaynaktandi ve hicbiri acilmiyordu.
-    const ERISILEMEZ = /traders ?union/i;
+    // Turkiye'de erisime engellenmis kaynaklar — ALAN ADINA gore (Google
+    // News <source url> veriyor; kaynak adi degisebilir, alan adi degismez).
+    // GitHub Actions ABD'de calistigi icin engeli burada olcemiyoruz; liste
+    // Turkiye'deki bir baglantidan olculdu (2026-10-25, 88 kaynak denendi):
+    //   tradersunion.com — engel IP'sine (213.14.227.50) cozuluyor, zaman asimi
+    //   t24.com.tr       — "29/09/2026 tarihli 2026/8894 D.Is sayili Istanbul
+    //                      1. Sulh Ceza Hakimligi karariyla erisime engellenmistir"
+    // Yeniden olcmek icin: kaynak alan adlarini topla, Turk DNS'iyle coz;
+    // 195.175.254.2 / 213.14.227.50 donenler ve engel sayfasi verenler engelli.
+    const ERISILEMEZ = new Set(['tradersunion.com', 't24.com.tr']);
     const once2 = items.length;
-    items = items.filter(i => !ERISILEMEZ.test(String(i.source || '')));
+    items = items.filter(i => !ERISILEMEZ.has(i.kaynakAlan));
+    items.forEach(i => delete i.kaynakAlan);
     if (once2 !== items.length) console.log(`🚫 Erisilemeyen kaynak elendi: ${once2 - items.length}`);
 
     // Tarihe göre sırala (en yeni önce)
