@@ -966,10 +966,36 @@ async function run() {
                 if (key.startsWith('_') || !h || typeof h !== 'object') continue;
                 // gun: hourly (24'e kadar)  — en azından 2 nokta varsa
                 if (h.hourly  && h.hourly.length  >= 2 && writeRealHistoryFromAccumulator(key, 'gun',   h.hourly, h.hourlyTs))  realHistoryWritten++;
+                // HAFTA / AY / YIL serileri KAPANISLARDAN olusuyor (gunluk, aylik);
+                // son nokta dunun ya da gecen ayin kapanisiydi. Ekranin ustundeki
+                // fiyat ve yuzde ise canli fiyattan hesaplaniyor: grafik basligi
+                // tutmuyordu. Yil grafiginde daha kotusu: zaman damgasi olmayan
+                // seride uygulama son noktayi "bu ay" sayiyor, yani Eylul kapanisi
+                // (gram 6.594) "Eki" etiketiyle gorunuyor, Ekim'in kendisi yoktu
+                // (2026-10-27, cihazda olculdu). Son noktaya canli fiyat eklenir;
+                // nokta sayisi degismesin diye en eskisi duser.
+                const canli   = Number(current[key]?.current);
+                const simdiSn = Math.floor(Date.now() / 1000);
+                const canliEkle = (seri, damga, adet) => {
+                    if (!Array.isArray(seri)) return [seri, damga];
+                    if (!(canli > 0)) return [seri.slice(-adet), damga?.slice(-adet)];
+                    const sonDamga = Array.isArray(damga) ? damga[damga.length - 1] : null;
+                    if (Number.isFinite(sonDamga) && sonDamga >= simdiSn) return [seri.slice(-adet), damga.slice(-adet)];
+                    return [
+                        [...seri.slice(-(adet - 1)), canli],
+                        Array.isArray(damga) ? [...damga.slice(-(adet - 1)), simdiSn] : undefined,
+                    ];
+                };
                 // hafta: daily son 7-8 gün
-                if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'hafta', h.daily.slice(-8), h.dailyTs?.slice(-8)))   realHistoryWritten++;
+                if (h.daily && h.daily.length >= 2) {
+                    const [p, t] = canliEkle(h.daily, h.dailyTs, 8);
+                    if (writeRealHistoryFromAccumulator(key, 'hafta', p, t)) realHistoryWritten++;
+                }
                 // ay: daily son 30 gün
-                if (h.daily   && h.daily.length   >= 2 && writeRealHistoryFromAccumulator(key, 'ay',    h.daily.slice(-31), h.dailyTs?.slice(-31)))  realHistoryWritten++;
+                if (h.daily && h.daily.length >= 2) {
+                    const [p, t] = canliEkle(h.daily, h.dailyTs, 31);
+                    if (writeRealHistoryFromAccumulator(key, 'ay', p, t)) realHistoryWritten++;
+                }
                 // yil: monthly son 12 ay (yoksa daily son 365 günden örnekle)
                 // Damgalar fiyatlarla AYNI sekilde secilmeli; yoksa hizalama
                 // bozulur ve yazici zaten times uretmez ama sessizce yanlis
@@ -983,7 +1009,10 @@ async function run() {
                     : (h.dailyTs && h.daily && h.daily.length > 30
                         ? h.dailyTs.filter((_, i, a) => i % 7 === 0 || i === a.length - 1).slice(-60)
                         : undefined);
-                if (yearlySeries && writeRealHistoryFromAccumulator(key, 'yil', yearlySeries, yearlyTs)) realHistoryWritten++;
+                if (yearlySeries) {
+                    const [p, t] = canliEkle(yearlySeries, yearlyTs, yearlySeries.length);
+                    if (writeRealHistoryFromAccumulator(key, 'yil', p, t)) realHistoryWritten++;
+                }
             }
             console.log(`  ✅ Gerçek piyasa history overlay: ${realHistoryWritten} dosya yazıldı`);
         } catch (e) {
